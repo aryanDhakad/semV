@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { db } from "../firebase";
 
 function CreateQuiz() {
+  const quizID = useRef();
   const [question, setQuestion] = useState({
-    questionNo: 0,
+    questionNo: "",
     questionContent: "",
     questionOptions: [],
   });
@@ -13,6 +14,8 @@ function CreateQuiz() {
     optionIsCorrect: false,
     optionWeightage: 1,
   });
+
+  const [questionList, setQuestionList] = useState([]);
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -54,19 +57,46 @@ function CreateQuiz() {
     });
   }
 
-  //   const [questionList, setQuestionList] = useState([]);
+  function addQuestion() {
+    db.ref("quiz/" + question.questionNo).set(question);
+    // setQuestionList((prev) => {
+    //   return [...prev, question];
+    // });
+    db.ref("quiz").on("value", (snapshot) => {
+      setQuestionList(snapshot.val());
+    });
+    setQuestion({
+      questionNo: "",
+      questionContent: "",
+      questionOptions: [],
+    });
+  }
+
+  useEffect(() => {
+    db.ref("quiz").on("value", (snapshot) => {
+      setQuestionList(snapshot.val());
+    });
+  }, []);
 
   return (
     <div className="">
-      <div className="my-5 ">
+      {/* <div className="my-5 ">
         <label className="w-100">
           Unique ID for the quiz :
-          <input type="text" id="quizID" className="form-control" />
+          <input
+            type="text"
+            id="quizID"
+            className="form-control"
+            ref={quizID}
+          />
         </label>
-      </div>
+      </div> */}
 
       <div className="row px-5">
         <div className="col-5 px-5 py-3">
+          <button className="btn btn-success w-100" onClick={addQuestion}>
+            Add Question
+          </button>
           <label className="">Sr. No.</label>
           <input
             type="text"
@@ -128,7 +158,7 @@ function CreateQuiz() {
           </div>
         </div>
       </div>
-      <div>
+      <div className="my-5">
         <h5>Sr. No. : {question.questionNo}</h5>
         <h5>Title : {question.questionContent}</h5>
         {question.questionOptions.map((item, index) => {
@@ -144,6 +174,39 @@ function CreateQuiz() {
             </div>
           );
         })}
+      </div>
+      <div className="container-fullwidth">
+        {questionList &&
+          questionList.map((item, index) => {
+            return (
+              <div key={index} className="my-5">
+                <h2>
+                  {item.questionNo} : {item.questionContent}
+                </h2>
+                <table className="table table-striped table-dark">
+                  <tbody>
+                    {item.questionOptions.map((item, index) => {
+                      return (
+                        <tr key={index}>
+                          <td className="col-10">
+                            <p>{item.optionContent}</p>
+                          </td>
+                          <td className="col-2">
+                            {item.optionIsCorrect ? (
+                              <p>Correct</p>
+                            ) : (
+                              <p>InCorrect</p>
+                            )}
+                          </td>
+                          <td>{item.optionWeightage}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            );
+          })}
       </div>
     </div>
   );
