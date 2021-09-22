@@ -4,11 +4,16 @@
 	justify-content: center;
 	align-items: center;
 }
+.jic{
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items: center;
+}
 
 .app__container {
 	margin-top: 10px;
-	width: 500px;
-	height: 500px;
+	
 	border: 1px solid #000;
 }
 

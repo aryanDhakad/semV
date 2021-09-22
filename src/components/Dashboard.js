@@ -20,7 +20,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="container p-3">
+    <div className="container p-3 ">
       <Link to="/create-quiz" className="btn btn-primary w-100 my-3">
         Create Quiz
       </Link>
