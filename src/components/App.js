@@ -8,7 +8,9 @@ import Login from "./Login";
 import PrivateRoute from "./PrivateRoute";
 import ForgotPassword from "./ForgotPassword";
 import UpdateProfile from "./UpdateProfile";
-import CreateQuiz from "./createQuiz";
+// import CreateQuiz from "./createQuiz";
+import CreateQuizForm from "./createQuizForm";
+import GetFirestore from "./GetFirestore";
 
 function App() {
   return (
@@ -26,7 +28,9 @@ function App() {
               <Route path="/signup" component={Signup} />
               <Route path="/login" component={Login} />
               <Route path="/forgot-password" component={ForgotPassword} />
-              <Route paht="/create-quiz" component={CreateQuiz} />
+              {/* <Route paht="/create-quiz" component={CreateQuiz} /> */}
+              <Route path="/create-quiz-form" component={CreateQuizForm} />
+              <Route path="/get-firestore-data" component={GetFirestore} />
             </Switch>
           </AuthProvider>
         </Router>

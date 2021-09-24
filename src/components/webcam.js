@@ -18,7 +18,7 @@ export default function Cam() {
   }, [webcamRef, setImgSrc]);
 
   useEffect(() => {
-    let interval = setInterval(capture, 1000);
+    let interval = setInterval(capture, 5000);
 
     return () => {
       clearInterval(interval);
