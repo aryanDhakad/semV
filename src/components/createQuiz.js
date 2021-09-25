@@ -4,11 +4,7 @@ import { db } from "../firebase";
 function CreateQuiz() {
   const quizID = useRef();
 
-  const [question, setQuestion] = useState({
-    questionNo: "",
-    questionContent: "",
-    questionOptions: [],
-  });
+  const [loading, setLoading] = useState(false);
 
   const [option, setOption] = useState({
     optionContent: "",
@@ -16,14 +12,23 @@ function CreateQuiz() {
     optionWeightage: 1,
   });
 
+  const [question, setQuestion] = useState({
+    questionNo: "",
+    questionContent: "",
+    questionOptions: [option, option, option],
+  });
+
   const [error, setError] = useState(null);
   const [questionList, setQuestionList] = useState([]);
 
-  const [optionId, setOptionId] = useState(0);
+  const [optionId, setOptionId] = useState(-1);
 
   useEffect(() => {
+    setLoading(true);
     db.ref("quiz").on("value", (snapshot) => {
-      setQuestionList(snapshot.val());
+      // console.log(snapshot.val());
+      setQuestionList([...Object.values(snapshot.val() || {})]);
+      setLoading(false);
     });
   }, []);
 
@@ -35,7 +40,7 @@ function CreateQuiz() {
         .child(value || "-1")
         .on("value", (snapshot) => {
           if (snapshot.val()) setError("Question Already Exists");
-          else setError("New Question");
+          else setError("");
         });
     }
 
@@ -77,20 +82,29 @@ function CreateQuiz() {
   }
 
   async function addQuestion() {
+    if (
+      question.questionOptions.length === 0 ||
+      question.questionContent === ""
+    ) {
+      setError("Question Incomplete or Improper.");
+      return;
+    }
     await db.ref("quiz/" + question.questionNo).set(question);
-    await db.ref("quiz").on("value", (snapshot) => {
-      setQuestionList(snapshot.val());
+    db.ref("quiz").on("value", (snapshot) => {
+      // console.log(snapshot.val());
+      setQuestionList([...Object.values(snapshot.val() || {})]);
     });
     setQuestion({
       questionNo: "",
       questionContent: "",
-      questionOptions: [],
+      questionOptions: [option, option, option],
     });
     setOption({
       optionContent: "",
       optionIsCorrect: false,
       optionWeightage: 1,
     });
+    setError("");
   }
 
   function updateOption(id) {
@@ -110,6 +124,12 @@ function CreateQuiz() {
         }),
       };
     });
+    setOptionId(-1);
+    setOption({
+      optionContent: "",
+      optionIsCorrect: false,
+      optionWeightage: 1,
+    });
   }
 
   function updateQuestion(id) {
@@ -125,15 +145,25 @@ function CreateQuiz() {
         }),
       };
     });
+    setOptionId(-1);
   }
 
   async function deleteQuestion(id) {
+    if (id === undefined || id === null || id === "") {
+      console.log(id);
+      return;
+    }
+
     await db.ref("quiz").child(id).remove();
     db.ref("quiz").on("value", (snapshot) => {
-      setQuestionList(snapshot.val());
+      // console.log(snapshot.val());
+      setQuestionList([...Object.values(snapshot.val() || {})]);
     });
   }
 
+  if (loading) {
+    return <h1>Loading ....</h1>;
+  }
   return (
     <div className="py-5">
       {/* <div className="my-5 ">
@@ -147,13 +177,7 @@ function CreateQuiz() {
           />
         </label>
       </div> */}
-      <div className="text-center">
-        {error === "Question Already Exists" ? (
-          <h3 className="text-danger ">{error}</h3>
-        ) : (
-          <h3 className="text-success">{error}</h3>
-        )}
-      </div>
+      <h3 className="text-danger text-center "> NOTE : {error}</h3>
 
       <div className="row px-5">
         <div className="col-7 px-1 py-1">
@@ -237,14 +261,16 @@ function CreateQuiz() {
       <div className="my-5 ">
         <div className="">
           {question.questionOptions.map((item, index) => {
+            let prop1 = index === optionId ? "shadow-lg" : "";
+            let itemCurrent = index === optionId ? option : item;
             return (
-              <div key={index} className="row my-2 shadow">
+              <div key={index} className={`row my-2 ${prop1}`}>
                 <div className="col-10">
-                  <p>{item.optionContent}</p>
+                  <p>{itemCurrent.optionContent}</p>
                 </div>
                 <div className="col-2">
-                  {item.optionIsCorrect ? <p>CORRECT</p> : <p>WRONG</p>}
-                  <p>{item.optionWeightage}</p>
+                  {itemCurrent.optionIsCorrect ? <p>CORRECT</p> : <p>WRONG</p>}
+                  <p>{itemCurrent.optionWeightage}</p>
                 </div>
                 <button
                   className="btn btn-danger ml-3 rounded-pill"
@@ -256,7 +282,7 @@ function CreateQuiz() {
                   className="btn btn-primary ml-3 rounded-pill px-3 py-1"
                   onClick={() => updateOption(index)}
                 >
-                  Update
+                  Select
                 </button>
               </div>
             );
@@ -265,10 +291,10 @@ function CreateQuiz() {
       </div>
       <div className="d-flex flex-wrap">
         {questionList &&
-          questionList.map((item) => {
+          questionList.map((item, index) => {
             return (
               <div
-                key={item.questionNo}
+                key={index}
                 className="my-2 p-2 fs-1 w-50 d-flex flex-wrap align-items-center justify-content-center "
               >
                 <h2>{`${item.questionNo}) ${item.questionContent}`}</h2>
@@ -298,7 +324,7 @@ function CreateQuiz() {
                   <button
                     type="button"
                     className="btn btn-primary ml-3 rounded-pill px-3 py-1"
-                    onClick={() => updateQuestion(item.questionNo)}
+                    onClick={() => updateQuestion(index)}
                   >
                     Update
                   </button>
