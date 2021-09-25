@@ -15,7 +15,7 @@ function App() {
   return (
     // <Exp />
     <Container
-      className="d-flex align-items-center justify-content-center"
+      className="align-items-center justify-content-center"
       style={{ minHeight: "100vh" }}
     >
       <div>

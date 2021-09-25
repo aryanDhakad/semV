@@ -10,12 +10,15 @@ function CreateQuiz() {
     optionContent: "",
     optionIsCorrect: false,
     optionWeightage: 1,
+    optionIsSelected: false,
   });
 
   const [question, setQuestion] = useState({
     questionNo: "",
     questionContent: "",
     questionOptions: [option, option, option],
+    questionIsAttempted: false,
+    questionIsMarked: false,
   });
 
   const [error, setError] = useState(null);
@@ -78,6 +81,7 @@ function CreateQuiz() {
       optionContent: "",
       optionIsCorrect: false,
       optionWeightage: 1,
+      optionIsSelected: false,
     });
   }
 
@@ -98,11 +102,14 @@ function CreateQuiz() {
       questionNo: "",
       questionContent: "",
       questionOptions: [option, option, option],
+      questionIsAttempted: false,
+      questionIsMarked: false,
     });
     setOption({
       optionContent: "",
       optionIsCorrect: false,
       optionWeightage: 1,
+      optionIsSelected: false,
     });
     setError("");
   }
@@ -129,6 +136,7 @@ function CreateQuiz() {
       optionContent: "",
       optionIsCorrect: false,
       optionWeightage: 1,
+      optionIsSelected: false,
     });
   }
 

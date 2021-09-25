@@ -20,11 +20,11 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="container p-3 ">
-      <Link to="/create-quiz" className="btn btn-primary w-100 my-3">
+    <div className="container p-3 w-50 text-center">
+      <Link to="/create-quiz" className="btn btn-primary w-75 mx-auto my-3">
         Create Quiz
       </Link>
-      <Link to="/take-quiz" className="btn btn-primary w-100 my-3">
+      <Link to="/take-quiz" className="btn btn-primary w-75 mx-auto my-3">
         Take Quiz
       </Link>
       <Card>
@@ -32,12 +32,15 @@ export default function Dashboard() {
           <h2 className="text-center mb-4">Profile</h2>
           {error && <Alert variant="danger">{error}</Alert>}
           <strong>Email:</strong> {currentUser.email}
-          <Link to="/update-profile" className="btn btn-primary w-100 mt-3">
+          <Link
+            to="/update-profile"
+            className="btn btn-primary w-75 mx-auto mt-3"
+          >
             Update Profile
           </Link>
         </Card.Body>
       </Card>
-      <div className="w-100 text-center mt-2">
+      <div className="w-75 mx-auto text-center mt-2">
         <Button variant="link" onClick={handleLogout}>
           Log Out
         </Button>
