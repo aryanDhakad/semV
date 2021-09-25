@@ -9,6 +9,7 @@ import PrivateRoute from "./PrivateRoute";
 import ForgotPassword from "./ForgotPassword";
 import UpdateProfile from "./UpdateProfile";
 import CreateQuiz from "./createQuiz";
+import TakeQuiz from "./TakeQuiz";
 
 function App() {
   return (
@@ -26,7 +27,8 @@ function App() {
               <Route path="/signup" component={Signup} />
               <Route path="/login" component={Login} />
               <Route path="/forgot-password" component={ForgotPassword} />
-              <Route paht="/create-quiz" component={CreateQuiz} />
+              <Route path="/create-quiz" component={CreateQuiz} />
+              <Route path="/take-quiz" component={TakeQuiz} />
             </Switch>
           </AuthProvider>
         </Router>

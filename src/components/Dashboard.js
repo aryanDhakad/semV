@@ -24,6 +24,9 @@ export default function Dashboard() {
       <Link to="/create-quiz" className="btn btn-primary w-100 my-3">
         Create Quiz
       </Link>
+      <Link to="/take-quiz" className="btn btn-primary w-100 my-3">
+        Take Quiz
+      </Link>
       <Card>
         <Card.Body>
           <h2 className="text-center mb-4">Profile</h2>
