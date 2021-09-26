@@ -1,8 +1,10 @@
 import React, { useRef, useState, useEffect } from "react";
 import { db } from "../firebase";
+import Webcam from "react-webcam";
 
 function TakeQuiz() {
   const quizID = useRef();
+  const webcamRef = useRef(null);
 
   const [loading, setLoading] = useState(false);
 
@@ -91,54 +93,50 @@ function TakeQuiz() {
   if (loading) {
     return <h1>Loading ....</h1>;
   } else if (current >= 0) {
-    let st = "my-2 p-4 flex-wrap fs-1";
-
-    if (
-      questionList[current].questionIsMarked &&
-      questionList[current].questionIsAttempted
-    )
-      st += " bg-warning";
-    else if (questionList[current].questionIsMarked) st += " bg-info";
-    else if (questionList[current].questionIsAttempted) st += " bg-success";
-    else st += " bg-danger";
-
     return (
-      <div className="row f-block ">
+      <div className="row ">
         {/* {Question Panel} */}
-        <div className="col-8 p-3">
-          <div>
-            <h2 className={st}>{`${current + 1}) ${
-              questionList[current].questionContent
-            }`}</h2>
-            {questionList[current].questionOptions &&
-              questionList[current].questionOptions.map((opt, indexOpt) => {
-                let st1 = "btn btn-primary w-50 my-1 p-2";
-                if (opt.optionIsSelected) st1 += " bg-dark";
-                else st1 += " bg-primary";
-                return (
-                  <div key={indexOpt}>
-                    <button
-                      className={st1}
-                      onClick={() => handleClick(current, indexOpt)}
-                    >
-                      {opt.optionContent}
-                    </button>
-                  </div>
-                );
-              })}
+        <div className="col-8 py-2 ">
+          <div
+            style={{
+              minHeight: "80vh",
+              border: "3px solid black",
+              position: "relative",
+            }}
+            className="p-1"
+          >
+            <h3
+              className="py-3 "
+              style={{ height: "30vh", position: "relative" }}
+            >{`${current + 1}) ${questionList[current].questionContent}`}</h3>
+            <div className="">
+              {questionList[current].questionOptions &&
+                questionList[current].questionOptions.map((opt, indexOpt) => {
+                  let st1 = "btn btn-primary my-1 p-2 w-100";
+                  if (opt.optionIsSelected) st1 += " bg-dark";
+                  else st1 += " bg-primary";
+                  return (
+                    <div key={indexOpt} className="w-50 my-2 ">
+                      <button
+                        className={st1}
+                        onClick={() => handleClick(current, indexOpt)}
+                      >
+                        {opt.optionContent}
+                      </button>
+                    </div>
+                  );
+                })}
+            </div>
           </div>
           <div className="">
+            <button className="btn btn-primary m-1 w-25 p-2 " onClick={prevQue}>
+              Before
+            </button>
             <button
               className="btn btn-primary mx-1 w-25 p-2 "
               onClick={nextQue}
             >
               Next
-            </button>
-            <button
-              className="btn btn-primary mx-1 w-25 p-2 "
-              onClick={prevQue}
-            >
-              Before
             </button>
             <button
               className="btn btn-primary mx-1 w-25 p-2 "
@@ -148,8 +146,35 @@ function TakeQuiz() {
             </button>
           </div>
         </div>
-        <div className="col-4">
-          <h2>Block will display</h2>
+        <div className="col-4 flex-wrap py-2">
+          <div style={{ minHeight: "70vh", border: "3px solid black" }}>
+            {questionList.map((item, index) => {
+              let st = "btn btn-primary m-2 p-3 rounded  ";
+
+              if (
+                questionList[index].questionIsMarked &&
+                questionList[index].questionIsAttempted
+              )
+                st += " bg-warning";
+              else if (questionList[index].questionIsMarked) st += " bg-info";
+              else if (questionList[index].questionIsAttempted)
+                st += " bg-success";
+              else st += " bg-danger";
+              return (
+                <button className={st} onClick={() => setCurrent(index)}>
+                  {index + 1}
+                </button>
+              );
+            })}
+          </div>
+          <div className="float-right">
+            <Webcam
+              height={150}
+              ref={webcamRef}
+              screenshotFormat="image/jpeg"
+              width={180}
+            />
+          </div>
         </div>
       </div>
     );
