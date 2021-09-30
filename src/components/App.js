@@ -11,11 +11,14 @@ import UpdateProfile from "./UpdateProfile";
 import CreateQuiz from "./createQuiz";
 import TakeQuiz from "./TakeQuiz";
 
+import CreateQuizForm from "./createQuizForm";
+import GetFirestore from "./GetFirestore";
+
 function App() {
   return (
     // <Exp />
     <Container
-      className="d-flex align-items-center justify-content-center"
+      className="align-items-center justify-content-center"
       style={{ minHeight: "100vh" }}
     >
       <div>
@@ -29,6 +32,9 @@ function App() {
               <Route path="/forgot-password" component={ForgotPassword} />
               <Route path="/create-quiz" component={CreateQuiz} />
               <Route path="/take-quiz" component={TakeQuiz} />
+
+              <Route path="/create-quiz-form" component={CreateQuizForm} />
+              <Route path="/get-firestore-data" component={GetFirestore} />
             </Switch>
           </AuthProvider>
         </Router>

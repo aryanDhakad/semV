@@ -14,7 +14,12 @@
     "react-dom": "^16.13.1",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.3",
-    "react-webcam": "^6.0.0"
+    "react-webcam": "^6.0.0",
+    "uuid": "^8.3.2",
+    "xlsx": "^0.17.2"
+  },
+  "devDependencies": {
+    "typescript": "3.8.3"
   },
   "scripts": {
     "start": "react-scripts start",
