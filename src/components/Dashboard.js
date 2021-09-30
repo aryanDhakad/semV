@@ -30,10 +30,15 @@ export default function Dashboard() {
     setLoading(false);
   }, []);
 
-  function handleSubmit(e, id) {
-    e.preventDefault();
+  function handleSubmit(type, id) {
     setQuizId(id);
-    history.push("/take-quiz");
+    if (type === "Edit") {
+      history.push("/create-quiz");
+    } else if (type === "Take") {
+      history.push("/take-quiz");
+    } else {
+      history.push("/");
+    }
   }
 
   async function handleLogout() {
@@ -62,21 +67,39 @@ export default function Dashboard() {
       {/* <Link to="/take-quiz" className="btn btn-primary w-75 mx-auto my-3">
         Take Quiz
       </Link> */}
-      <form className="form" action="/take-quiz" method="get">
-        {quizzes.map((item) => {
-          // console.log(item);
-          return (
-            <button
-              key={item.quizName}
-              type="submit"
-              className="btn btn-primary m-3"
-              onClick={(e) => handleSubmit(e, item.quizUUID)}
-            >
-              {item.quizName}
-            </button>
-          );
-        })}
-      </form>
+
+      <h3>Edit Quiz</h3>
+
+      {quizzes.map((item) => {
+        // console.log(item);
+        return (
+          <button
+            key={item.quizName}
+            type="submit"
+            className="btn btn-primary m-3"
+            onClick={() => handleSubmit("Edit", item.quizUUID)}
+          >
+            {item.quizName}
+          </button>
+        );
+      })}
+
+      <h3>Take Quiz</h3>
+
+      {quizzes.map((item) => {
+        // console.log(item);
+        return (
+          <button
+            key={item.quizName}
+            type="submit"
+            className="btn btn-primary m-3"
+            onClick={() => handleSubmit("Take", item.quizUUID)}
+          >
+            {item.quizName}
+          </button>
+        );
+      })}
+
       {/* <Card>
         <Card.Body>
           <h2 className="text-center mb-4">Profile</h2>
