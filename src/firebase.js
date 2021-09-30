@@ -4,14 +4,14 @@ import "firebase/database";
 import "firebase/firestore";
 
 const app = firebase.initializeApp({
-  apiKey: "AIzaSyC8Bk_srQF6-cpdews7_OPhE9lIYmjMqvY",
-  authDomain: "project5-e2264.firebaseapp.com",
-  databaseURL: "https://project5-e2264-default-rtdb.firebaseio.com",
-  projectId: "project5-e2264",
-  storageBucket: "project5-e2264.appspot.com",
-  messagingSenderId: "424059128465",
-  appId: "1:424059128465:web:595fad9553ae37b3854d30",
-  measurementId: "G-R5ERT7WVB0",
+  apiKey: "AIzaSyDs6tyOFInCjMaDWuSrtZeLiyZe7nTNyZ4",
+  authDomain: "semv-3ba00.firebaseapp.com",
+  databaseURL: "https://semv-3ba00-default-rtdb.firebaseio.com",
+  projectId: "semv-3ba00",
+  storageBucket: "semv-3ba00.appspot.com",
+  messagingSenderId: "764651983056",
+  appId: "1:764651983056:web:5a1010393f29e17e788ed5",
+  measurementId: "G-SXX6Z94MN0",
 });
 
 export const auth = app.auth();
