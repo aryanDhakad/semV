@@ -1,9 +1,10 @@
 import React, { useRef, useState, useEffect } from "react";
 import { db } from "../firebase";
 import Webcam from "react-webcam";
+import { useAuth } from "../contexts/AuthContext";
 
 function TakeQuiz() {
-  const quizID = useRef();
+  const { quizId } = useAuth();
   const webcamRef = useRef(null);
 
   const [loading, setLoading] = useState(false);
@@ -31,7 +32,9 @@ function TakeQuiz() {
 
   useEffect(() => {
     setLoading(true);
-    db.ref("quiz").on("value", (snapshot) => {
+
+    db.ref("quiz/" + quizId + "/").on("value", (snapshot) => {
+      // console.log("This is Quiz Id : " + quizId);
       // console.log(snapshot.val());
       setQuestionList([...Object.values(snapshot.val() || {})]);
       setLoading(false);
@@ -93,87 +96,101 @@ function TakeQuiz() {
   if (loading) {
     return <h1>Loading ....</h1>;
   } else if (current >= 0) {
+    // questionList.forEach((item) => {
+    //   console.log(item);
+    // });
     return (
-      <div className="row ">
-        {/* {Question Panel} */}
-        <div className="col-8 py-2 ">
-          <div
-            style={{
-              minHeight: "80vh",
-              border: "3px solid black",
-              position: "relative",
-            }}
-            className="p-1"
-          >
-            <h3
-              className="py-3 "
-              style={{ height: "30vh", position: "relative" }}
-            >{`${current + 1}) ${questionList[current].questionContent}`}</h3>
+      // <h1>Done Loading ....</h1>
+      <div>
+        <h3> Quiz ID : {quizId}</h3>
+        <div className="row ">
+          {/* {Question Panel} */}
+          <div className="col-8 py-2 ">
+            <div
+              style={{
+                minHeight: "80vh",
+                border: "3px solid black",
+                position: "relative",
+              }}
+              className="p-1"
+            >
+              <h3
+                className="py-3 "
+                style={{ height: "30vh", position: "relative" }}
+              >{`${current + 1}) ${questionList[current].questionContent}`}</h3>
+              <div className="">
+                {questionList[current].questionOptions &&
+                  questionList[current].questionOptions.map((opt, indexOpt) => {
+                    let st1 = "btn btn-primary my-1 p-2 w-100";
+                    if (opt.optionIsSelected) st1 += " bg-dark";
+                    else st1 += " bg-primary";
+                    return (
+                      <div key={indexOpt} className="w-50 my-2 ">
+                        <button
+                          className={st1}
+                          onClick={() => handleClick(current, indexOpt)}
+                        >
+                          {opt.optionContent}
+                        </button>
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
             <div className="">
-              {questionList[current].questionOptions &&
-                questionList[current].questionOptions.map((opt, indexOpt) => {
-                  let st1 = "btn btn-primary my-1 p-2 w-100";
-                  if (opt.optionIsSelected) st1 += " bg-dark";
-                  else st1 += " bg-primary";
-                  return (
-                    <div key={indexOpt} className="w-50 my-2 ">
-                      <button
-                        className={st1}
-                        onClick={() => handleClick(current, indexOpt)}
-                      >
-                        {opt.optionContent}
-                      </button>
-                    </div>
-                  );
-                })}
+              <button
+                className="btn btn-primary m-1 w-25 p-2 "
+                onClick={prevQue}
+              >
+                Before
+              </button>
+              <button
+                className="btn btn-primary mx-1 w-25 p-2 "
+                onClick={nextQue}
+              >
+                Next
+              </button>
+              <button
+                className="btn btn-primary mx-1 w-25 p-2 "
+                onClick={() => MarkForReview(current)}
+              >
+                Mark For Review
+              </button>
             </div>
           </div>
-          <div className="">
-            <button className="btn btn-primary m-1 w-25 p-2 " onClick={prevQue}>
-              Before
-            </button>
-            <button
-              className="btn btn-primary mx-1 w-25 p-2 "
-              onClick={nextQue}
-            >
-              Next
-            </button>
-            <button
-              className="btn btn-primary mx-1 w-25 p-2 "
-              onClick={() => MarkForReview(current)}
-            >
-              Mark For Review
-            </button>
-          </div>
-        </div>
-        <div className="col-4 flex-wrap py-2">
-          <div style={{ minHeight: "70vh", border: "3px solid black" }}>
-            {questionList.map((item, index) => {
-              let st = "btn btn-primary m-2 p-3 rounded  ";
+          <div className="col-4 flex-wrap py-2">
+            <div style={{ minHeight: "70vh", border: "3px solid black" }}>
+              {questionList.map((item, index) => {
+                let st = "btn btn-primary m-2 p-3 rounded  ";
 
-              if (
-                questionList[index].questionIsMarked &&
-                questionList[index].questionIsAttempted
-              )
-                st += " bg-warning";
-              else if (questionList[index].questionIsMarked) st += " bg-info";
-              else if (questionList[index].questionIsAttempted)
-                st += " bg-success";
-              else st += " bg-danger";
-              return (
-                <button className={st} onClick={() => setCurrent(index)}>
-                  {index + 1}
-                </button>
-              );
-            })}
-          </div>
-          <div className="float-right">
-            <Webcam
+                if (
+                  questionList[index].questionIsMarked &&
+                  questionList[index].questionIsAttempted
+                )
+                  st += " bg-warning";
+                else if (questionList[index].questionIsMarked) st += " bg-info";
+                else if (questionList[index].questionIsAttempted)
+                  st += " bg-success";
+                else st += " bg-danger";
+                return (
+                  <button
+                    className={st}
+                    key={index}
+                    onClick={() => setCurrent(index)}
+                  >
+                    {index + 1}
+                  </button>
+                );
+              })}
+            </div>
+            <div className="float-right">
+              {/* <Webcam
               height={150}
               ref={webcamRef}
               screenshotFormat="image/jpeg"
               width={180}
-            />
+            /> */}
+            </div>
           </div>
         </div>
       </div>

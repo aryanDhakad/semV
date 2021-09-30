@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { db } from "../firebase";
-
+import { useAuth } from "../contexts/AuthContext";
 function CreateQuiz() {
-  const quizID = useRef();
-
+  const { quizId } = useAuth();
   const [loading, setLoading] = useState(false);
 
   const [option, setOption] = useState({
@@ -28,7 +27,7 @@ function CreateQuiz() {
 
   useEffect(() => {
     setLoading(true);
-    db.ref("quiz").on("value", (snapshot) => {
+    db.ref("quiz/" + quizId).on("value", (snapshot) => {
       // console.log(snapshot.val());
       setQuestionList([...Object.values(snapshot.val() || {})]);
       setLoading(false);
@@ -39,7 +38,7 @@ function CreateQuiz() {
     const { name, value } = e.target;
 
     if (name === "questionNo") {
-      db.ref("quiz")
+      db.ref("quiz/" + quizId)
         .child(value || "-1")
         .on("value", (snapshot) => {
           if (snapshot.val()) setError("Question Already Exists");
@@ -93,8 +92,8 @@ function CreateQuiz() {
       setError("Question Incomplete or Improper.");
       return;
     }
-    await db.ref("quiz/" + question.questionNo).set(question);
-    db.ref("quiz").on("value", (snapshot) => {
+    await db.ref(`quiz/${quizId}/` + question.questionNo).set(question);
+    db.ref("quiz/" + quizId).on("value", (snapshot) => {
       // console.log(snapshot.val());
       setQuestionList([...Object.values(snapshot.val() || {})]);
     });
@@ -162,8 +161,11 @@ function CreateQuiz() {
       return;
     }
 
-    await db.ref("quiz").child(id).remove();
-    db.ref("quiz").on("value", (snapshot) => {
+    await db
+      .ref("quiz/" + quizId)
+      .child(id)
+      .remove();
+    db.ref("quiz/" + quizId).on("value", (snapshot) => {
       // console.log(snapshot.val());
       setQuestionList([...Object.values(snapshot.val() || {})]);
     });
