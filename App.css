@@ -14,7 +14,7 @@
 .app__container {
 	margin-top: 10px;
 	
-	border: 1px solid #000;
+	border: 1px solid red;
 }
 
 .app__input {
