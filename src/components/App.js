@@ -32,7 +32,6 @@ function App() {
               <Route path="/forgot-password" component={ForgotPassword} />
               <Route path="/create-quiz" component={CreateQuiz} />
               <Route path="/take-quiz" component={TakeQuiz} />
-
               <Route path="/create-quiz-form" component={CreateQuizForm} />
               <Route path="/get-firestore-data" component={GetFirestore} />
             </Switch>
