@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
+import { Modal, Button } from "react-bootstrap";
 import { db } from "../firebase";
 import Webcam from "react-webcam";
 import { useAuth } from "../contexts/AuthContext";
@@ -27,6 +28,8 @@ function TakeQuiz() {
   const [error, setError] = useState(null);
   const [questionList, setQuestionList] = useState([]);
   const [current, setCurrent] = useState(-1);
+  const [score, setScore] = useState(0);
+  const [show, setShow] = useState(false);
 
   const [optionId, setOptionId] = useState(-1);
 
@@ -37,10 +40,14 @@ function TakeQuiz() {
       // console.log("This is Quiz Id : " + quizId);
       // console.log(snapshot.val());
       setQuestionList([...Object.values(snapshot.val() || {})]);
+
       setLoading(false);
-      setCurrent(0);
     });
-  }, []);
+  }, [quizId]);
+
+  useEffect(() => {
+    if (current === -1 && questionList.length) setCurrent(0);
+  }, [questionList, current]);
 
   function MarkForReview(que) {
     let indQue = que;
@@ -62,6 +69,11 @@ function TakeQuiz() {
     opt = questionList[current].questionOptions[opt];
     // console.log(que, opt);
     opt.optionIsSelected = !opt.optionIsSelected;
+    let sign = opt.optionIsCorrect ? 1 : -1;
+    if (opt.optionIsSelected) setScore(score + sign * opt.optionWeightage);
+    else if (!opt.optionIsSelected)
+      setScore(score - sign * opt.optionWeightage);
+
     questionList[current].questionOptions = questionList[
       current
     ].questionOptions.map((item, index) => {
@@ -96,13 +108,36 @@ function TakeQuiz() {
   if (loading) {
     return <h1>Loading ....</h1>;
   } else if (current >= 0) {
-    // questionList.forEach((item) => {
-    //   console.log(item);
-    // });
     return (
-      // <h1>Done Loading ....</h1>
       <div>
-        <h3> Quiz ID : {quizId}</h3>
+        <Modal
+          show={show}
+          onHide={() => setShow(!show)}
+          backdrop="static"
+          keyboard={false}
+        >
+          <Modal.Header closeButton>
+            <Modal.Title> End Test</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>Are You Sure You Want To End The Test?</Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShow(!show)}>
+              End Test
+            </Button>
+          </Modal.Footer>
+        </Modal>
+
+        <div className="fs-3 d-inline p-2 mx-2">
+          Quiz ID : {quizId}, Score : {score}
+        </div>
+
+        <button
+          className="btn btn-danger d-inline mx-2"
+          onClick={() => setShow(!show)}
+        >
+          End Test
+        </button>
+
         <div className="row ">
           {/* {Question Panel} */}
           <div className="col-8 py-2 ">
@@ -196,7 +231,7 @@ function TakeQuiz() {
       </div>
     );
   } else {
-    return <h1>Nothing</h1>;
+    return <h1>No Question in Database</h1>;
   }
 }
 
