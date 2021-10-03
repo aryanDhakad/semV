@@ -4,7 +4,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { Link, useHistory } from "react-router-dom";
 import { store } from "../firebase";
 
-export default function Dashboard() {
+export default function TeacherDash() {
   const { currentUser, logout, setQuizId } = useAuth();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -34,8 +34,6 @@ export default function Dashboard() {
     setQuizId(id);
     if (type === "Edit") {
       history.push("/create-quiz");
-    } else if (type === "Take") {
-      history.push("/take-quiz");
     } else {
       history.push("/");
     }
@@ -46,7 +44,7 @@ export default function Dashboard() {
 
     try {
       await logout();
-      history.push("/login");
+      history.push("/");
     } catch {
       setError("Failed to log out");
     }
@@ -57,16 +55,17 @@ export default function Dashboard() {
 
   return (
     <div className="container p-3 w-50 text-center">
+      <h2>Teacher Dashboard</h2>
       <Link
         to="/create-quiz-form"
         className="btn btn-primary w-75 mx-auto my-3"
       >
         Create Quiz
       </Link>
-      <Accordion defaultActiveKey="2">
+      <Accordion defaultActiveKey="1">
         <Card>
           <Accordion.Toggle as={Card.Header} eventKey="0">
-            Take Quiz
+            Edit Quiz
           </Accordion.Toggle>
 
           <Accordion.Collapse eventKey="0">
@@ -88,9 +87,9 @@ export default function Dashboard() {
           </Accordion.Collapse>
         </Card>
 
-        <Card>
+        {/* <Card>
           <Accordion.Toggle as={Card.Header} eventKey="1">
-            Edit Quiz
+            Take Quiz
           </Accordion.Toggle>
 
           <Accordion.Collapse eventKey="1">
@@ -110,12 +109,12 @@ export default function Dashboard() {
               })}
             </Card.Body>
           </Accordion.Collapse>
-        </Card>
+        </Card> */}
         <Card>
-          <Accordion.Toggle as={Card.Header} eventKey="2">
+          <Accordion.Toggle as={Card.Header} eventKey="1">
             Profile
           </Accordion.Toggle>
-          <Accordion.Collapse eventKey="2">
+          <Accordion.Collapse eventKey="1">
             <Card.Body>
               <h2 className="text-center mb-4">Profile</h2>
               {error && <Alert variant="danger">{error}</Alert>}

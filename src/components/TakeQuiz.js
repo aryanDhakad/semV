@@ -69,10 +69,10 @@ function TakeQuiz() {
     opt = questionList[current].questionOptions[opt];
     // console.log(que, opt);
     opt.optionIsSelected = !opt.optionIsSelected;
-    if (opt.optionIsSelected && opt.optionIsCorrect)
-      setScore(score + opt.optionWeightage);
-    else if (opt.optionIsSelected && !opt.optionIsCorrect)
-      setScore(score - opt.optionWeightage);
+    let sign = opt.optionIsCorrect ? 1 : -1;
+    if (opt.optionIsSelected) setScore(score + sign * opt.optionWeightage);
+    else if (!opt.optionIsSelected)
+      setScore(score - sign * opt.optionWeightage);
 
     questionList[current].questionOptions = questionList[
       current
