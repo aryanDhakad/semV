@@ -1,14 +1,16 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Modal, Button } from "react-bootstrap";
-import { db } from "../firebase";
 import Webcam from "react-webcam";
 import { useAuth } from "../contexts/AuthContext";
+import Timer from "./Timer";
+import { Link, useHistory } from "react-router-dom";
+import { db } from "../firebase";
 
 function TakeQuiz() {
-  const { quizId } = useAuth();
-  const webcamRef = useRef(null);
+  const { quizInfo, expireTime, currentUser } = useAuth();
 
-  const [loading, setLoading] = useState(false);
+  const webcamRef = useRef(null);
+  let history = useHistory();
 
   const [option, setOption] = useState({
     optionContent: "",
@@ -24,11 +26,12 @@ function TakeQuiz() {
     questionIsAttempted: false,
     questionIsMarked: false,
   });
+  const [loading, setLoading] = useState(false);
 
   const [error, setError] = useState(null);
   const [questionList, setQuestionList] = useState([]);
   const [current, setCurrent] = useState(-1);
-  const [score, setScore] = useState(0);
+  const [attempt, setAttempt] = useState({ atm: 0, mrk: 0 });
   const [show, setShow] = useState(false);
 
   const [optionId, setOptionId] = useState(-1);
@@ -36,14 +39,15 @@ function TakeQuiz() {
   useEffect(() => {
     setLoading(true);
 
-    db.ref("quiz/" + quizId + "/").on("value", (snapshot) => {
-      // console.log("This is Quiz Id : " + quizId);
-      // console.log(snapshot.val());
-      setQuestionList([...Object.values(snapshot.val() || {})]);
+    db.collection("quiz/" + quizInfo.quizName + "/questions")
+      .get()
+      .then((snapshot) => {
+        let document = snapshot.docs.map((doc) => doc.data());
 
-      setLoading(false);
-    });
-  }, [quizId]);
+        setQuestionList([...(document || [])]);
+        setLoading(false);
+      });
+  }, [quizInfo.quizName]);
 
   useEffect(() => {
     if (current === -1 && questionList.length) setCurrent(0);
@@ -69,10 +73,6 @@ function TakeQuiz() {
     opt = questionList[current].questionOptions[opt];
     // console.log(que, opt);
     opt.optionIsSelected = !opt.optionIsSelected;
-    let sign = opt.optionIsCorrect ? 1 : -1;
-    if (opt.optionIsSelected) setScore(score + sign * opt.optionWeightage);
-    else if (!opt.optionIsSelected)
-      setScore(score - sign * opt.optionWeightage);
 
     questionList[current].questionOptions = questionList[
       current
@@ -104,6 +104,16 @@ function TakeQuiz() {
   function prevQue() {
     if (current - 1 >= 0) setCurrent(current - 1);
   }
+  function EndTest() {
+    let n = 0;
+    let m = 0;
+    questionList.forEach((item) => {
+      if (item.questionIsAttempted) n += 1;
+      if (item.questionIsMarked) m += 1;
+    });
+    setAttempt({ atm: n, mrk: m });
+    setShow(!show);
+  }
 
   if (loading) {
     return <h1>Loading ....</h1>;
@@ -119,22 +129,52 @@ function TakeQuiz() {
           <Modal.Header closeButton>
             <Modal.Title> End Test</Modal.Title>
           </Modal.Header>
-          <Modal.Body>Are You Sure You Want To End The Test?</Modal.Body>
+          <Modal.Body>
+            Are You Sure You Want To End The Test?
+            <p>Attempted : {attempt.atm}</p>
+            <p>Marked For Review: {attempt.mrk}</p>
+            <p>Not Attempted : {questionList.length - attempt.atm}</p>
+          </Modal.Body>
+
           <Modal.Footer>
-            <Button variant="secondary" onClick={() => setShow(!show)}>
+            <Button
+              variant="secondary"
+              onClick={async () => {
+                let student = db.collection("Student").doc(currentUser.email);
+
+                await student.collection("Attempt").doc(quizInfo.quizName).set({
+                  Info: quizInfo,
+                  questions: questionList,
+                });
+
+                history.push("/studentDash");
+
+                // student.get().then(async (doc) => {
+                //   let data = doc.data();
+                //   let newData = {
+                //     ...data,
+                //     data.Attempt : [...data.Attempt,{Id : quizInfo.quizUUID, data : questionList}]
+                //   }
+                // });
+                // student.set({
+                //   ...student.data(),
+                //   student.data().Attempt : [...student.data().Attempt,questionList]
+                // })
+
+                // history.push("/");
+              }}
+            >
               End Test
             </Button>
           </Modal.Footer>
         </Modal>
 
         <div className="fs-3 d-inline p-2 mx-2">
-          Quiz ID : {quizId}, Score : {score}
+          Quiz ID : {quizInfo.quizUUID} , Name : {quizInfo.quizName},
+          <Timer expiryTimestamp={expireTime} history={history} />
         </div>
 
-        <button
-          className="btn btn-danger d-inline mx-2"
-          onClick={() => setShow(!show)}
-        >
+        <button className="btn btn-danger d-inline mx-2" onClick={EndTest}>
           End Test
         </button>
 

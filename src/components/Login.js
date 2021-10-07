@@ -1,9 +1,9 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Form, Button, Card, Alert } from "react-bootstrap";
 import { useAuth } from "../contexts/AuthContext";
 import { Link, useHistory } from "react-router-dom";
 import PopupSignIn from "./PopupSignIn";
-import Cam from "./webcam";
+
 
 export default function Login() {
   const emailRef = useRef();
@@ -11,8 +11,15 @@ export default function Login() {
   const { login } = useAuth();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
   const [type, setType] = useState("Student");
   const history = useHistory();
+
+  // useEffect(() => {
+  //   let timerFunc = setInterval(() => {
+  //     setTimer(Date.now());
+  //   }, 1000);
+  // }, []);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -32,12 +39,13 @@ export default function Login() {
     setLoading(false);
   }
 
+  if (loading) {
+    return <h2>Loading...</h2>;
+  }
+
   return (
     <>
-      <div className="mb-4 text-center">
-        <Cam />
-      </div>
-
+     
       <Card>
         <Card.Body>
           <h2 className="text-center mb-4">Log In</h2>

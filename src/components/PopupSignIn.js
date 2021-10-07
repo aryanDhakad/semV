@@ -3,9 +3,11 @@ import { auth } from "../firebase";
 import Firebase from "firebase/app";
 import { useHistory } from "react-router-dom";
 import { Button } from "react-bootstrap";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function PopupSignIn() {
   const history = useHistory();
+  const { setCurrentUser } = useAuth();
 
   const handleGoogleLogin = (event) => {
     event.preventDefault();
@@ -14,7 +16,9 @@ export default function PopupSignIn() {
     auth
       .signInWithPopup(provider)
       .then(function (result) {
-        history.push("/");
+        setCurrentUser(result);
+
+        history.push("/studentDash");
       })
       .catch((error) => {
         console.log(error);

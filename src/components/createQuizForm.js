@@ -1,23 +1,24 @@
-import React, { useState, useCallback, useRef } from "react";
+import React, { useState, useCallback, useRef, useEffect } from "react";
 import XLSX from "xlsx";
 import "bootstrap/dist/css/bootstrap.css";
 import { Link, useHistory } from "react-router-dom";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import { v4 as uuid4 } from "uuid";
-import { store } from "../firebase";
+import { db } from "../firebase";
 import { useAuth } from "../contexts/AuthContext";
 function CreateQuizForm() {
-  const { setQuizId } = useAuth();
+  const { setQuizInfo, quizInfo } = useAuth();
   const history = useHistory();
-  const [quizInfo, setQuizInfo] = useState({
+  const [info, setInfo] = useState({
     quizUUID: "",
     quizName: "",
     instructorName: "",
     instructorEmail: "",
     quizInstructions: "",
     quizDate: "",
-    quizTime: "",
+    quizTimeStart: "",
+    quizTimeEnd: "",
     quizWeightage: "",
     quizTaEmailList: [],
     quizStudentEmailList: [],
@@ -28,13 +29,21 @@ function CreateQuizForm() {
   const taEmailListRef = useRef([]);
   const studentEmailListRef = useRef([]);
   // const quizInstructionsRef = useRef("");
-  const [isReading, setIsReading] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    if (quizInfo.quizName !== "default") {
+      setInfo(quizInfo);
+      setLoading(false);
+    }
+  }, [quizInfo]);
 
   function handleChange(e) {
     const { name, value } = e.target;
     // if quiz name already exists, set error
 
-    setQuizInfo((prev) => {
+    setInfo((prev) => {
       return {
         ...prev,
         [name]: value,
@@ -50,7 +59,7 @@ function CreateQuizForm() {
       var data = new Uint8Array(e.target.result);
       var workbook = XLSX.read(data, { type: "array" });
       var firstSheet = workbook.SheetNames[0];
-      setIsReading(false);
+      setLoading(false);
       const elements = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet]);
 
       // Converting json to array
@@ -75,7 +84,7 @@ function CreateQuizForm() {
       studentEmailListRef.current = studentEmailList;
     };
 
-    setIsReading(true);
+    setLoading(true);
     reader.readAsArrayBuffer(file);
   }, []);
 
@@ -85,25 +94,28 @@ function CreateQuizForm() {
 
     // generating uuid
     const tempUUID = uuid4();
-    setQuizId(tempUUID);
+
+    setQuizInfo(info);
 
     // final quiz information
-    await store.collection("quizInfo").doc(quizInfo.quizName).set({
+    await db.collection("quizInfo").doc(info.quizName).set({
       quizUUID: tempUUID,
-      quizName: quizInfo.quizName,
-      // instructorName: quizInfo.instructorName,
-      // instructorEmail: quizInfo.instructorEmail,
-      // quizInstructions: quizInfo.quizInstructions,
+      quizName: info.quizName,
+      // instructorName: info.instructorName,
+      // instructorEmail: info.instructorEmail,
+      // quizInstructions: info.quizInstructions,
       // quizInstructions: quizInstructionsRef.current,
-      // quizDate: quizInfo.quizDate,
-      // quizTime: quizInfo.quizTime,
-      // quizWeightage: quizInfo.quizWeightage,
+      quizDate: info.quizDate,
+      quizTimeStart: info.quizTimeStart,
+      quizTimeEnd: info.quizTimeEnd,
+      quizIsAttempted: false,
+      // quizWeightage: info.quizWeightage,
       // quizTaEmailList: taEmailListRef.current,
       // quizStudentEmailList: studentEmailListRef.current,
     });
     history.push("/create-quiz");
 
-    // setQuizInfo({
+    // setInfo({
     //   quizUUID: "",
     //   quizName: "",
     //   instructorName: "",
@@ -117,6 +129,11 @@ function CreateQuizForm() {
     // });
     // console.log(JSON.stringify(finalQuizInfo, null, 4));
   }
+
+  if (loading) {
+    return <h3>Loading ....</h3>;
+  }
+
   return (
     <div style={{ display: "block", width: 700, padding: 30 }}>
       <h2>Enter Quiz Information</h2>
@@ -126,7 +143,7 @@ function CreateQuizForm() {
           <Form.Control
             type="text"
             name="quizName"
-            value={quizInfo.quizName}
+            value={info.quizName}
             onChange={handleChange}
           />
         </Form.Group>
@@ -135,43 +152,52 @@ function CreateQuizForm() {
           <Form.Control
             type="text"
             name="instructorName"
-            value={quizInfo.instructorName}
+            value={info.instructorName}
             onChange={handleChange}
           />
-        </Form.Group> */}
-        {/* <Form.Group controlId="exampleForm.ControlInput1">
+        </Form.Group>
+        <Form.Group controlId="exampleForm.ControlInput1">
           <Form.Label>Instructor Email:</Form.Label>
           <Form.Control
             type="email"
             name="instructorEmail"
-            value={quizInfo.instructorEmail}
+            value={info.instructorEmail}
             onChange={handleChange}
           />
-        </Form.Group>
+        </Form.Group> */}
         <Form.Group controlId="exampleForm.ControlInput1">
           <Form.Label>Quiz Date:</Form.Label>
           <Form.Control
-            type="text"
+            type="date"
             name="quizDate"
-            value={quizInfo.quizDate}
+            value={info.quizDate}
             onChange={handleChange}
           />
         </Form.Group>
         <Form.Group controlId="exampleForm.ControlInput1">
-          <Form.Label>Quiz Time:</Form.Label>
+          <Form.Label>Quiz Time Start:</Form.Label>
           <Form.Control
-            type="text"
-            name="quizTime"
-            value={quizInfo.quizTime}
+            type="datetime-local"
+            name="quizTimeStart"
+            // value={() => new Date(info.quizTimeStart)}
             onChange={handleChange}
           />
         </Form.Group>
         <Form.Group controlId="exampleForm.ControlInput1">
+          <Form.Label>Quiz Time End:</Form.Label>
+          <Form.Control
+            type="datetime-local"
+            name="quizTimeEnd"
+            // value={() => new Date(info.quizTimeEnd)}
+            onChange={handleChange}
+          />
+        </Form.Group>
+        {/* <Form.Group controlId="exampleForm.ControlInput1">
           <Form.Label>Quiz Weightage:</Form.Label>
           <Form.Control
             type="text"
             name="quizWeightage"
-            value={quizInfo.quizWeightage}
+            value={info.quizWeightage}
             onChange={handleChange}
           />
         </Form.Group>
@@ -181,7 +207,7 @@ function CreateQuizForm() {
             as="textarea"
             rows={3}
             name="quizInstructions"
-            value={quizInfo.quizInstructions}
+            value={info.quizInstructions}
             // defaultValue="Enter instructions here..."
             onChange={handleChange}
           />

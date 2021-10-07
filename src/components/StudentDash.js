@@ -1,27 +1,36 @@
 import React, { useState, useEffect } from "react";
-import { Card, Button, Alert, Accordion } from "react-bootstrap";
+import { Card, Button, Alert, div } from "react-bootstrap";
 import { useAuth } from "../contexts/AuthContext";
 import { Link, useHistory } from "react-router-dom";
-import { store } from "../firebase";
+import { db } from "../firebase";
 
 export default function StudentDash() {
-  const { currentUser, logout, setQuizId } = useAuth();
+  const { currentUser, logout, setQuizInfo, setExpireTime } = useAuth();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [quizzes, setQuizzes] = useState([]);
+  const [quizzesNow, setQuizzesNow] = useState([]);
+  const [quizzesDone, setQuizzesDone] = useState([]);
   const history = useHistory();
 
   useEffect(() => {
     setLoading(true);
-    store
-      .collection("quizInfo")
+    let time = new Date();
+    db.collection("quizInfo")
       .get()
       .then((snapshot) => {
         snapshot.docs.forEach((doc) => {
-          setQuizzes((prev) => {
-            // console.log(doc.data());
-            return [...prev, doc.data()];
-          });
+          let time2ed = new Date(doc.data().quizTimeEnd);
+
+          if (time2ed.getTime() < time.getTime()) {
+            setQuizzesDone((prev) => {
+              return [...prev, doc.data()];
+            });
+          } else {
+            setQuizzesNow((prev) => {
+              // console.log(doc.data());
+              return [...prev, doc.data()];
+            });
+          }
         });
       })
       .catch((err) => {
@@ -30,12 +39,23 @@ export default function StudentDash() {
     setLoading(false);
   }, []);
 
-  function handleSubmit(type, id) {
-    setQuizId(id);
-    if (type === "Take") {
-      history.push("/take-quiz");
+  function handleSubmit(type, item, start, end) {
+    start = new Date(start);
+    end = new Date(end);
+    let now = new Date();
+
+    if (start.getTime() > now.getTime()) {
+      setError("Test Not Started");
+    } else if (now.getTime() > end.getTime()) {
+      setError("Test Has Ended");
     } else {
-      history.push("/");
+      setQuizInfo(item);
+      setExpireTime(end);
+      if (type === "Take") {
+        history.push("/take-quiz");
+      } else {
+        history.push("/");
+      }
     }
   }
 
@@ -56,49 +76,79 @@ export default function StudentDash() {
   return (
     <div className="container p-3 w-50 text-center">
       <h2>Student Dashboard</h2>
-      <Accordion>
+      <p> {error && <Alert variant="danger">{error}</Alert>}</p>
+      <div>
         <Card>
-          <Accordion.Toggle as={Card.Header} eventKey="1">
-            Take Quiz
-          </Accordion.Toggle>
+          <Card.Header>Take Quiz</Card.Header>
 
-          <Accordion.Collapse eventKey="1">
+          <div>
             <Card.Body>
-              {quizzes.map((item) => {
+              {quizzesNow.map((item) => {
                 // console.log(item);
                 return (
                   <Button
                     key={item.quizName}
                     type="submit"
                     className="btn btn-primary m-3"
-                    onClick={() => handleSubmit("Take", item.quizUUID)}
+                    onClick={() =>
+                      handleSubmit(
+                        "Take",
+                        item,
+                        item.quizTimeStart,
+                        item.quizTimeEnd
+                      )
+                    }
                   >
                     {item.quizName}
                   </Button>
                 );
               })}
             </Card.Body>
-          </Accordion.Collapse>
+          </div>
         </Card>
         <Card>
-          <Accordion.Toggle as={Card.Header} eventKey="2">
-            Profile
-          </Accordion.Toggle>
-          <Accordion.Collapse eventKey="2">
+          <Card.Header>Review Quiz</Card.Header>
+
+          <div>
+            <Card.Body>
+              {quizzesDone.map((item) => {
+                // console.log(item);
+                return (
+                  <Button
+                    key={item.quizName}
+                    type="submit"
+                    className="btn btn-dark m-3"
+                    onClick={() =>
+                      handleSubmit(
+                        "Take",
+                        item,
+                        item.quizTimeStart,
+                        item.quizTimeEnd
+                      )
+                    }
+                  >
+                    {item.quizName}
+                  </Button>
+                );
+              })}
+            </Card.Body>
+          </div>
+        </Card>
+        <Card>
+          <Card.Header>Profile</Card.Header>
+          <div>
             <Card.Body>
               <h2 className="text-center mb-4">Profile</h2>
-              {error && <Alert variant="danger">{error}</Alert>}
               <strong>Email:</strong> {currentUser.email}
-              <Link
-                to="/update-profile"
-                className="btn btn-primary w-75 mx-auto mt-3"
-              >
+              <br />
+              <strong>Name:</strong> {currentUser.displayName}
+              <Link to="/update-profile" className="btn btn-primary ">
                 Update Profile
               </Link>
             </Card.Body>
-          </Accordion.Collapse>
+          </div>
         </Card>
-      </Accordion>
+      </div>
 
       <div className="w-75 mx-auto text-center mt-2">
         <Button variant="link" onClick={handleLogout}>
