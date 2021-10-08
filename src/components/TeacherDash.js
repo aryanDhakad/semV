@@ -5,11 +5,17 @@ import { Link, useHistory } from "react-router-dom";
 import { db } from "../firebase";
 
 export default function TeacherDash() {
-  const { currentUser, logout, quizInfo, setQuizInfo } = useAuth();
+  const { currentUser, logout, setQuizInfo } = useAuth();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [quizzesNow, setQuizzesNow] = useState([]);
   const [quizzesDone, setQuizzesDone] = useState([]);
+  const [notif, setNotif] = useState({
+    facult: currentUser.email,
+    content: "",
+    time: "",
+    isRead: false,
+  });
   const history = useHistory();
 
   useEffect(() => {
@@ -57,6 +63,24 @@ export default function TeacherDash() {
       setError("Failed to log out");
     }
   }
+
+  async function sendNotif() {
+    await db
+      .collection("Student")
+      .get()
+      .then((snapshot) => {
+        snapshot.docs.forEach((doc) => {
+          db.collection("Student").doc(doc.id).collection("Notifs").add(notif);
+        });
+      });
+
+    setNotif({
+      content: "",
+      time: "",
+      isRead: false,
+    });
+  }
+
   if (loading) {
     return <h1>Loading...</h1>;
   }
@@ -64,12 +88,35 @@ export default function TeacherDash() {
   return (
     <div className="container p-3 w-50 text-center">
       <h2>Teacher Dashboard</h2>
+      {error && <Alert variant="danger">{error}</Alert>}
       <Link
         to="/create-quiz-form"
         className="btn btn-primary w-75 mx-auto my-3"
       >
         Create Quiz
       </Link>
+      <div>
+        <label for="notif">Type Notification</label>
+        <input
+          className="form-control"
+          type="text"
+          name="content"
+          value={notif.content}
+          onChange={(e) => {
+            const { name, value } = e.target;
+            setNotif((prev) => {
+              return {
+                ...prev,
+                [name]: value,
+                time: new Date().toLocaleDateString("en-US"),
+              };
+            });
+          }}
+        />
+      </div>
+      <button className="btn btn-primary" onClick={sendNotif}>
+        Add Notification
+      </button>
       <>
         <Card>
           <Card.Header>Edit Quiz</Card.Header>
@@ -104,6 +151,7 @@ export default function TeacherDash() {
                     key={item.quizName}
                     type="submit"
                     className="btn btn-dark m-3"
+                    onClick={() => handleSubmit("Edit", item)}
                   >
                     {item.quizName}
                   </Button>
@@ -140,8 +188,6 @@ export default function TeacherDash() {
           <Card.Header>Profile</Card.Header>
           <div>
             <Card.Body>
-              <h2 className="text-center mb-4">Profile</h2>
-              {error && <Alert variant="danger">{error}</Alert>}
               <strong>Email:</strong> {currentUser.email}
               <Link
                 to="/update-profile"

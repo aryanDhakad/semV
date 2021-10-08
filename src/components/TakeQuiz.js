@@ -12,29 +12,12 @@ function TakeQuiz() {
   const webcamRef = useRef(null);
   let history = useHistory();
 
-  const [option, setOption] = useState({
-    optionContent: "",
-    optionIsCorrect: false,
-    optionWeightage: 1,
-    optionIsSelected: false,
-  });
-
-  const [question, setQuestion] = useState({
-    questionNo: "",
-    questionContent: "",
-    questionOptions: [option, option, option],
-    questionIsAttempted: false,
-    questionIsMarked: false,
-  });
   const [loading, setLoading] = useState(false);
 
-  const [error, setError] = useState(null);
   const [questionList, setQuestionList] = useState([]);
   const [current, setCurrent] = useState(-1);
   const [attempt, setAttempt] = useState({ atm: 0, mrk: 0 });
   const [show, setShow] = useState(false);
-
-  const [optionId, setOptionId] = useState(-1);
 
   useEffect(() => {
     setLoading(true);
@@ -147,21 +130,7 @@ function TakeQuiz() {
                   questions: questionList,
                 });
 
-                history.push("/studentDash");
-
-                // student.get().then(async (doc) => {
-                //   let data = doc.data();
-                //   let newData = {
-                //     ...data,
-                //     data.Attempt : [...data.Attempt,{Id : quizInfo.quizUUID, data : questionList}]
-                //   }
-                // });
-                // student.set({
-                //   ...student.data(),
-                //   student.data().Attempt : [...student.data().Attempt,questionList]
-                // })
-
-                // history.push("/");
+                history.push("/review-test");
               }}
             >
               End Test
