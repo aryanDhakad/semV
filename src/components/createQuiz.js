@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { db } from "../firebase";
+import { Link, useHistory } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 function CreateQuiz() {
-  const { quizId } = useAuth();
+  const { quizInfo } = useAuth();
   const [loading, setLoading] = useState(false);
 
   const [option, setOption] = useState({
@@ -27,24 +28,28 @@ function CreateQuiz() {
 
   useEffect(() => {
     setLoading(true);
-    db.ref("quiz/" + quizId).on("value", (snapshot) => {
-      // console.log(snapshot.val());
-      setQuestionList([...Object.values(snapshot.val() || {})]);
-      setLoading(false);
-    });
-  }, []);
+
+    db.collection("quizInfo/" + quizInfo.quizUUID + "/questions")
+      .get()
+      .then((snapshot) => {
+        let document = snapshot.docs.map((doc) => doc.data());
+
+        setQuestionList([...(document || [])]);
+        setLoading(false);
+      });
+  }, [quizInfo.quizUUID]);
 
   function handleChange(e) {
     const { name, value } = e.target;
 
-    if (name === "questionNo") {
-      db.ref("quiz/" + quizId)
-        .child(value || "-1")
-        .on("value", (snapshot) => {
-          if (snapshot.val()) setError("Question Already Exists");
-          else setError("");
-        });
-    }
+    // if (name === "questionNo") {
+    //   db.doc("quizInfo/" + quizInfo.quizUUID)
+    //     .get()
+    //     .then((doc) => {
+    //       if (doc.exists) setError("Question Already Exists");
+    //       else setError("");
+    //     });
+    // }
 
     setQuestion((prev) => {
       return {
@@ -92,11 +97,20 @@ function CreateQuiz() {
       setError("Question Incomplete or Improper.");
       return;
     }
-    await db.ref(`quiz/${quizId}/` + question.questionNo).set(question);
-    db.ref("quiz/" + quizId).on("value", (snapshot) => {
-      // console.log(snapshot.val());
-      setQuestionList([...Object.values(snapshot.val() || {})]);
-    });
+    await db
+      .collection(`quizInfo/${quizInfo.quizUUID}/questions`)
+      .doc(question.questionNo)
+      .set(question);
+    setLoading(true);
+
+    db.collection("quizInfo/" + quizInfo.quizUUID + "/questions")
+      .get()
+      .then((snapshot) => {
+        let document = snapshot.docs.map((doc) => doc.data());
+
+        setQuestionList([...(document || [])]);
+        setLoading(false);
+      });
     setQuestion({
       questionNo: "",
       questionContent: "",
@@ -157,18 +171,22 @@ function CreateQuiz() {
 
   async function deleteQuestion(id) {
     if (id === undefined || id === null || id === "") {
-      console.log(id);
       return;
     }
-
+    setLoading(true);
     await db
-      .ref("quiz/" + quizId)
-      .child(id)
-      .remove();
-    db.ref("quiz/" + quizId).on("value", (snapshot) => {
-      // console.log(snapshot.val());
-      setQuestionList([...Object.values(snapshot.val() || {})]);
-    });
+      .collection("quizInfo/" + quizInfo.quizUUID + "/questions")
+      .doc(id)
+      .delete();
+
+    db.collection("quizInfo/" + quizInfo.quizUUID + "/questions")
+      .get()
+      .then((snapshot) => {
+        let document = snapshot.docs.map((doc) => doc.data());
+
+        setQuestionList([...(document || [])]);
+        setLoading(false);
+      });
   }
 
   if (loading) {
@@ -176,6 +194,9 @@ function CreateQuiz() {
   }
   return (
     <div className="py-5">
+      <Link to="/create-quiz-form">Edit Quiz Info</Link>
+      <br />
+      <Link to="/teacherDash">Exit</Link>
       <h3 className="text-danger text-center "> NOTE : {error}</h3>
 
       <div className="row px-5">

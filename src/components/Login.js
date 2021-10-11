@@ -2,8 +2,9 @@ import React, { useRef, useState } from "react";
 import { Form, Button, Card, Alert } from "react-bootstrap";
 import { useAuth } from "../contexts/AuthContext";
 import { Link, useHistory } from "react-router-dom";
+import { db } from "../firebase";
 import PopupSignIn from "./PopupSignIn";
-import Cam from "./webcam";
+import loginPage from "../images/loginPage.jpg";
 
 export default function Login() {
   const emailRef = useRef();
@@ -11,81 +12,120 @@ export default function Login() {
   const { login } = useAuth();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
   const [type, setType] = useState("Student");
   const history = useHistory();
+
+  // useEffect(() => {
+  //   let timerFunc = setInterval(() => {
+  //     setTimer(Date.now());
+  //   }, 1000);
+  // }, []);
 
   async function handleSubmit(e) {
     e.preventDefault();
 
     setError("");
     setLoading(true);
+
     await login(emailRef.current.value, passwordRef.current.value)
       .then((cred) => {
-        if (type === "Student") history.push("/studentDash");
-        else if (type === "Teacher") history.push("/teacherDash");
-        else history.push("/");
+        console.log(cred);
+        if (type === "Student") {
+          history.push("/studentDash");
+          // let doc = db.collection("Student").doc(emailRef.current.value).get();
+          // if (doc.exists) {
+
+          // } else {
+          //   setError("User Not Found");
+          // }
+        } else if (type === "Teacher") {
+          history.push("/teacherDash");
+          // let doc = db.collection("Teacher").doc(emailRef.current.value).get();
+          // if (doc.exists) {
+          // } else {
+          //   setError("User Not Found");
+          // }
+        } else history.push("/");
       })
       .catch((err) => {
+        console.log(err);
         setError(`${err.message}`);
       });
 
     setLoading(false);
   }
 
-  return (
-    <>
-      <div className="mb-4 text-center">
-        <Cam />
-      </div>
+  if (loading) {
+    return <h2>Loading...</h2>;
+  }
 
-      <Card>
-        <Card.Body>
-          <h2 className="text-center mb-4">Log In</h2>
-          {error && <Alert variant="danger">{error}</Alert>}
+  return (
+    <div>
+      <div className="container-fluid p-4 rounded-pill display-4 shadow-lg my-2">
+        Quizzy
+      </div>
+      <div
+        className="shadow-lg rounded"
+        style={{
+          backgroundImage: `url(${loginPage})`,
+          backgroundPosition: "center",
+          backgroundSize: "cover",
+          backgroundRepeat: "no-repeat",
+          height: "100%",
+          width: "100%",
+        }}
+      >
+        <div className="w-25 ml-auto">
           <Form onSubmit={handleSubmit}>
-            <Form.Group id="email">
-              <Form.Label>Email</Form.Label>
-              <Form.Control type="email" ref={emailRef} required />
-            </Form.Group>
-            <Form.Group id="password">
-              <Form.Label>Password</Form.Label>
-              <Form.Control type="password" ref={passwordRef} required />
-            </Form.Group>
-            <Form.Group>
-              <Form.Label className="mx-4">
-                Student
-                <Form.Control
-                  type="radio"
-                  checked={type === "Student"}
-                  onClick={() => setType("Student")}
-                  onChange={() => console.log("Student Selected")}
-                />
-              </Form.Label>
-              <Form.Label className="mx-4">
-                Teacher
-                <Form.Control
-                  type="radio"
-                  checked={type === "Teacher"}
-                  onClick={() => setType("Teacher")}
-                  onChange={() => console.log("Teacher Select")}
-                />
-              </Form.Label>
-            </Form.Group>
-            <Button disabled={loading} className="w-100" type="submit">
-              Log In
-            </Button>
+            <Card>
+              <Card.Body>
+                <h2 className="text-center mb-4">Log In</h2>
+                {error && <Alert variant="danger">{error}</Alert>}
+
+                <Form.Group id="email">
+                  <Form.Label>Email</Form.Label>
+                  <Form.Control type="email" ref={emailRef} required />
+                </Form.Group>
+                <Form.Group id="password">
+                  <Form.Label>Password</Form.Label>
+                  <Form.Control type="password" ref={passwordRef} required />
+                </Form.Group>
+                <Form.Group>
+                  <Form.Label className="mx-4">
+                    Student
+                    <Form.Control
+                      type="radio"
+                      checked={type === "Student"}
+                      onClick={() => setType("Student")}
+                      onChange={() => console.log("Student Selected")}
+                    />
+                  </Form.Label>
+                  <Form.Label className="mx-4">
+                    Teacher
+                    <Form.Control
+                      type="radio"
+                      checked={type === "Teacher"}
+                      onClick={() => setType("Teacher")}
+                      onChange={() => console.log("Teacher Select")}
+                    />
+                  </Form.Label>
+                </Form.Group>
+              </Card.Body>
+              <Card.Footer className="d-flex justify-content-between">
+                <Button
+                  disabled={loading}
+                  className="p-3 rounded-pill"
+                  type="submit"
+                >
+                  Log In
+                </Button>
+                <PopupSignIn />
+              </Card.Footer>
+            </Card>
           </Form>
-          <div className="w-100 text-center mt-3">
-            <Link to="/forgot-password">Forgot Password?</Link>
-          </div>
-        </Card.Body>
-      </Card>
-      <div className="w-100 text-center mt-2">
-        Need an account? <Link to="/signup">Sign Up</Link>
+        </div>
       </div>
-      <div className="m-3 p-1">
-        <PopupSignIn />
-      </div>
-    </>
+    </div>
   );
 }
