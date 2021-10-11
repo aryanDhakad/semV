@@ -176,17 +176,6 @@ function CreateQuiz() {
   }
   return (
     <div className="py-5">
-      {/* <div className="my-5 ">
-        <label className="w-100">
-          Unique ID for the quiz :
-          <input
-            type="text"
-            id="quizID"
-            className="form-control"
-            ref={quizID}
-          />
-        </label>
-      </div> */}
       <h3 className="text-danger text-center "> NOTE : {error}</h3>
 
       <div className="row px-5">

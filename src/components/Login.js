@@ -11,6 +11,7 @@ export default function Login() {
   const { login } = useAuth();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [type, setType] = useState("Student");
   const history = useHistory();
 
   async function handleSubmit(e) {
@@ -20,7 +21,9 @@ export default function Login() {
     setLoading(true);
     await login(emailRef.current.value, passwordRef.current.value)
       .then((cred) => {
-        history.push("/");
+        if (type === "Student") history.push("/studentDash");
+        else if (type === "Teacher") history.push("/teacherDash");
+        else history.push("/");
       })
       .catch((err) => {
         setError(`${err.message}`);
@@ -47,6 +50,26 @@ export default function Login() {
             <Form.Group id="password">
               <Form.Label>Password</Form.Label>
               <Form.Control type="password" ref={passwordRef} required />
+            </Form.Group>
+            <Form.Group>
+              <Form.Label className="mx-4">
+                Student
+                <Form.Control
+                  type="radio"
+                  checked={type === "Student"}
+                  onClick={() => setType("Student")}
+                  onChange={() => console.log("Student Selected")}
+                />
+              </Form.Label>
+              <Form.Label className="mx-4">
+                Teacher
+                <Form.Control
+                  type="radio"
+                  checked={type === "Teacher"}
+                  onClick={() => setType("Teacher")}
+                  onChange={() => console.log("Teacher Select")}
+                />
+              </Form.Label>
             </Form.Group>
             <Button disabled={loading} className="w-100" type="submit">
               Log In
