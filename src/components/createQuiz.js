@@ -29,7 +29,7 @@ function CreateQuiz() {
   useEffect(() => {
     setLoading(true);
 
-    db.collection("quiz/" + quizInfo.quizName + "/questions")
+    db.collection("quizInfo/" + quizInfo.quizUUID + "/questions")
       .get()
       .then((snapshot) => {
         let document = snapshot.docs.map((doc) => doc.data());
@@ -37,19 +37,19 @@ function CreateQuiz() {
         setQuestionList([...(document || [])]);
         setLoading(false);
       });
-  }, []);
+  }, [quizInfo.quizUUID]);
 
   function handleChange(e) {
     const { name, value } = e.target;
 
-    if (name === "questionNo") {
-      db.doc("quiz/" + quizInfo.quizName)
-        .get()
-        .then((doc) => {
-          if (doc.exists) setError("Question Already Exists");
-          else setError("");
-        });
-    }
+    // if (name === "questionNo") {
+    //   db.doc("quizInfo/" + quizInfo.quizUUID)
+    //     .get()
+    //     .then((doc) => {
+    //       if (doc.exists) setError("Question Already Exists");
+    //       else setError("");
+    //     });
+    // }
 
     setQuestion((prev) => {
       return {
@@ -98,12 +98,12 @@ function CreateQuiz() {
       return;
     }
     await db
-      .collection(`quiz/${quizInfo.quizName}/questions`)
+      .collection(`quizInfo/${quizInfo.quizUUID}/questions`)
       .doc(question.questionNo)
       .set(question);
     setLoading(true);
 
-    db.collection("quiz/" + quizInfo.quizName + "/questions")
+    db.collection("quizInfo/" + quizInfo.quizUUID + "/questions")
       .get()
       .then((snapshot) => {
         let document = snapshot.docs.map((doc) => doc.data());
@@ -175,11 +175,11 @@ function CreateQuiz() {
     }
     setLoading(true);
     await db
-      .collection("quiz/" + quizInfo.quizName + "/questions")
+      .collection("quizInfo/" + quizInfo.quizUUID + "/questions")
       .doc(id)
       .delete();
 
-    db.collection("quiz/" + quizInfo.quizName + "/questions")
+    db.collection("quizInfo/" + quizInfo.quizUUID + "/questions")
       .get()
       .then((snapshot) => {
         let document = snapshot.docs.map((doc) => doc.data());

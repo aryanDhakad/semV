@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useRef, useEffect } from "react";
 import XLSX from "xlsx";
 import "bootstrap/dist/css/bootstrap.css";
-import { Link, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import { v4 as uuid4 } from "uuid";
@@ -16,9 +16,9 @@ function CreateQuizForm() {
     instructorName: "",
     instructorEmail: "",
     quizInstructions: "",
-    quizDate: "",
     quizTimeStart: "",
     quizTimeEnd: "",
+    quizLetReview: false,
     quizWeightage: "",
     quizTaEmailList: [],
     quizStudentEmailList: [],
@@ -33,10 +33,11 @@ function CreateQuizForm() {
 
   useEffect(() => {
     setLoading(true);
-    if (quizInfo.quizName !== "default") {
+    if (quizInfo.quizUUID !== "") {
       setInfo(quizInfo);
       setLoading(false);
     }
+    setLoading(false);
   }, [quizInfo]);
 
   function handleChange(e) {
@@ -93,27 +94,18 @@ function CreateQuizForm() {
     e.preventDefault();
 
     // generating uuid
-    const tempUUID = uuid4();
-
-    setQuizInfo(info);
+    info.quizUUID = info.quizUUID ? info.quizUUID : uuid4();
 
     // final quiz information
-    await db.collection("quizInfo").doc(info.quizName).set({
-      quizUUID: tempUUID,
-      quizName: info.quizName,
-      // instructorName: info.instructorName,
-      // instructorEmail: info.instructorEmail,
-      // quizInstructions: info.quizInstructions,
-      // quizInstructions: quizInstructionsRef.current,
-      quizDate: info.quizDate,
-      quizTimeStart: info.quizTimeStart,
-      quizTimeEnd: info.quizTimeEnd,
-      quizIsAttempted: false,
-      // quizWeightage: info.quizWeightage,
-      // quizTaEmailList: taEmailListRef.current,
-      // quizStudentEmailList: studentEmailListRef.current,
-    });
-    history.push("/create-quiz");
+    await db
+      .collection("quizInfo")
+      .doc(info.quizUUID)
+      .set(info)
+      .then(() => {
+        console.log("Created quiz");
+        setQuizInfo(info);
+        history.push("/create-quiz");
+      });
 
     // setInfo({
     //   quizUUID: "",
@@ -121,7 +113,7 @@ function CreateQuizForm() {
     //   instructorName: "",
     //   instructorEmail: "",
     //   quizInstructions: "",
-    //   quizDate: "",
+
     //   quizTime: "",
     //   quizWeightage: "",
     //   quizTaEmailList: [],
@@ -133,7 +125,7 @@ function CreateQuizForm() {
   if (loading) {
     return <h3>Loading ....</h3>;
   }
-
+  // console.log(info);
   return (
     <div style={{ display: "block", width: 700, padding: 30 }}>
       <h2>Enter Quiz Information</h2>
@@ -165,21 +157,13 @@ function CreateQuizForm() {
             onChange={handleChange}
           />
         </Form.Group> */}
-        <Form.Group controlId="exampleForm.ControlInput1">
-          <Form.Label>Quiz Date:</Form.Label>
-          <Form.Control
-            type="date"
-            name="quizDate"
-            value={info.quizDate}
-            onChange={handleChange}
-          />
-        </Form.Group>
+
         <Form.Group controlId="exampleForm.ControlInput1">
           <Form.Label>Quiz Time Start:</Form.Label>
           <Form.Control
             type="datetime-local"
             name="quizTimeStart"
-            // value={() => new Date(info.quizTimeStart)}
+            value={info.quizTimeStart}
             onChange={handleChange}
           />
         </Form.Group>
@@ -188,9 +172,28 @@ function CreateQuizForm() {
           <Form.Control
             type="datetime-local"
             name="quizTimeEnd"
-            // value={() => new Date(info.quizTimeEnd)}
+            value={info.quizTimeEnd}
             onChange={handleChange}
           />
+        </Form.Group>
+        <Form.Group controlId="exampleForm.ControlInput1">
+          <Form.Label>
+            Let Review Test :
+            <Form.Control
+              type="checkbox"
+              name="quizLetReview"
+              checked={info.quizLetReview}
+              onChange={() => {}}
+              onClick={() =>
+                setInfo((prev) => {
+                  return {
+                    ...prev,
+                    quizLetReview: !prev.quizLetReview,
+                  };
+                })
+              }
+            />
+          </Form.Label>
         </Form.Group>
         {/* <Form.Group controlId="exampleForm.ControlInput1">
           <Form.Label>Quiz Weightage:</Form.Label>

@@ -86,124 +86,100 @@ export default function TeacherDash() {
   }
 
   return (
-    <div className="container p-3 w-50 text-center">
+    <div className="container p-3  text-center">
       <h2>Teacher Dashboard</h2>
       {error && <Alert variant="danger">{error}</Alert>}
-      <Link
-        to="/create-quiz-form"
-        className="btn btn-primary w-75 mx-auto my-3"
-      >
-        Create Quiz
-      </Link>
-      <div>
-        <label for="notif">Type Notification</label>
-        <input
-          className="form-control"
-          type="text"
-          name="content"
-          value={notif.content}
-          onChange={(e) => {
-            const { name, value } = e.target;
-            setNotif((prev) => {
-              return {
-                ...prev,
-                [name]: value,
-                time: new Date().toLocaleDateString("en-US"),
-              };
-            });
-          }}
-        />
+      <div className="row text-left my-4 p-4">
+        <div className="col-6">
+          <strong>Email:</strong> {currentUser.email}
+          <br />
+          <strong>Name:</strong> {currentUser.displayName}
+        </div>
+        <div className="col-6">
+          <Button variant="outline-danger" onClick={handleLogout}>
+            Log Out
+          </Button>
+        </div>
       </div>
-      <button className="btn btn-primary" onClick={sendNotif}>
-        Add Notification
-      </button>
-      <>
-        <Card>
-          <Card.Header>Edit Quiz</Card.Header>
+      <div className="row">
+        <div className="col-4">
+          <label>NOTIFICATION :</label>
+          <textarea
+            row="7"
+            col="20"
+            className="form-control"
+            type="text"
+            name="content"
+            value={notif.content}
+            onChange={(e) => {
+              const { name, value } = e.target;
+              setNotif((prev) => {
+                return {
+                  ...prev,
+                  [name]: value,
+                  time: new Date().toLocaleDateString("en-US"),
+                };
+              });
+            }}
+          />
+          <button
+            className="btn btn-primary rounded-circle mx-3 "
+            onClick={sendNotif}
+          >
+            +
+          </button>
 
-          <div>
-            <Card.Body>
-              {quizzesNow.map((item) => {
-                // console.log(item);
-                return (
-                  <button
-                    key={item.quizName}
-                    type="submit"
-                    className="btn btn-primary m-3"
-                    onClick={() => handleSubmit("Edit", item)}
-                  >
-                    {item.quizName}
-                  </button>
-                );
-              })}
-            </Card.Body>
-          </div>
-        </Card>
-        <Card>
-          <Card.Header>Past Quiz</Card.Header>
+          <Link
+            to="/create-quiz-form"
+            className="btn btn-primary w-100 mx-auto my-3"
+          >
+            Create Quiz
+          </Link>
+        </div>
+        <div className="col-8">
+          <Card>
+            <Card.Header>Edit Quiz</Card.Header>
 
-          <div>
-            <Card.Body>
-              {quizzesDone.map((item) => {
-                // console.log(item);
-                return (
-                  <Button
-                    key={item.quizName}
-                    type="submit"
-                    className="btn btn-dark m-3"
-                    onClick={() => handleSubmit("Edit", item)}
-                  >
-                    {item.quizName}
-                  </Button>
-                );
-              })}
-            </Card.Body>
-          </div>
-        </Card>
+            <div>
+              <Card.Body>
+                {quizzesNow.map((item) => {
+                  // console.log(item);
+                  return (
+                    <button
+                      key={item.quizName}
+                      type="submit"
+                      className="btn btn-primary m-3"
+                      onClick={() => handleSubmit("Edit", item)}
+                    >
+                      {item.quizName}
+                    </button>
+                  );
+                })}
+              </Card.Body>
+            </div>
+          </Card>
+          <Card>
+            <Card.Header>Past Quiz</Card.Header>
 
-        {/* <Card>
-          <Card.Header  >
-            Take Quiz
-          </Card.Header>
-
-          <div >
-            <Card.Body>
-              {quizzesNow.map((item) => {
-                // console.log(item);
-                return (
-                  <Button
-                    key={item.quizName}
-                    type="submit"
-                    className="btn btn-primary m-3"
-                    onClick={() => handleSubmit("Take", item.quizUUID)}
-                  >
-                    {item.quizName}
-                  </Button>
-                );
-              })}
-            </Card.Body>
-          </div>
-        </Card> */}
-        <Card>
-          <Card.Header>Profile</Card.Header>
-          <div>
-            <Card.Body>
-              <strong>Email:</strong> {currentUser.email}
-              <Link
-                to="/update-profile"
-                className="btn btn-primary w-75 mx-auto mt-3"
-              >
-                Update Profile
-              </Link>
-            </Card.Body>
-          </div>
-        </Card>
-      </>
-
-      <div className="w-75 mx-auto text-center mt-2">
-        <Button variant="link" onClick={handleLogout}>
-          Log Out
-        </Button>
+            <div>
+              <Card.Body>
+                {quizzesDone.map((item) => {
+                  // console.log(item);
+                  return (
+                    <Button
+                      key={item.quizName}
+                      type="submit"
+                      className="btn btn-dark m-3"
+                      onClick={() => handleSubmit("Edit", item)}
+                    >
+                      {item.quizName}
+                    </Button>
+                  );
+                })}
+              </Card.Body>
+            </div>
+          </Card>
+        </div>
       </div>
     </div>
   );

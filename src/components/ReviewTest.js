@@ -18,7 +18,7 @@ function ReviewTest() {
     db.collection("Student")
       .doc(currentUser.email)
       .collection("Attempt")
-      .doc(quizInfo.quizName)
+      .doc(quizInfo.quizUUID)
       .get()
       .then((doc) => {
         if (doc.exists) {
@@ -30,7 +30,7 @@ function ReviewTest() {
 
         setLoading(false);
       });
-  }, [currentUser.email, quizInfo.quizName]);
+  }, [currentUser.email, quizInfo.quizUUID]);
 
   useEffect(() => {
     if (current === -1 && questionList.length) setCurrent(0);

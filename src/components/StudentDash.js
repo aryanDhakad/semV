@@ -22,7 +22,7 @@ export default function StudentDash() {
         snapshot.docs.forEach((doc) => {
           let time2ed = new Date(doc.data().quizTimeEnd);
 
-          if (time2ed.getTime() < time.getTime()) {
+          if (time2ed.getTime() < time.getTime() && doc.data().quizLetReview) {
             setQuizzesDone((prev) => {
               return [...prev, doc.data()];
             });
@@ -84,6 +84,11 @@ export default function StudentDash() {
       setError("Failed to log out");
     }
   }
+
+  function showTime(time) {
+    let t = new Date(time);
+    return t.toLocaleString("en-US");
+  }
   if (loading) {
     return <h1>Loading...</h1>;
   }
@@ -97,10 +102,6 @@ export default function StudentDash() {
           <strong>Name:</strong> {currentUser.displayName}
         </div>
         <div className="col-6">
-          <Link to="/update-profile" className="btn btn-primary mx-1">
-            Update Profile
-          </Link>
-
           <Button variant="outline-danger" onClick={handleLogout}>
             Log Out
           </Button>
@@ -114,7 +115,7 @@ export default function StudentDash() {
             <thead className="thead-dark">
               <tr>
                 <th> Name. </th>
-                <th> Subject </th>
+                <th> Faculty </th>
                 <th> Date </th>
                 <th> .... </th>
               </tr>
@@ -123,7 +124,7 @@ export default function StudentDash() {
               {notifs.map((item, index) => {
                 return (
                   <tr key={index}>
-                    <tr scope="row">{index + 1}</tr>
+                    <th scope="row">{index + 1}</th>
                     <td>{item.facult}</td>
                     <td>{item.content}</td>
                     <td>
@@ -207,11 +208,11 @@ export default function StudentDash() {
               {quizzesNow.map((item, index) => {
                 // console.log(item);
                 return (
-                  <tr>
+                  <tr key={index}>
                     <th scope="row">{index + 1}</th>
                     <td>{item.quizName}</td>
-                    <td>{item.quizTimeStart}</td>
-                    <td>{item.quizTimeEnd}</td>
+                    <td>{showTime(item.quizTimeStart)}</td>
+                    <td>{showTime(item.quizTimeEnd)}</td>
                     <td>
                       <Button
                         key={index}
@@ -250,15 +251,11 @@ export default function StudentDash() {
               {quizzesDone.map((item, index) => {
                 // console.log(item);
                 return (
-                  <tr>
+                  <tr key={index}>
                     <th scope="row">{index + 1}</th>
                     <td>{item.quizName}</td>
-                    <td>
-                      {new Date(item.quizTimeStart).toLocaleDateString("en-US")}
-                    </td>
-                    <td>
-                      {new Date(item.quizTimeEnd).toLocaleDateString("en-US")}
-                    </td>
+                    <td>{showTime(item.quizTimeStart)}</td>
+                    <td>{showTime(item.quizTimeEnd)}</td>
                     <td>
                       <Button
                         key={index}
@@ -273,7 +270,7 @@ export default function StudentDash() {
                           )
                         }
                       >
-                        Start
+                        Review
                       </Button>
                     </td>
                   </tr>

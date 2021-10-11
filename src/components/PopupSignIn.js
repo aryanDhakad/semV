@@ -16,24 +16,19 @@ export default function PopupSignIn() {
     auth
       .signInWithPopup(provider)
       .then(function (result) {
-        setCurrentUser(result);
+        if (result.additionalUserInfo.profile.hd === "iiita.ac.in") {
+          setCurrentUser(result);
 
-        history.push("/studentDash");
+          history.push("/studentDash");
+        }
       })
       .catch((error) => {
         console.log(error);
       });
   };
   return (
-    <div className="container">
-      <div className="vertical-center text-center">
-        <Button
-          className="w-50 mt-3 mx-auto rounded-pill p-2"
-          onClick={handleGoogleLogin}
-        >
-          Sign In with Google
-        </Button>
-      </div>
-    </div>
+    <Button className="   rounded-pill p-2" onClick={handleGoogleLogin}>
+      Google
+    </Button>
   );
 }

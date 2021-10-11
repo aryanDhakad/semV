@@ -22,7 +22,7 @@ function TakeQuiz() {
   useEffect(() => {
     setLoading(true);
 
-    db.collection("quiz/" + quizInfo.quizName + "/questions")
+    db.collection("quizInfo/" + quizInfo.quizUUID + "/questions")
       .get()
       .then((snapshot) => {
         let document = snapshot.docs.map((doc) => doc.data());
@@ -30,7 +30,7 @@ function TakeQuiz() {
         setQuestionList([...(document || [])]);
         setLoading(false);
       });
-  }, [quizInfo.quizName]);
+  }, [quizInfo.quizUUID]);
 
   useEffect(() => {
     if (current === -1 && questionList.length) setCurrent(0);
@@ -125,12 +125,15 @@ function TakeQuiz() {
               onClick={async () => {
                 let student = db.collection("Student").doc(currentUser.email);
 
-                await student.collection("Attempt").doc(quizInfo.quizName).set({
+                await student.collection("Attempt").doc(quizInfo.quizUUID).set({
                   Info: quizInfo,
                   questions: questionList,
                 });
-
-                history.push("/review-test");
+                if (quizInfo.quizLetReview) {
+                  history.push("/review-test");
+                } else {
+                  history.push("/studentDash");
+                }
               }}
             >
               End Test
