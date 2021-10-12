@@ -7,7 +7,7 @@ import { Link, useHistory } from "react-router-dom";
 import { db } from "../firebase";
 
 function TakeQuiz() {
-  const { quizInfo, expireTime, currentUser } = useAuth();
+  const { quizInfo, expireTime, currentUser, setQuizInfo } = useAuth();
 
   const webcamRef = useRef(null);
   let history = useHistory();
@@ -129,11 +129,8 @@ function TakeQuiz() {
                   Info: quizInfo,
                   questions: questionList,
                 });
-                if (quizInfo.quizLetReview) {
-                  history.push("/review-test");
-                } else {
-                  history.push("/studentDash");
-                }
+
+                history.push("/studentDash");
               }}
             >
               End Test

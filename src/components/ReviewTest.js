@@ -23,14 +23,18 @@ function ReviewTest() {
       .then((doc) => {
         if (doc.exists) {
           let data = doc.data();
-          console.log(data.questions);
 
           setQuestionList([...(data.questions || [])]);
         }
+        db.collection("Student")
+          .doc(currentUser.email)
+          .collection("Attempt")
+          .doc(quizInfo.quizUUID)
+          .set(quizInfo);
 
         setLoading(false);
       });
-  }, [currentUser.email, quizInfo.quizUUID]);
+  }, [currentUser.email, quizInfo, quizInfo.quizUUID]);
 
   useEffect(() => {
     if (current === -1 && questionList.length) setCurrent(0);

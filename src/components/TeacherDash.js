@@ -21,6 +21,7 @@ export default function TeacherDash() {
 
   useEffect(() => {
     setLoading(true);
+    setQuizInfo({});
     let time = new Date();
     db.collection("quizInfo")
       .get()

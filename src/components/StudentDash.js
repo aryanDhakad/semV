@@ -37,13 +37,27 @@ export default function StudentDash() {
 
           if (time2ed.getTime() < time.getTime() && doc.data().quizLetReview) {
             setQuizzesDone((prev) => {
-              return [...prev, doc.data()];
-            });
-          } else {
-            setQuizzesNow((prev) => {
               // console.log(doc.data());
               return [...prev, doc.data()];
             });
+          } else {
+            db.collection(`Student/${currentUser.email || "default"}/Attempt`)
+              .doc(doc.id)
+              .get()
+              .then((doc1) => {
+                if (!doc1.exists) {
+                  setQuizzesNow((prev) => {
+                    // console.log(doc.data());
+                    return [...prev, doc.data()];
+                  });
+                }
+                // else if (doc.data().quizLetReview) {
+                //   setQuizzesDone((prev) => {
+                //     // console.log(doc.data());
+                //     return [...prev, doc.data()];
+                //   });
+                // }
+              });
           }
         });
       })
@@ -79,17 +93,14 @@ export default function StudentDash() {
     let now = new Date();
     if (start.getTime() > now.getTime()) {
       setError("Test Not Started");
-    } else if (now.getTime() > end.getTime()) {
+    } else if (type === "review") {
       setQuizInfo(item);
       history.push("/review-test");
-    } else {
+    } else if (type === "take") {
       setQuizInfo(item);
       setExpireTime(end);
-      if (type === "Take") {
-        history.push("/take-quiz");
-      } else {
-        history.push("/");
-      }
+
+      history.push("/take-quiz");
     }
   }
 
@@ -117,163 +128,177 @@ export default function StudentDash() {
       </div>
 
       <p> {error && <Alert variant="danger">{error}</Alert>}</p>
+
       <div className="row">
         <div className="col-6">
-          <table className=" table">
-            <thead className="thead-dark">
-              <tr>
-                <th> Name. </th>
-                <th> Faculty </th>
-                <th> Date </th>
-                <th> .... </th>
-              </tr>
-            </thead>
-            <tbody>
-              {notifs.map((item, index) => {
-                return (
-                  <tr key={index}>
-                    <th scope="row">{index + 1}</th>
-                    <td>{item.faculty}</td>
-                    <td>{item.content}</td>
-                    <td>
-                      {item.isRead ? (
-                        <button
-                          className="btn btn-danger btn-sm"
-                          onClick={() => {
-                            setNotifs((prev) => {
-                              return prev.filter((item, id) => {
-                                return id !== index;
+          {notifs.length ? (
+            <table className=" table">
+              <thead className="thead-dark">
+                <tr>
+                  <th> Name. </th>
+                  <th> Faculty </th>
+                  <th> Date </th>
+                  <th> .... </th>
+                </tr>
+              </thead>
+              <tbody>
+                {notifs.map((item, index) => {
+                  return (
+                    <tr key={index}>
+                      <th scope="row">{index + 1}</th>
+                      <td>{item.faculty}</td>
+                      <td>{item.content}</td>
+                      <td>
+                        {item.isRead ? (
+                          <button
+                            className="btn btn-danger btn-sm"
+                            onClick={() => {
+                              setNotifs((prev) => {
+                                return prev.filter((item, id) => {
+                                  return id !== index;
+                                });
                               });
-                            });
-                            db.collection("Student")
-                              .doc(currentUser.email)
-                              .collection("Notifs")
-                              .doc(item.id)
-                              .delete();
-                          }}
-                        >
-                          X
-                        </button>
-                      ) : (
-                        <button
-                          className="btn btn-primary btn-sm mx-1"
-                          onClick={() => {
-                            setNotifs((prev) => {
-                              return prev.map((item, id) => {
-                                if (id === index) {
-                                  item.isRead = true;
-                                  return item;
-                                } else return item;
+                              db.collection("Student")
+                                .doc(currentUser.email)
+                                .collection("Notifs")
+                                .doc(item.id)
+                                .delete();
+                            }}
+                          >
+                            X
+                          </button>
+                        ) : (
+                          <button
+                            className="btn btn-primary btn-sm mx-1"
+                            onClick={() => {
+                              setNotifs((prev) => {
+                                return prev.map((item, id) => {
+                                  if (id === index) {
+                                    item.isRead = true;
+                                    return item;
+                                  } else return item;
+                                });
                               });
-                            });
 
-                            db.collection("Student")
-                              .doc(currentUser.email)
-                              .collection("Notifs")
-                              .doc(item.id)
-                              .update({
-                                isRead: !item.isRead,
-                              });
-                          }}
-                        >
-                          Mark As Read
-                        </button>
-                      )}{" "}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                              db.collection("Student")
+                                .doc(currentUser.email)
+                                .collection("Notifs")
+                                .doc(item.id)
+                                .update({
+                                  isRead: !item.isRead,
+                                });
+                            }}
+                          >
+                            Mark As Read
+                          </button>
+                        )}{" "}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          ) : (
+            <h3 className="shadow-lg">Nothing to check Here..</h3>
+          )}
         </div>
 
         <div className="col-6">
-          <h3>Upcoming Quiz</h3>
-          <table className="table my-3">
-            <thead className="thead-dark">
-              <tr>
-                <td>Sr No.</td>
-                <td>Name </td>
-                <td>Starts At</td>
-                <td>Ends At</td>
-                <td>Faculty</td>
-                <td>....</td>
-              </tr>
-            </thead>
-            <tbody>
-              {quizzesNow.map((item, index) => {
-                // console.log(item);
-                return (
-                  <tr key={index}>
-                    <th scope="row">{index + 1}</th>
-                    <td>{item.quizName}</td>
-                    <td>{showTime(item.quizTimeStart)}</td>
-                    <td>{showTime(item.quizTimeEnd)}</td>
-                    <td>
-                      <Button
-                        key={index}
-                        type="submit"
-                        className="btn btn-primary m-3"
-                        onClick={() =>
-                          handleSubmit(
-                            "Take",
-                            item,
-                            item.quizTimeStart,
-                            item.quizTimeEnd
-                          )
-                        }
-                      >
-                        Start
-                      </Button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-          <h3>Past Quiz</h3>
-          <table className="table my-3">
-            <thead className="thead-dark">
-              <tr>
-                <td>Sr No.</td>
-                <td>Name </td>
-                <td>Starts At</td>
-                <td>Ends At</td>
-                <td>Faculty</td>
-                <td>....</td>
-              </tr>
-            </thead>
-            <tbody>
-              {quizzesDone.map((item, index) => {
-                // console.log(item);
-                return (
-                  <tr key={index}>
-                    <th scope="row">{index + 1}</th>
-                    <td>{item.quizName}</td>
-                    <td>{showTime(item.quizTimeStart)}</td>
-                    <td>{showTime(item.quizTimeEnd)}</td>
-                    <td>
-                      <Button
-                        key={index}
-                        type="submit"
-                        className="btn btn-primary m-3"
-                        onClick={() =>
-                          handleSubmit(
-                            "Take",
-                            item,
-                            item.quizTimeStart,
-                            item.quizTimeEnd
-                          )
-                        }
-                      >
-                        Review
-                      </Button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          <h3 className="shadow-lg">Upcoming Quiz</h3>
+          {quizzesNow.length ? (
+            <table className="table my-3">
+              <thead className="thead-dark">
+                <tr>
+                  <td>Sr No.</td>
+                  <td>Name </td>
+                  <td>Starts At</td>
+                  <td>Ends At</td>
+                  <td>Faculty</td>
+                  <td>....</td>
+                </tr>
+              </thead>
+              <tbody>
+                {quizzesNow.map((item, index) => {
+                  // console.log(item);
+                  return (
+                    <tr key={index}>
+                      <th scope="row">{index + 1}</th>
+                      <td>{item.quizName}</td>
+                      <td>{showTime(item.quizTimeStart)}</td>
+                      <td>{showTime(item.quizTimeEnd)}</td>
+                      <td>
+                        <Button
+                          key={index}
+                          type="submit"
+                          className="btn btn-primary m-3"
+                          onClick={() =>
+                            handleSubmit(
+                              "take",
+                              item,
+                              item.quizTimeStart,
+                              item.quizTimeEnd
+                            )
+                          }
+                        >
+                          Start
+                        </Button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          ) : (
+            <h3 className="shadow-lg">No Upcoming Quizzes..</h3>
+          )}
+
+          <h3 className="shadow-lg">Past Quiz</h3>
+          {quizzesDone.length ? (
+            <table className="table my-3">
+              <thead className="thead-dark">
+                <tr>
+                  <td>Sr No.</td>
+                  <td>Name </td>
+                  <td>Starts At</td>
+                  <td>Ends At</td>
+                  <td>Faculty</td>
+                  <td>....</td>
+                </tr>
+              </thead>
+              <tbody>
+                {quizzesDone.map((item, index) => {
+                  // console.log(item);
+                  return (
+                    <tr key={index}>
+                      <th scope="row">{index + 1}</th>
+                      <td>{item.quizName}</td>
+                      <td>{showTime(item.quizTimeStart)}</td>
+                      <td>{showTime(item.quizTimeEnd)}</td>
+                      <td>
+                        <Button
+                          key={index}
+                          type="submit"
+                          className="btn btn-primary m-3"
+                          onClick={() =>
+                            handleSubmit(
+                              "review",
+                              item,
+                              item.quizTimeStart,
+                              item.quizTimeEnd
+                            )
+                          }
+                        >
+                          Review
+                        </Button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          ) : (
+            <h3 className="shadow-lg">No Quizzes to see..</h3>
+          )}
         </div>
       </div>
     </div>
