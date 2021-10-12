@@ -16,12 +16,6 @@ export default function Login() {
   const [type, setType] = useState("Student");
   const history = useHistory();
 
-  // useEffect(() => {
-  //   let timerFunc = setInterval(() => {
-  //     setTimer(Date.now());
-  //   }, 1000);
-  // }, []);
-
   async function handleSubmit(e) {
     e.preventDefault();
 
@@ -30,22 +24,28 @@ export default function Login() {
 
     await login(emailRef.current.value, passwordRef.current.value)
       .then((cred) => {
-        console.log(cred);
         if (type === "Student") {
-          history.push("/studentDash");
-          // let doc = db.collection("Student").doc(emailRef.current.value).get();
-          // if (doc.exists) {
-
-          // } else {
-          //   setError("User Not Found");
-          // }
+          db.collection("Student")
+            .doc(cred.user.email)
+            .get()
+            .then((doc) => {
+              if (doc.exists) {
+                history.push("/studentDash");
+              } else {
+                setError("User Not Found");
+              }
+            });
         } else if (type === "Teacher") {
-          history.push("/teacherDash");
-          // let doc = db.collection("Teacher").doc(emailRef.current.value).get();
-          // if (doc.exists) {
-          // } else {
-          //   setError("User Not Found");
-          // }
+          db.collection("Student")
+            .doc(cred.user.email)
+            .get()
+            .then((doc) => {
+              if (doc.exists) {
+                history.push("/teacherDash");
+              } else {
+                setError("User Not Found");
+              }
+            });
         } else history.push("/");
       })
       .catch((err) => {

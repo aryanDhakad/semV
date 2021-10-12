@@ -19,6 +19,7 @@ function CreateQuizForm() {
     quizTimeStart: "",
     quizTimeEnd: "",
     quizLetReview: false,
+    questionIsAttempted: false,
     quizWeightage: "",
     quizTaEmailList: [],
     quizStudentEmailList: [],
