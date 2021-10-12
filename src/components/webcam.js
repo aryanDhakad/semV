@@ -17,17 +17,25 @@ export default function Cam() {
     }
   }, [webcamRef, setImgSrc]);
 
-  useEffect(() => {
-    let interval = setInterval(capture, 5000);
+  // useEffect(() => {
+  //   let interval = setInterval(capture, 500);
 
-    return () => {
-      clearInterval(interval);
-    };
-  }, [capture]);
+  //   return () => {
+  //     clearInterval(interval);
+  //   };
+  // }, [capture]);
 
   return (
     <div>
-      <Button variant="primary" onClick={handleShow}>
+      <Webcam
+        height={500}
+        ref={webcamRef}
+        screenshotFormat="image/jpeg"
+        width={500}
+      />
+      {imgSrc && <img src={imgSrc} alt="N.F." />}
+
+      {/* <Button variant="primary" onClick={handleShow}>
         Allow WebCam Access
       </Button>
 
@@ -57,7 +65,7 @@ export default function Cam() {
             Take Screen Shot
           </Button>
         </Modal.Footer>
-      </Modal>
+      </Modal> */}
     </div>
   );
 }

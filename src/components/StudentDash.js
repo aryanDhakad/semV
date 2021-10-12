@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Card, Button, Alert, Badge } from "react-bootstrap";
+import { Button, Alert, Badge } from "react-bootstrap";
 import { useAuth } from "../contexts/AuthContext";
-import { Link, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { db } from "../firebase";
 
 export default function StudentDash() {
   const { currentUser, logout, setQuizInfo, setExpireTime } = useAuth();
+
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [quizzesNow, setQuizzesNow] = useState([]);
@@ -13,8 +14,20 @@ export default function StudentDash() {
   const [notifs, setNotifs] = useState([]);
   const history = useHistory();
 
+  async function handleLogout() {
+    setError("");
+
+    try {
+      await logout();
+      history.push("/");
+    } catch {
+      setError("Failed to log out");
+    }
+  }
+
   useEffect(() => {
     setLoading(true);
+
     let time = new Date();
     db.collection("quizInfo")
       .get()
@@ -38,26 +51,32 @@ export default function StudentDash() {
         setError(err);
       });
 
-    db.collection("Student")
-      .doc(currentUser.email)
-      .collection("Notifs")
-      .get()
-      .then((snap) => {
-        let data = snap.docs.map((item) => {
-          return { id: item.id, ...item.data() };
-        });
+    setLoading(false);
+  }, []);
 
-        setNotifs([...data]);
-      });
+  useEffect(() => {
+    setLoading(true);
+    if (currentUser) {
+      db.collection("Student")
+        .doc(currentUser.email)
+        .collection("Notifs")
+        .get()
+        .then((snap) => {
+          let data = snap.docs.map((item) => {
+            return { id: item.id, ...item.data() };
+          });
+
+          setNotifs([...data]);
+        });
+    }
 
     setLoading(false);
-  }, [currentUser.email]);
+  }, [currentUser]);
 
   function handleSubmit(type, item, start, end) {
     start = new Date(start);
     end = new Date(end);
     let now = new Date();
-
     if (start.getTime() > now.getTime()) {
       setError("Test Not Started");
     } else if (now.getTime() > end.getTime()) {
@@ -74,22 +93,11 @@ export default function StudentDash() {
     }
   }
 
-  async function handleLogout() {
-    setError("");
-
-    try {
-      await logout();
-      history.push("/");
-    } catch {
-      setError("Failed to log out");
-    }
-  }
-
   function showTime(time) {
     let t = new Date(time);
     return t.toLocaleString("en-US");
   }
-  if (loading) {
+  if (loading || !currentUser) {
     return <h1>Loading...</h1>;
   }
 
@@ -125,40 +133,28 @@ export default function StudentDash() {
                 return (
                   <tr key={index}>
                     <th scope="row">{index + 1}</th>
-                    <td>{item.facult}</td>
+                    <td>{item.faculty}</td>
                     <td>{item.content}</td>
                     <td>
-                      <Badge variant={item.isRead ? "success" : "danger"}>
-                        {" "}
-                        {item.isRead ? (
-                          <span>Read</span>
-                        ) : (
-                          <span>Not Read</span>
-                        )}{" "}
-                      </Badge>
-                    </td>
-                    <td>
-                      {" "}
-                      <button
-                        className="btn btn-danger btn-sm"
-                        onClick={() => {
-                          setNotifs((prev) => {
-                            return prev.filter((item, id) => {
-                              return id !== index;
+                      {item.isRead ? (
+                        <button
+                          className="btn btn-danger btn-sm"
+                          onClick={() => {
+                            setNotifs((prev) => {
+                              return prev.filter((item, id) => {
+                                return id !== index;
+                              });
                             });
-                          });
-                          db.collection("Student")
-                            .doc(currentUser.email)
-                            .collection("Notifs")
-                            .doc(item.id)
-                            .delete();
-                        }}
-                      >
-                        X
-                      </button>
-                    </td>
-                    <td>
-                      {!item.isRead && (
+                            db.collection("Student")
+                              .doc(currentUser.email)
+                              .collection("Notifs")
+                              .doc(item.id)
+                              .delete();
+                          }}
+                        >
+                          X
+                        </button>
+                      ) : (
                         <button
                           className="btn btn-primary btn-sm mx-1"
                           onClick={() => {
@@ -182,7 +178,7 @@ export default function StudentDash() {
                         >
                           Mark As Read
                         </button>
-                      )}
+                      )}{" "}
                     </td>
                   </tr>
                 );

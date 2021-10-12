@@ -8,10 +8,11 @@ export default function TeacherDash() {
   const { currentUser, logout, setQuizInfo } = useAuth();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
   const [quizzesNow, setQuizzesNow] = useState([]);
   const [quizzesDone, setQuizzesDone] = useState([]);
   const [notif, setNotif] = useState({
-    facult: currentUser.email,
+    faculty: currentUser && currentUser.email,
     content: "",
     time: "",
     isRead: false,
@@ -65,23 +66,32 @@ export default function TeacherDash() {
   }
 
   async function sendNotif() {
+    setLoading(true);
     await db
       .collection("Student")
       .get()
       .then((snapshot) => {
         snapshot.docs.forEach((doc) => {
+          setNotif((prev) => {
+            return {
+              ...prev,
+              faculty: currentUser && currentUser.email,
+            };
+          });
           db.collection("Student").doc(doc.id).collection("Notifs").add(notif);
         });
       });
 
     setNotif({
+      faculty: currentUser && currentUser.email,
       content: "",
       time: "",
       isRead: false,
     });
+    setLoading(false);
   }
 
-  if (loading) {
+  if (loading || !currentUser) {
     return <h1>Loading...</h1>;
   }
 
@@ -123,6 +133,7 @@ export default function TeacherDash() {
             }}
           />
           <button
+            disabled={loading}
             className="btn btn-primary rounded-circle mx-3 "
             onClick={sendNotif}
           >
