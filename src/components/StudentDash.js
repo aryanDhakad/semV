@@ -7,15 +7,21 @@ import { db } from "../firebase";
 export default function StudentDash() {
   const { currentUser, logout, setQuizInfo, setExpireTime } = useAuth();
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [quizzesNow, setQuizzesNow] = useState([]);
   const [quizzesDone, setQuizzesDone] = useState([]);
   const [notifs, setNotifs] = useState([]);
   const history = useHistory();
 
-  useEffect(() => {
-    if (currentUser) getData();
-  }, [currentUser]);
+  if (currentUser) {
+    console.log(currentUser.email);
+  } else {
+    console.log("Null value");
+  }
+
+  // useEffect(() => {
+  //   if (currentUser) getData();
+  // }, [currentUser]);
 
   async function handleLogout() {
     setError("");

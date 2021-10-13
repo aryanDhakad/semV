@@ -34,7 +34,7 @@ function CreateQuizForm() {
 
   useEffect(() => {
     setLoading(true);
-    if (quizInfo.quizUUID !== "") {
+    if (quizInfo.quizUUID !== "default") {
       setInfo(quizInfo);
     }
     setLoading(false);

@@ -18,42 +18,45 @@ export default function Login() {
 
   async function handleSubmit(e) {
     e.preventDefault();
+    try {
+      setError("");
+      setLoading(true);
 
-    setError("");
-    setLoading(true);
-
-    await login(emailRef.current.value, passwordRef.current.value)
-      .then((cred) => {
-        if (type === "Student") {
-          history.push("/studentDash");
-          // db.collection("Student")
-          //   .doc(cred.user.email)
-          //   .get()
-          //   .then((doc) => {
-          //     if (doc.exists) {
-          //       history.push("/studentDash");
-          //     } else {
-          //       setError("User Not Found");
-          //     }
-          //   });
-        } else if (type === "Teacher") {
-          history.push("/teacherDash");
-          // db.collection("Student")
-          //   .doc(cred.user.email)
-          //   .get()
-          //   .then((doc) => {
-          //     if (doc.exists) {
-          //       history.push("/teacherDash");
-          //     } else {
-          //       setError("User Not Found");
-          //     }
-          //   });
-        } else history.push("/");
-      })
-      .catch((err) => {
-        console.log(err);
-        setError(`${err.message}`);
-      });
+      await login(emailRef.current.value, passwordRef.current.value)
+        .then((cred) => {
+          if (type === "Student") {
+            history.push("/studentDash");
+            // db.collection("Student")
+            //   .doc(cred.user.email)
+            //   .get()
+            //   .then((doc) => {
+            //     if (doc.exists) {
+            //       history.push("/studentDash");
+            //     } else {
+            //       setError("User Not Found");
+            //     }
+            //   });
+          } else if (type === "Teacher") {
+            history.push("/teacherDash");
+            // db.collection("Student")
+            //   .doc(cred.user.email)
+            //   .get()
+            //   .then((doc) => {
+            //     if (doc.exists) {
+            //       history.push("/teacherDash");
+            //     } else {
+            //       setError("User Not Found");
+            //     }
+            //   });
+          } else history.push("/");
+        })
+        .catch((err) => {
+          console.log(err);
+          setError(`${err.message}`);
+        });
+    } catch {
+      setError("Failed");
+    }
 
     setLoading(false);
   }

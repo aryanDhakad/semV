@@ -23,7 +23,7 @@ function ReviewTest() {
       .then((doc) => {
         if (doc.exists) {
           let data = doc.data();
-          console.log(data.questions);
+          // console.log(data.questions);
           setQuestionList([...(data.questions || [])]);
         }
 

@@ -46,15 +46,6 @@ function CreateQuiz() {
   function handleChange(e) {
     const { name, value } = e.target;
 
-    // if (name === "questionNo") {
-    //   db.doc("quizInfo/" + quizInfo.quizUUID)
-    //     .get()
-    //     .then((doc) => {
-    //       if (doc.exists) setError("Question Already Exists");
-    //       else setError("");
-    //     });
-    // }
-
     setQuestion((prev) => {
       return {
         ...prev,
