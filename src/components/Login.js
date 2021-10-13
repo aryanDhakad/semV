@@ -112,7 +112,7 @@ export default function Login() {
                     />
                   </Form.Label>
                 </Form.Group>
-                <Link to="./signup">Create Account</Link>
+                <Link to="/signup">Create Account</Link>
               </Card.Body>
               <Card.Footer className="d-flex justify-content-between">
                 <Button

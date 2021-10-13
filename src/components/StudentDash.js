@@ -13,15 +13,9 @@ export default function StudentDash() {
   const [notifs, setNotifs] = useState([]);
   const history = useHistory();
 
-  if (currentUser) {
-    console.log(currentUser.email);
-  } else {
-    console.log("Null value");
-  }
-
-  // useEffect(() => {
-  //   if (currentUser) getData();
-  // }, [currentUser]);
+  useEffect(() => {
+    if (currentUser) getData();
+  }, [currentUser]);
 
   async function handleLogout() {
     setError("");
