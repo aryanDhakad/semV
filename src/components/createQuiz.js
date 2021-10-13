@@ -4,7 +4,7 @@ import { Link, useHistory } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 function CreateQuiz() {
   const { quizInfo } = useAuth();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const [option, setOption] = useState({
     optionContent: "",
@@ -26,30 +26,25 @@ function CreateQuiz() {
 
   const [optionId, setOptionId] = useState(-1);
 
-  useEffect(() => {
-    setLoading(true);
-
-    db.collection("quizInfo/" + quizInfo.quizUUID + "/questions")
+  async function getData() {
+    await db
+      .collection("quizInfo/" + quizInfo.quizUUID + "/questions")
       .get()
       .then((snapshot) => {
         let document = snapshot.docs.map((doc) => doc.data());
 
         setQuestionList([...(document || [])]);
-        setLoading(false);
       });
-  }, [quizInfo.quizUUID]);
+  }
+
+  useEffect(() => {
+    setLoading(true);
+    getData();
+    setLoading(false);
+  }, []);
 
   function handleChange(e) {
     const { name, value } = e.target;
-
-    // if (name === "questionNo") {
-    //   db.doc("quizInfo/" + quizInfo.quizUUID)
-    //     .get()
-    //     .then((doc) => {
-    //       if (doc.exists) setError("Question Already Exists");
-    //       else setError("");
-    //     });
-    // }
 
     setQuestion((prev) => {
       return {
@@ -90,6 +85,7 @@ function CreateQuiz() {
   }
 
   async function addQuestion() {
+    setLoading(true);
     if (
       question.questionOptions.length === 0 ||
       question.questionContent === ""
@@ -101,16 +97,9 @@ function CreateQuiz() {
       .collection(`quizInfo/${quizInfo.quizUUID}/questions`)
       .doc(question.questionNo)
       .set(question);
-    setLoading(true);
 
-    db.collection("quizInfo/" + quizInfo.quizUUID + "/questions")
-      .get()
-      .then((snapshot) => {
-        let document = snapshot.docs.map((doc) => doc.data());
+    getData();
 
-        setQuestionList([...(document || [])]);
-        setLoading(false);
-      });
     setQuestion({
       questionNo: "",
       questionContent: "",
@@ -125,6 +114,7 @@ function CreateQuiz() {
       optionIsSelected: false,
     });
     setError("");
+    setLoading(false);
   }
 
   function updateOption(id) {
@@ -179,14 +169,8 @@ function CreateQuiz() {
       .doc(id)
       .delete();
 
-    db.collection("quizInfo/" + quizInfo.quizUUID + "/questions")
-      .get()
-      .then((snapshot) => {
-        let document = snapshot.docs.map((doc) => doc.data());
-
-        setQuestionList([...(document || [])]);
-        setLoading(false);
-      });
+    getData();
+    setLoading(false);
   }
 
   if (loading) {

@@ -10,7 +10,7 @@ export function useAuth() {
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState();
   const [loading, setLoading] = useState(true);
-  const [quizInfo, setQuizInfo] = useState({ quizName: "default" });
+  const [quizInfo, setQuizInfo] = useState({ quizUUID: "default" });
   const [expireTime, setExpireTime] = useState("");
 
   function signup(email, password) {

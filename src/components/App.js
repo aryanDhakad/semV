@@ -10,20 +10,16 @@ import StudentDash from "./StudentDash";
 import TeacherDash from "./TeacherDash";
 import ReviewTest from "./ReviewTest";
 import CreateQuizForm from "./createQuizForm";
-
 function App() {
   return (
-    // <Exp />
     <Container className="" style={{ minHeight: "100vh" }}>
       <div>
         <Router>
           <AuthProvider>
             <Switch>
               <Route exact path="/" component={Login} />
-
               <Route path="/signup" component={Signup} />
               <Route path="/login" component={Login} />
-
               <Route path="/create-quiz" component={CreateQuiz} />
               <Route path="/take-quiz" component={TakeQuiz} />
               <Route path="/studentDash" component={StudentDash} />

@@ -5,9 +5,8 @@ import { useHistory } from "react-router-dom";
 import { Button } from "react-bootstrap";
 import { useAuth } from "../contexts/AuthContext";
 
-export default function PopupSignIn() {
+export default function PopupSignIn({ setError, loading }) {
   const history = useHistory();
-  const { setCurrentUser } = useAuth();
 
   const handleGoogleLogin = (event) => {
     event.preventDefault();
@@ -17,17 +16,22 @@ export default function PopupSignIn() {
       .signInWithPopup(provider)
       .then(function (result) {
         if (result.additionalUserInfo.profile.hd === "iiita.ac.in") {
-          setCurrentUser(result);
-
           history.push("/studentDash");
+        } else {
+          setError("Use Instute ID");
         }
       })
       .catch((error) => {
         console.log(error);
+        setError(error.message);
       });
   };
   return (
-    <Button className="   rounded-pill p-2" onClick={handleGoogleLogin}>
+    <Button
+      className="   rounded-pill p-2"
+      disabled={loading}
+      onClick={handleGoogleLogin}
+    >
       Google
     </Button>
   );

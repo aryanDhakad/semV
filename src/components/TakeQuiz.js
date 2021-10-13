@@ -12,7 +12,7 @@ function TakeQuiz() {
   const webcamRef = useRef(null);
   let history = useHistory();
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const [questionList, setQuestionList] = useState([]);
   const [current, setCurrent] = useState(-1);
@@ -28,8 +28,8 @@ function TakeQuiz() {
         let document = snapshot.docs.map((doc) => doc.data());
 
         setQuestionList([...(document || [])]);
-        setLoading(false);
       });
+    setLoading(false);
   }, [quizInfo.quizUUID]);
 
   useEffect(() => {
@@ -123,12 +123,15 @@ function TakeQuiz() {
             <Button
               variant="secondary"
               onClick={async () => {
-                let student = db.collection("Student").doc(currentUser.email);
-
-                await student.collection("Attempt").doc(quizInfo.quizUUID).set({
-                  Info: quizInfo,
-                  questions: questionList,
-                });
+                await db
+                  .collection("Student")
+                  .doc(currentUser.email)
+                  .collection("Attempt")
+                  .doc(quizInfo.quizUUID)
+                  .set({
+                    Info: quizInfo,
+                    questions: questionList,
+                  });
 
                 history.push("/studentDash");
               }}

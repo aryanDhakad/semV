@@ -30,13 +30,12 @@ function CreateQuizForm() {
   const taEmailListRef = useRef([]);
   const studentEmailListRef = useRef([]);
   // const quizInstructionsRef = useRef("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setLoading(true);
-    if (quizInfo.quizUUID !== "") {
+    if (quizInfo.quizUUID !== "default") {
       setInfo(quizInfo);
-      setLoading(false);
     }
     setLoading(false);
   }, [quizInfo]);
@@ -93,6 +92,7 @@ function CreateQuizForm() {
   // Submitting values
   async function handleSubmit(e) {
     e.preventDefault();
+    setLoading(true);
 
     // generating uuid
     info.quizUUID = info.quizUUID ? info.quizUUID : uuid4();
@@ -108,19 +108,7 @@ function CreateQuizForm() {
         history.push("/create-quiz");
       });
 
-    // setInfo({
-    //   quizUUID: "",
-    //   quizName: "",
-    //   instructorName: "",
-    //   instructorEmail: "",
-    //   quizInstructions: "",
-
-    //   quizTime: "",
-    //   quizWeightage: "",
-    //   quizTaEmailList: [],
-    //   quizStudentEmailList: [],
-    // });
-    // console.log(JSON.stringify(finalQuizInfo, null, 4));
+    setLoading(false);
   }
 
   if (loading) {

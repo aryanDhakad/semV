@@ -6,8 +6,9 @@ import { db } from "../firebase";
 
 export default function TeacherDash() {
   const { currentUser, logout, setQuizInfo } = useAuth();
+
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const [quizzesNow, setQuizzesNow] = useState([]);
   const [quizzesDone, setQuizzesDone] = useState([]);
@@ -19,11 +20,12 @@ export default function TeacherDash() {
   });
   const history = useHistory();
 
-  useEffect(() => {
+  async function getData() {
     setLoading(true);
-    setQuizInfo({});
+
     let time = new Date();
-    db.collection("quizInfo")
+    await db
+      .collection("quizInfo")
       .get()
       .then((snapshot) => {
         snapshot.docs.forEach((doc) => {
@@ -45,7 +47,12 @@ export default function TeacherDash() {
         setError(err);
       });
     setLoading(false);
-  }, []);
+  }
+
+  useEffect(() => {
+    setQuizInfo({});
+    if (currentUser) getData();
+  }, [currentUser]);
   function handleSubmit(type, item) {
     setQuizInfo(item);
     if (type === "Edit") {
