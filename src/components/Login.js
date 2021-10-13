@@ -25,27 +25,29 @@ export default function Login() {
     await login(emailRef.current.value, passwordRef.current.value)
       .then((cred) => {
         if (type === "Student") {
-          db.collection("Student")
-            .doc(cred.user.email)
-            .get()
-            .then((doc) => {
-              if (doc.exists) {
-                history.push("/studentDash");
-              } else {
-                setError("User Not Found");
-              }
-            });
+          history.push("/studentDash");
+          // db.collection("Student")
+          //   .doc(cred.user.email)
+          //   .get()
+          //   .then((doc) => {
+          //     if (doc.exists) {
+          //       history.push("/studentDash");
+          //     } else {
+          //       setError("User Not Found");
+          //     }
+          //   });
         } else if (type === "Teacher") {
-          db.collection("Student")
-            .doc(cred.user.email)
-            .get()
-            .then((doc) => {
-              if (doc.exists) {
-                history.push("/teacherDash");
-              } else {
-                setError("User Not Found");
-              }
-            });
+          history.push("/teacherDash");
+          // db.collection("Student")
+          //   .doc(cred.user.email)
+          //   .get()
+          //   .then((doc) => {
+          //     if (doc.exists) {
+          //       history.push("/teacherDash");
+          //     } else {
+          //       setError("User Not Found");
+          //     }
+          //   });
         } else history.push("/");
       })
       .catch((err) => {
@@ -54,10 +56,6 @@ export default function Login() {
       });
 
     setLoading(false);
-  }
-
-  if (loading) {
-    return <h2>Loading...</h2>;
   }
 
   return (
@@ -111,6 +109,7 @@ export default function Login() {
                     />
                   </Form.Label>
                 </Form.Group>
+                <Link to="./signup">Create Account</Link>
               </Card.Body>
               <Card.Footer className="d-flex justify-content-between">
                 <Button
@@ -120,7 +119,7 @@ export default function Login() {
                 >
                   Log In
                 </Button>
-                <PopupSignIn />
+                <PopupSignIn setError={setError} loading={loading} />
               </Card.Footer>
             </Card>
           </Form>

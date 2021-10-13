@@ -7,13 +7,13 @@ import { db } from "../firebase";
 function ReviewTest() {
   const { currentUser, quizInfo } = useAuth();
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const [questionList, setQuestionList] = useState([]);
   const [current, setCurrent] = useState(-1);
 
   useEffect(() => {
-    setLoading(false);
+    setLoading(true);
 
     db.collection("Student")
       .doc(currentUser.email)
@@ -23,18 +23,24 @@ function ReviewTest() {
       .then((doc) => {
         if (doc.exists) {
           let data = doc.data();
-
+          console.log(data.questions);
           setQuestionList([...(data.questions || [])]);
         }
+
         db.collection("Student")
           .doc(currentUser.email)
           .collection("Attempt")
           .doc(quizInfo.quizUUID)
-          .set(quizInfo);
-
-        setLoading(false);
+          .update({
+            Info: quizInfo,
+          });
+      })
+      .catch((err) => {
+        console.log(err);
       });
-  }, [currentUser.email, quizInfo, quizInfo.quizUUID]);
+    setLoading(false);
+    setCurrent(0);
+  }, [currentUser.email, quizInfo]);
 
   useEffect(() => {
     if (current === -1 && questionList.length) setCurrent(0);
@@ -50,6 +56,7 @@ function ReviewTest() {
   if (loading) {
     return <h1>Loading ....</h1>;
   } else if (current >= 0) {
+    console.log(questionList);
     return (
       <div>
         <div className="fs-3 d-inline p-2 mx-2">
@@ -69,23 +76,33 @@ function ReviewTest() {
               }}
               className="p-1"
             >
-              <h3
-                className="py-3 "
-                style={{ height: "30vh", position: "relative" }}
-              >{`${current + 1}) ${questionList[current].questionContent}`}</h3>
-              <div className="">
-                {questionList[current].questionOptions &&
-                  questionList[current].questionOptions.map((opt, indexOpt) => {
-                    let st1 = "btn  my-1 p-2 w-100";
-                    if (opt.optionIsCorrect) st1 += " btn-success";
-                    else st1 += " btn-danger";
-                    return (
-                      <div key={indexOpt} className="w-50 my-2 ">
-                        <button className={st1}>{opt.optionContent}</button>
-                      </div>
-                    );
-                  })}
-              </div>
+              {questionList.length && (
+                <div>
+                  <h3
+                    className="py-3 "
+                    style={{ height: "30vh", position: "relative" }}
+                  >{`${current + 1}) ${
+                    questionList[current].questionContent
+                  }`}</h3>
+                  <div className="">
+                    {questionList[current].questionOptions &&
+                      questionList[current].questionOptions.map(
+                        (opt, indexOpt) => {
+                          let st1 = "btn  my-1 p-2 w-100";
+                          if (opt.optionIsCorrect) st1 += " btn-success";
+                          else st1 += " btn-danger";
+                          return (
+                            <div key={indexOpt} className="w-50 my-2 ">
+                              <button className={st1}>
+                                {opt.optionContent}
+                              </button>
+                            </div>
+                          );
+                        }
+                      )}
+                  </div>
+                </div>
+              )}
             </div>
             <div className="">
               <button

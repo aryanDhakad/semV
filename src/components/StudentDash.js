@@ -6,13 +6,16 @@ import { db } from "../firebase";
 
 export default function StudentDash() {
   const { currentUser, logout, setQuizInfo, setExpireTime } = useAuth();
-
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [quizzesNow, setQuizzesNow] = useState([]);
   const [quizzesDone, setQuizzesDone] = useState([]);
   const [notifs, setNotifs] = useState([]);
   const history = useHistory();
+
+  useEffect(() => {
+    if (currentUser) getData();
+  }, [currentUser]);
 
   async function handleLogout() {
     setError("");
@@ -25,21 +28,24 @@ export default function StudentDash() {
     }
   }
 
-  useEffect(() => {
+  async function getData() {
     setLoading(true);
 
     let time = new Date();
-    db.collection("quizInfo")
+    await db
+      .collection("quizInfo")
       .get()
       .then((snapshot) => {
         snapshot.docs.forEach((doc) => {
           let time2ed = new Date(doc.data().quizTimeEnd);
 
-          if (time2ed.getTime() < time.getTime() && doc.data().quizLetReview) {
-            setQuizzesDone((prev) => {
-              // console.log(doc.data());
-              return [...prev, doc.data()];
-            });
+          if (time2ed.getTime() < time.getTime()) {
+            if (doc.data().quizLetReview) {
+              setQuizzesDone((prev) => {
+                // console.log(doc.data());
+                return [...prev, doc.data()];
+              });
+            }
           } else {
             db.collection(`Student/${currentUser.email || "default"}/Attempt`)
               .doc(doc.id)
@@ -51,12 +57,6 @@ export default function StudentDash() {
                     return [...prev, doc.data()];
                   });
                 }
-                // else if (doc.data().quizLetReview) {
-                //   setQuizzesDone((prev) => {
-                //     // console.log(doc.data());
-                //     return [...prev, doc.data()];
-                //   });
-                // }
               });
           }
         });
@@ -65,27 +65,21 @@ export default function StudentDash() {
         setError(err);
       });
 
-    setLoading(false);
-  }, []);
-
-  useEffect(() => {
-    setLoading(true);
-    if (currentUser) {
-      db.collection("Student")
-        .doc(currentUser.email)
-        .collection("Notifs")
-        .get()
-        .then((snap) => {
-          let data = snap.docs.map((item) => {
-            return { id: item.id, ...item.data() };
-          });
-
-          setNotifs([...data]);
+    await db
+      .collection("Student")
+      .doc(currentUser.email)
+      .collection("Notifs")
+      .get()
+      .then((snap) => {
+        let data = snap.docs.map((item) => {
+          return { id: item.id, ...item.data() };
         });
-    }
+
+        setNotifs([...data]);
+      });
 
     setLoading(false);
-  }, [currentUser]);
+  }
 
   function handleSubmit(type, item, start, end) {
     start = new Date(start);
@@ -132,70 +126,64 @@ export default function StudentDash() {
       <div className="row">
         <div className="col-6">
           {notifs.length ? (
-            <table className=" table">
-              <thead className="thead-dark">
-                <tr>
-                  <th> Name. </th>
-                  <th> Faculty </th>
-                  <th> Date </th>
-                  <th> .... </th>
-                </tr>
-              </thead>
+            <table className=" table ">
               <tbody>
-                {notifs.map((item, index) => {
-                  return (
-                    <tr key={index}>
-                      <th scope="row">{index + 1}</th>
-                      <td>{item.faculty}</td>
-                      <td>{item.content}</td>
-                      <td>
-                        {item.isRead ? (
-                          <button
-                            className="btn btn-danger btn-sm"
-                            onClick={() => {
-                              setNotifs((prev) => {
-                                return prev.filter((item, id) => {
-                                  return id !== index;
+                <div style={{ maxHeight: "100vh", overflow: "scroll" }}>
+                  {notifs.map((item, index) => {
+                    return (
+                      <tr key={index}>
+                        <th scope="row">{index + 1}</th>
+                        <td>{item.faculty}</td>
+                        <td>{item.content}</td>
+                        <td>
+                          {item.isRead ? (
+                            <button
+                              className="btn btn-danger btn-sm"
+                              onClick={() => {
+                                setNotifs((prev) => {
+                                  return prev.filter((item, id) => {
+                                    return id !== index;
+                                  });
                                 });
-                              });
-                              db.collection("Student")
-                                .doc(currentUser.email)
-                                .collection("Notifs")
-                                .doc(item.id)
-                                .delete();
-                            }}
-                          >
-                            X
-                          </button>
-                        ) : (
-                          <button
-                            className="btn btn-primary btn-sm mx-1"
-                            onClick={() => {
-                              setNotifs((prev) => {
-                                return prev.map((item, id) => {
-                                  if (id === index) {
-                                    item.isRead = true;
-                                    return item;
-                                  } else return item;
+                                db.collection("Student")
+                                  .doc(currentUser.email)
+                                  .collection("Notifs")
+                                  .doc(item.id)
+                                  .delete();
+                              }}
+                            >
+                              X
+                            </button>
+                          ) : (
+                            <button
+                              className="btn btn-primary btn-sm mx-1"
+                              onClick={() => {
+                                setNotifs((prev) => {
+                                  return prev.map((item, id) => {
+                                    if (id === index) {
+                                      item.isRead = true;
+                                      return item;
+                                    } else return item;
+                                  });
                                 });
-                              });
 
-                              db.collection("Student")
-                                .doc(currentUser.email)
-                                .collection("Notifs")
-                                .doc(item.id)
-                                .update({
-                                  isRead: !item.isRead,
-                                });
-                            }}
-                          >
-                            Mark As Read
-                          </button>
-                        )}{" "}
-                      </td>
-                    </tr>
-                  );
-                })}
+                                db.collection("Student")
+                                  .doc(currentUser.email)
+                                  .collection("Notifs")
+                                  .doc(item.id)
+                                  .update({
+                                    isRead: !item.isRead,
+                                  });
+                              }}
+                            >
+                              Mark As Read
+                            </button>
+                          )}{" "}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </div>
               </tbody>
             </table>
           ) : (
