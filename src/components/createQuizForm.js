@@ -173,14 +173,12 @@ function CreateQuizForm() {
       return;
     }
 
-    // console.log(taEmailListRef.current, studentEmailListRef.current);
-
     // final quiz information
 
     await db
       .collection("quizInfo")
       .doc(info.quizUUID)
-      .set(info)
+      .set(Object.assign({}, info))
       .then(() => {
         localStorage.setItem("quizInfo", JSON.stringify(info));
         console.log("Created quiz");
