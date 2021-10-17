@@ -1,40 +1,63 @@
 import React, { useRef, useState, useEffect } from "react";
-import { Modal, Button } from "react-bootstrap";
 import Webcam from "react-webcam";
 import { useAuth } from "../contexts/AuthContext";
 import Timer from "./Timer";
 import { Link, useHistory } from "react-router-dom";
 import { db } from "../firebase";
+import Cam from "./webcam";
+import ExitQuizModal from "./ExitQuizModal";
+import QuizCurrentQuestion from "./QuizCurrentQuestion";
+import QuestionPanel from "./QuestionPanel";
 
 function TakeQuiz() {
-  const { quizInfo, expireTime, currentUser, setQuizInfo } = useAuth();
+  const { currentUser } = useAuth();
 
   const webcamRef = useRef(null);
   let history = useHistory();
 
   const [loading, setLoading] = useState(true);
+  const [quizInfo, setQuizInfo] = useState({ quizUUID: "default" });
+  const [expireTime, setExpireTime] = useState("");
 
   const [questionList, setQuestionList] = useState([]);
-  const [current, setCurrent] = useState(-1);
+  const [current, setCurrent] = useState(0);
   const [attempt, setAttempt] = useState({ atm: 0, mrk: 0 });
   const [show, setShow] = useState(false);
 
-  useEffect(() => {
+  let item1 = localStorage.getItem("quizInfo");
+  item1 = JSON.parse(item1);
+  let endTime = localStorage.getItem("endTime");
+
+  async function getData() {
     setLoading(true);
 
-    db.collection("quizInfo/" + quizInfo.quizUUID + "/questions")
+    // console.log(expireTime, quizInfo);
+
+    await db
+      .collection("quizInfo/" + quizInfo.quizUUID + "/questions")
       .get()
       .then((snapshot) => {
         let document = snapshot.docs.map((doc) => doc.data());
-
+        // console.log(document);
         setQuestionList([...(document || [])]);
       });
+
     setLoading(false);
-  }, [quizInfo.quizUUID]);
+  }
 
   useEffect(() => {
-    if (current === -1 && questionList.length) setCurrent(0);
-  }, [questionList, current]);
+    setQuizInfo(item1);
+    setExpireTime(new Date(endTime));
+  }, []);
+
+  useEffect(() => {
+    getData();
+  }, [quizInfo, expireTime]);
+
+  // useEffect(() => {
+  //   // console.log("setCurrent", current, questionList.length);
+  //   if (current === -1 && questionList.length) setCurrent(0);
+  // }, [questionList]);
 
   function MarkForReview(que) {
     let indQue = que;
@@ -100,46 +123,19 @@ function TakeQuiz() {
 
   if (loading) {
     return <h1>Loading ....</h1>;
-  } else if (current >= 0) {
+  } else if (questionList.length) {
     return (
       <div>
-        <Modal
+        <ExitQuizModal
           show={show}
-          onHide={() => setShow(!show)}
-          backdrop="static"
-          keyboard={false}
-        >
-          <Modal.Header closeButton>
-            <Modal.Title> End Test</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            Are You Sure You Want To End The Test?
-            <p>Attempted : {attempt.atm}</p>
-            <p>Marked For Review: {attempt.mrk}</p>
-            <p>Not Attempted : {questionList.length - attempt.atm}</p>
-          </Modal.Body>
-
-          <Modal.Footer>
-            <Button
-              variant="secondary"
-              onClick={async () => {
-                await db
-                  .collection("Student")
-                  .doc(currentUser.email)
-                  .collection("Attempt")
-                  .doc(quizInfo.quizUUID)
-                  .set({
-                    Info: quizInfo,
-                    questions: questionList,
-                  });
-
-                history.push("/studentDash");
-              }}
-            >
-              End Test
-            </Button>
-          </Modal.Footer>
-        </Modal>
+          setShow={setShow}
+          attempt={attempt}
+          questionList={questionList}
+          db={db}
+          currentUser={currentUser}
+          quizInfo={quizInfo}
+          history={history}
+        />
 
         <div className="fs-3 d-inline p-2 mx-2">
           Quiz ID : {quizInfo.quizUUID} , Name : {quizInfo.quizName},
@@ -153,90 +149,30 @@ function TakeQuiz() {
         <div className="row ">
           {/* {Question Panel} */}
           <div className="col-8 py-2 ">
-            <div
-              style={{
-                minHeight: "80vh",
-                border: "3px solid black",
-                position: "relative",
-              }}
-              className="p-1"
-            >
-              <h3
-                className="py-3 "
-                style={{ height: "30vh", position: "relative" }}
-              >{`${current + 1}) ${questionList[current].questionContent}`}</h3>
-              <div className="">
-                {questionList[current].questionOptions &&
-                  questionList[current].questionOptions.map((opt, indexOpt) => {
-                    let st1 = "btn btn-primary my-1 p-2 w-100";
-                    if (opt.optionIsSelected) st1 += " bg-dark";
-                    else st1 += " bg-primary";
-                    return (
-                      <div key={indexOpt} className="w-50 my-2 ">
-                        <button
-                          className={st1}
-                          onClick={() => handleClick(current, indexOpt)}
-                        >
-                          {opt.optionContent}
-                        </button>
-                      </div>
-                    );
-                  })}
-              </div>
-            </div>
-            <div className="">
-              <button
-                className="btn btn-primary m-1 w-25 p-2 "
-                onClick={prevQue}
-              >
-                Before
-              </button>
-              <button
-                className="btn btn-primary mx-1 w-25 p-2 "
-                onClick={nextQue}
-              >
-                Next
-              </button>
-              <button
-                className="btn btn-primary mx-1 w-25 p-2 "
-                onClick={() => MarkForReview(current)}
-              >
-                Mark For Review
-              </button>
-            </div>
+            <QuizCurrentQuestion
+              current={current}
+              questionList={questionList}
+              handleClick={handleClick}
+              MarkForReview={MarkForReview}
+              prevQue={prevQue}
+              nextQue={nextQue}
+            />
           </div>
           <div className="col-4 flex-wrap py-2">
             <div style={{ minHeight: "70vh", border: "3px solid black" }}>
               {questionList.map((item, index) => {
-                let st = "btn btn-primary m-2 p-3 rounded  ";
-
-                if (
-                  questionList[index].questionIsMarked &&
-                  questionList[index].questionIsAttempted
-                )
-                  st += " bg-warning";
-                else if (questionList[index].questionIsMarked) st += " bg-info";
-                else if (questionList[index].questionIsAttempted)
-                  st += " bg-success";
-                else st += " bg-danger";
                 return (
-                  <button
-                    className={st}
+                  <QuestionPanel
                     key={index}
-                    onClick={() => setCurrent(index)}
-                  >
-                    {index + 1}
-                  </button>
+                    questionList={questionList}
+                    index={index}
+                    setCurrent={setCurrent}
+                  />
                 );
               })}
             </div>
             <div className="float-right">
-              {/* <Webcam
-              height={150}
-              ref={webcamRef}
-              screenshotFormat="image/jpeg"
-              width={180}
-            /> */}
+              <Cam />
             </div>
           </div>
         </div>

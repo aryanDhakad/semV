@@ -1,18 +1,33 @@
 import React, { useState, useEffect } from "react";
-
 import { useAuth } from "../contexts/AuthContext";
 import { Link } from "react-router-dom";
 import { db } from "../firebase";
 
 function ReviewTest() {
-  const { currentUser, quizInfo } = useAuth();
+  const { currentUser } = useAuth();
 
   const [loading, setLoading] = useState(true);
+  const [quizInfo, setQuizInfo] = useState({ quizUUID: "default" });
 
   const [questionList, setQuestionList] = useState([]);
   const [current, setCurrent] = useState(-1);
 
+  let item1 = localStorage.getItem("quizInfo");
+  item1 = JSON.parse(item1);
+
   useEffect(() => {
+    setQuizInfo(item1);
+  }, []);
+
+  useEffect(() => {
+    getData();
+  }, [quizInfo]);
+
+  useEffect(() => {
+    if (current === -1 && questionList.length) setCurrent(0);
+  }, [questionList, current]);
+
+  async function getData() {
     setLoading(true);
 
     db.collection("Student")
@@ -40,11 +55,7 @@ function ReviewTest() {
       });
     setLoading(false);
     setCurrent(0);
-  }, [currentUser.email, quizInfo]);
-
-  useEffect(() => {
-    if (current === -1 && questionList.length) setCurrent(0);
-  }, [questionList, current]);
+  }
 
   function nextQue() {
     if (current + 1 < questionList.length) setCurrent(current + 1);
@@ -56,7 +67,6 @@ function ReviewTest() {
   if (loading) {
     return <h1>Loading ....</h1>;
   } else if (current >= 0) {
-    console.log(questionList);
     return (
       <div>
         <div className="fs-3 d-inline p-2 mx-2">
@@ -84,18 +94,28 @@ function ReviewTest() {
                   >{`${current + 1}) ${
                     questionList[current].questionContent
                   }`}</h3>
-                  <div className="">
+                  <div className=" px-2">
                     {questionList[current].questionOptions &&
                       questionList[current].questionOptions.map(
                         (opt, indexOpt) => {
-                          let st1 = "btn  my-1 p-2 w-100";
-                          if (opt.optionIsCorrect) st1 += " btn-success";
-                          else st1 += " btn-danger";
+                          let st1 = "btn btn-primary my-1 p-2 w-75";
+
                           return (
-                            <div key={indexOpt} className="w-50 my-2 ">
+                            <div key={indexOpt} className="w-75 my-2  ">
                               <button className={st1}>
                                 {opt.optionContent}
                               </button>
+
+                              {opt.optionIsSelected &&
+                                (opt.optionIsCorrect ? (
+                                  <span className="badge mx-1 badge-pill badge-success">
+                                    Correect
+                                  </span>
+                                ) : (
+                                  <span className="badge mx-1 badge-pill badge-danger">
+                                    Wrong
+                                  </span>
+                                ))}
                             </div>
                           );
                         }

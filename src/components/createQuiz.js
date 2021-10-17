@@ -1,10 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
 import { db } from "../firebase";
 import { Link, useHistory } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext";
+// import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+// import { Editor } from "react-draft-wysiwyg";
+// import { EditorState, convertToRaw } from "draft-js";
+
 function CreateQuiz() {
-  const { quizInfo } = useAuth();
+  let quizInfo = localStorage.getItem("quizInfo");
+  quizInfo = JSON.parse(quizInfo);
   const [loading, setLoading] = useState(true);
+  // const [editorState, setEditorState] = useState(EditorState.createEmpty());
 
   const [option, setOption] = useState({
     optionContent: "",
@@ -196,6 +201,13 @@ function CreateQuiz() {
             value={question.questionNo}
             onChange={handleChange}
           />
+          {/* <Editor
+            editorState={editorState}
+            toolbarClassName="toolbarClassName"
+            wrapperClassName="wrapperClassName"
+            editorClassName="editorClassName"
+            onEditorStateChange={handleChange12}
+          /> */}
           <label>Prompt : </label>
           <textarea
             name="questionContent"

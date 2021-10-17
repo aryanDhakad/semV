@@ -1,14 +1,22 @@
-import React, { useRef, useState, useCallback, useEffect } from "react";
-import { Modal, Button } from "react-bootstrap";
+import React, { useEffect, useState, useRef, useCallback } from "react";
+import * as cocoSsd from "@tensorflow-models/coco-ssd";
+import * as tf from "@tensorflow/tfjs";
+// import {loadGraphModel} from '@tensorflow/tfjs-converter';
+
+// import * as posenet from '@tensorflow-models/posenet';
 import Webcam from "react-webcam";
 
-export default function Cam() {
+// import * as cvstfjs from '@microsoft/customvision-tfjs';
+
+function Cam() {
   const webcamRef = useRef(null);
-  const [show, setShow] = useState(false);
   const [imgSrc, setImgSrc] = useState(null);
 
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
+  const [videoWidth, setVideoWidth] = useState(960);
+  const [videoHeight, setVideoHeight] = useState(640);
+  const [start, setStart] = useState(false);
+
+  const [model, setModel] = useState();
 
   const capture = useCallback(() => {
     if (webcamRef.current) {
@@ -17,55 +25,176 @@ export default function Cam() {
     }
   }, [webcamRef, setImgSrc]);
 
-  // useEffect(() => {
-  //   let interval = setInterval(capture, 500);
+  async function loadModel() {
+    try {
+      const model = await cocoSsd.load();
+      setModel(model);
+      console.log("setloadedModel");
+      setStart(true);
+    } catch (err) {
+      console.log(err);
+      console.log("failed load model");
+    }
+  }
 
-  //   return () => {
-  //     clearInterval(interval);
-  //   };
-  // }, [capture]);
+  useEffect(() => {
+    tf.ready().then(() => {
+      loadModel();
+    });
+  }, []);
+
+  useEffect(() => {
+    if (start) setTimeout(play, 5000);
+  }, [start]);
+
+  async function play() {
+    let count = 0;
+    let violations = 0;
+    predictionFunction();
+
+    async function predictionFunction() {
+      const predictions = await model.detect(document.getElementById("img"));
+
+      // var cnvs = document.getElementById("myCanvas");
+
+      // // cnvs.style.position = "absolute";
+
+      // var ctx = cnvs.getContext("2d");
+      // ctx.clearRect(
+      //   0,
+      //   0,
+      //   webcamRef.current.video.videoWidth,
+      //   webcamRef.current.video.videoHeight
+      // );
+      // setVideoHeight(webcamRef.current.video.videoHeight);
+      // setVideoWidth(webcamRef.current.video.videoWidth);
+
+      if (predictions.length > 0) {
+        // setPredictionData(predictions);
+        var dict = {};
+        dict["person"] = 0;
+        dict["cell phone"] = 0;
+
+        for (let n = 0; n < predictions.length; n++) {
+          // Check scores
+
+          if (predictions[n].score > 0.5) {
+            dict[predictions[n].class] += 1;
+            if (
+              predictions[n].class !== "person" &&
+              predictions[n].class !== "cell phone"
+            ) {
+              continue;
+            }
+            console.log(count, predictions[n].class);
+
+            if (dict["person"] > 1 || dict["cell phone"] > 0) {
+              count += 1;
+
+              if (count > 10) {
+                console.log("Violation");
+                violations++;
+                capture();
+                count = 0;
+                // take_ss();
+              }
+            }
+
+            // let bboxLeft = predictions[n].bbox[0];
+            // let bboxTop = predictions[n].bbox[1];
+            // let bboxWidth = predictions[n].bbox[2];
+            // let bboxHeight = predictions[n].bbox[3] - bboxTop;
+
+            // ctx.beginPath();
+            // ctx.font = "28px Arial";
+            // ctx.fillStyle = "red";
+
+            // ctx.fillText(
+            //   predictions[n].class +
+            //     ": " +
+            //     Math.round(parseFloat(predictions[n].score) * 100) +
+            //     "%",
+            //   bboxLeft,
+            //   bboxTop
+            // );
+
+            // ctx.rect(bboxLeft, bboxTop, bboxWidth, bboxHeight);
+            // ctx.strokeStyle = "#FF0000";
+
+            // ctx.lineWidth = 3;
+            // ctx.stroke();
+          }
+        }
+      }
+      if (violations <= 5) setTimeout(predictionFunction, 2000);
+      else {
+        alert("you have been caught");
+      }
+    }
+  }
+
+  // useEffect(() => {
+  //   //prevent initial triggering
+  //   if (mounted.current) {
+  //     play();
+  //   } else {
+  //     mounted.current = true;
+  //   }
+  // }, [start]);
+
+  const videoConstraints = {
+    height: 200,
+    width: 200,
+    maxWidth: "100vw",
+    facingMode: "environment",
+  };
 
   return (
     <div>
-      <Webcam
-        height={500}
-        ref={webcamRef}
-        screenshotFormat="image/jpeg"
-        width={500}
-      />
-      {imgSrc && <img src={imgSrc} alt="N.F." />}
-
-      {/* <Button variant="primary" onClick={handleShow}>
-        Allow WebCam Access
-      </Button>
-
-      <Modal
-        show={show}
-        onHide={handleClose}
-        backdrop="static"
-        keyboard={false}
-      >
-        <Modal.Header closeButton>
-          <Modal.Title> Please Allow WebCam Access</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Webcam
-            height={500}
-            ref={webcamRef}
-            screenshotFormat="image/jpeg"
-            width={500}
-          />
-          {imgSrc && <img src={imgSrc} alt="N.F." />}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Close
-          </Button>
-          <Button variant="primary" onClick={capture}>
-            Take Screen Shot
-          </Button>
-        </Modal.Footer>
-      </Modal> */}
+      {/* <button onClick={play}>Start</button> */}
+      {/* <div style={{ position: "absolute", top: "400px", zIndex: "9999" }}>
+        <canvas
+          id="myCanvas"
+          width={videoWidth}
+          height={videoHeight}
+          style={{ backgroundColor: "transparent" }}
+        />
+      </div> */}
+      <div className="d-flex flex-wrap">
+        <Webcam
+          audio={false}
+          id="img"
+          ref={webcamRef}
+          // width={640}
+          screenshotQuality={1}
+          screenshotFormat="image/jpeg"
+          videoConstraints={videoConstraints}
+        />
+        <div>
+          {imgSrc && <img src={imgSrc} alt="N.F." className="m-2 shadow-lg" />}
+        </div>
+      </div>
+      {/* <button onClick={play}>Start</button>
+      <div style={{ position: "absolute", top: "400px", zIndex: "9999" }}>
+        <Webcam
+          audio={false}
+          id="img"
+          ref={webcamRef}
+          // width={640}
+          screenshotQuality={1}
+          screenshotFormat="image/jpeg"
+          videoConstraints={videoConstraints}
+        />
+        <canvas
+          id="myCanvas"
+          width={videoWidth}
+          height={videoHeight}
+          style={{ backgroundColor: "transparent" }}
+        />
+      </div>
+      <div>{imgSrc && <img src={imgSrc} alt="N.F." />}</div> */}
     </div>
   );
 }
+
+export default React.memo(Cam);

@@ -5,7 +5,7 @@ import { Link, useHistory } from "react-router-dom";
 import { db } from "../firebase";
 
 export default function TeacherDash() {
-  const { currentUser, logout, setQuizInfo } = useAuth();
+  const { currentUser, logout } = useAuth();
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
@@ -50,13 +50,31 @@ export default function TeacherDash() {
   }
 
   useEffect(() => {
-    setQuizInfo({});
     if (currentUser) getData();
   }, [currentUser]);
+
   function handleSubmit(type, item) {
-    setQuizInfo(item);
     if (type === "Edit") {
+      localStorage.setItem("quizInfo", JSON.stringify(item));
       history.push("/create-quiz");
+    } else if (type === "create") {
+      localStorage.setItem(
+        "quizInfo",
+        JSON.stringify({
+          quizUUID: "",
+          quizName: "",
+          instructorName: "",
+          instructorEmail: "",
+          quizInstructions: "",
+          quizTimeStart: "",
+          quizTimeEnd: "",
+          quizLetReview: false,
+          quizWeightage: "",
+          quizTaEmailList: [],
+          quizStudentEmailList: [],
+        })
+      );
+      history.push("/create-quiz-form");
     } else {
       history.push("/");
     }
@@ -147,13 +165,12 @@ export default function TeacherDash() {
           >
             +
           </button>
-
-          <Link
-            to="/create-quiz-form"
-            className="btn btn-primary w-100 mx-auto my-3"
+          <button
+            className="btn btn-primary m-3"
+            onClick={() => handleSubmit("create", {})}
           >
             Create Quiz
-          </Link>
+          </button>
         </div>
         <div className="col-8">
           <Card>
