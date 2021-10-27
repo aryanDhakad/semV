@@ -1,13 +1,13 @@
 import React, { useRef, useState, useEffect } from "react";
 import Webcam from "react-webcam";
 import { useAuth } from "../contexts/AuthContext";
-import Timer from "../components/TakeQuizComponent/Timer";
+import Timer from "./Timer";
 import { Link, useHistory } from "react-router-dom";
 import { db } from "../firebase";
-import Cam from "../components/TakeQuizComponent/webcam";
-import ExitQuizModal from "../components/TakeQuizComponent/ExitQuizModal";
-import QuizCurrentQuestion from "../components/TakeQuizComponent/QuizCurrentQuestion";
-import QuestionPanel from "../components/TakeQuizComponent/QuestionPanel";
+import Cam from "./webcam";
+import ExitQuizModal from "./ExitQuizModal";
+import QuizCurrentQuestion from "./QuizCurrentQuestion";
+import QuestionPanel from "./QuestionPanel";
 
 function TakeQuiz() {
   const { currentUser } = useAuth();

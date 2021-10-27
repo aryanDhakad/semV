@@ -55,4 +55,4 @@ function Notif({ item, index, setNotifs, db, currentUser }) {
   );
 }
 
-export default React.memo(Notif);
+export default Notif;

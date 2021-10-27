@@ -9,6 +9,7 @@ import { useAuth } from "../contexts/AuthContext";
 function CreateQuizForm() {
   let item = JSON.parse(localStorage.getItem("quizInfo"));
   const [info, setInfo] = useState(item);
+
   const [questionList, setQuestionList] = useState([]);
   const { currentUser } = useAuth();
   const history = useHistory();

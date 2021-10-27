@@ -4,7 +4,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { useHistory } from "react-router-dom";
 import { db } from "../firebase";
 import Notif from "./Notif";
-import QuizListItem from "../components/TakeQuizComponent/QuizListItem";
+import QuizListItem from "./QuizListItem";
 
 function StudentDash() {
   const { currentUser, logout } = useAuth();
@@ -81,7 +81,6 @@ function StudentDash() {
       });
 
     setLoading(false);
-    console.log("Data Loaded.");
   }
 
   function handleSubmit(type, item, start, end) {
@@ -130,7 +129,7 @@ function StudentDash() {
           {notifs.length ? (
             <table className=" table ">
               <tbody>
-                <div style={{ maxHeight: "100vh", overflow: "scroll" }}>
+                <section style={{ maxHeight: "100vh", overflow: "scroll" }}>
                   {notifs.map((item, index) => {
                     return (
                       <Notif
@@ -143,7 +142,7 @@ function StudentDash() {
                       />
                     );
                   })}
-                </div>
+                </section>
               </tbody>
             </table>
           ) : (
@@ -223,4 +222,4 @@ function StudentDash() {
   );
 }
 
-export default React.memo(StudentDash);
+export default StudentDash;

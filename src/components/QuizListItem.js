@@ -24,4 +24,4 @@ function QuizListItem({ index, item, showTime, handleSubmit, type }) {
   );
 }
 
-export default React.memo(QuizListItem);
+export default QuizListItem;
