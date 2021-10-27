@@ -4,9 +4,9 @@ import { useAuth } from "../contexts/AuthContext";
 import { useHistory } from "react-router-dom";
 import { db } from "../firebase";
 import Notif from "./Notif";
-import QuizListItem from "./QuizListItem";
+import QuizListItem from "../components/TakeQuizComponent/QuizListItem";
 
-export default function StudentDash() {
+function StudentDash() {
   const { currentUser, logout } = useAuth();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -81,6 +81,7 @@ export default function StudentDash() {
       });
 
     setLoading(false);
+    console.log("Data Loaded.");
   }
 
   function handleSubmit(type, item, start, end) {
@@ -221,3 +222,5 @@ export default function StudentDash() {
     </div>
   );
 }
+
+export default React.memo(StudentDash);

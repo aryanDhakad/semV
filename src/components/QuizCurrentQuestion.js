@@ -1,4 +1,5 @@
 import React from "react";
+import ReactHtmlParser from "react-html-parser";
 
 function QuizCurrentQuestion({
   current,
@@ -18,10 +19,10 @@ function QuizCurrentQuestion({
         }}
         className="p-1"
       >
-        <h3
-          className="py-3 "
-          style={{ height: "30vh", position: "relative" }}
-        >{`${current + 1}) ${questionList[current].questionContent}`}</h3>
+        <h4 className="py-3 " style={{ height: "30vh", position: "relative" }}>
+          {current + 1}{" "}
+          <div> {ReactHtmlParser(questionList[current].questionContent)} </div>{" "}
+        </h4>
         <div className="">
           {questionList[current].questionOptions &&
             questionList[current].questionOptions.map((opt, indexOpt) => {
@@ -34,7 +35,7 @@ function QuizCurrentQuestion({
                     className={st1}
                     onClick={() => handleClick(current, indexOpt)}
                   >
-                    {opt.optionContent}
+                    <div> {ReactHtmlParser(opt.optionContent)} </div>
                   </button>
                 </div>
               );

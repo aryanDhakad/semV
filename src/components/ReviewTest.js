@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { Link } from "react-router-dom";
 import { db } from "../firebase";
+import ReactHtmlParser from "react-html-parser";
 
 function ReviewTest() {
   const { currentUser } = useAuth();
@@ -91,9 +92,12 @@ function ReviewTest() {
                   <h3
                     className="py-3 "
                     style={{ height: "30vh", position: "relative" }}
-                  >{`${current + 1}) ${
-                    questionList[current].questionContent
-                  }`}</h3>
+                  >
+                    {current + 1}{" "}
+                    <div>
+                      {ReactHtmlParser(questionList[current].questionContent)}
+                    </div>
+                  </h3>
                   <div className=" px-2">
                     {questionList[current].questionOptions &&
                       questionList[current].questionOptions.map(
@@ -103,7 +107,10 @@ function ReviewTest() {
                           return (
                             <div key={indexOpt} className="w-75 my-2  ">
                               <button className={st1}>
-                                {opt.optionContent}
+                                <div>
+                                  {" "}
+                                  {ReactHtmlParser(opt.optionContent)}{" "}
+                                </div>{" "}
                               </button>
 
                               {opt.optionIsSelected &&

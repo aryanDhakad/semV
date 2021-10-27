@@ -194,24 +194,42 @@ function CreateQuizForm() {
     setLoading(false);
   }
 
+  async function deleteQuiz() {
+    await db.collection("quizInfo").doc(info.quizUUID).delete();
+
+    await db
+      .collection("Student")
+      .get()
+      .then((snapshot) => {
+        snapshot.docs.forEach(async (doc) => {
+          await db
+            .doc("Student/" + doc.id + "/Attempt/" + info.quizUUID)
+            .delete();
+        });
+      });
+    localStorage.setItem("quizUUID", "");
+    history.push("/teacherDash");
+  }
+
   if (loading) {
     return <h1>Loading ....</h1>;
   }
 
   return (
-    <div style={{ display: "block", width: 700, padding: 30 }}>
-      <h2>Enter Quiz Information</h2>
-      <Form onSubmit={handleSubmit}>
-        <Form.Group controlId="exampleForm.ControlInput1">
-          <Form.Label>Quiz Name:</Form.Label>
-          <Form.Control
-            type="text"
-            name="quizName"
-            value={info.quizName}
-            onChange={handleChange}
-          />
-        </Form.Group>
-        {/* <Form.Group controlId="exampleForm.ControlInput1">
+    <div>
+      <div style={{ display: "block", width: 700, padding: 30 }}>
+        <h2>Enter Quiz Information</h2>
+        <Form onSubmit={handleSubmit}>
+          <Form.Group controlId="exampleForm.ControlInput1">
+            <Form.Label>Quiz Name:</Form.Label>
+            <Form.Control
+              type="text"
+              name="quizName"
+              value={info.quizName}
+              onChange={handleChange}
+            />
+          </Form.Group>
+          {/* <Form.Group controlId="exampleForm.ControlInput1">
           <Form.Label>Instructor Name:</Form.Label>
           <Form.Control
             type="text"
@@ -230,120 +248,134 @@ function CreateQuizForm() {
           />
         </Form.Group> */}
 
-        <Form.Group controlId="exampleForm.ControlInput1">
-          <Form.Label>Quiz Time Start:</Form.Label>
-          <Form.Control
-            type="datetime-local"
-            name="quizTimeStart"
-            value={info.quizTimeStart}
-            onChange={handleChange}
-          />
-        </Form.Group>
-        <Form.Group controlId="exampleForm.ControlInput1">
-          <Form.Label>Quiz Time End:</Form.Label>
-          <Form.Control
-            type="datetime-local"
-            name="quizTimeEnd"
-            value={info.quizTimeEnd}
-            onChange={handleChange}
-          />
-        </Form.Group>
-        <Form.Group controlId="exampleForm.ControlInput1">
-          <Form.Label>
-            Let Review Test :
+          <Form.Group controlId="exampleForm.ControlInput1">
+            <Form.Label>Quiz Time Start:</Form.Label>
             <Form.Control
-              type="checkbox"
-              name="quizLetReview"
-              checked={info.quizLetReview}
-              onChange={() => {}}
-              onClick={() =>
-                setInfo((prev) => {
-                  return {
-                    ...prev,
-                    quizLetReview: !prev.quizLetReview,
-                  };
-                })
-              }
+              type="datetime-local"
+              name="quizTimeStart"
+              value={info.quizTimeStart}
+              onChange={handleChange}
             />
-          </Form.Label>
-        </Form.Group>
-        <Form.Group controlId="exampleForm.ControlInput1">
-          <Form.Label>Quiz Weightage:</Form.Label>
-          <Form.Control
-            type="text"
-            name="quizWeightage"
-            value={info.quizWeightage}
-            onChange={handleChange}
-          />
-        </Form.Group>
-        <Form.Group controlId="exampleForm.ControlTextarea1">
-          <Form.Label>Quiz Instructions:</Form.Label>
-          <Form.Control
-            as="textarea"
-            rows={3}
-            name="quizInstructions"
-            value={info.quizInstructions}
-            // defaultValue="Enter instructions here..."
-            onChange={handleChange}
-          />
-        </Form.Group>
-        <Form.Group controlId="formFile">
-          <Form.Label>
-            TA List (.xls and .xlsx):
-            {info.quizTaEmailList.length ? (
-              <span className="badge badge-pill badge-success">
-                File Uploaded
-              </span>
-            ) : (
-              <span className="badge badge-pill badge-danger">
-                File Missing
-              </span>
-            )}
-          </Form.Label>
-          <Form.Control type="file" name="taList" onChange={handleFileChange} />
-        </Form.Group>
-        <Form.Group controlId="formFile">
-          <Form.Label>
-            Student List (.xls and .xlsx):
-            {info.quizStudentEmailList.length ? (
-              <span className="badge badge-pill badge-success">
-                File Uploaded
-              </span>
-            ) : (
-              <span className="badge badge-pill badge-danger">
-                File Missing
-              </span>
-            )}
-          </Form.Label>
-          <Form.Control type="file" name="taList" onChange={handleFileChange} />
-        </Form.Group>
+          </Form.Group>
+          <Form.Group controlId="exampleForm.ControlInput1">
+            <Form.Label>Quiz Time End:</Form.Label>
+            <Form.Control
+              type="datetime-local"
+              name="quizTimeEnd"
+              value={info.quizTimeEnd}
+              onChange={handleChange}
+            />
+          </Form.Group>
+          <Form.Group controlId="exampleForm.ControlInput1">
+            <Form.Label>
+              Let Review Test :
+              <Form.Control
+                type="checkbox"
+                name="quizLetReview"
+                checked={info.quizLetReview}
+                onChange={() => {}}
+                onClick={() =>
+                  setInfo((prev) => {
+                    return {
+                      ...prev,
+                      quizLetReview: !prev.quizLetReview,
+                    };
+                  })
+                }
+              />
+            </Form.Label>
+          </Form.Group>
+          <Form.Group controlId="exampleForm.ControlInput1">
+            <Form.Label>Quiz Weightage:</Form.Label>
+            <Form.Control
+              type="text"
+              name="quizWeightage"
+              value={info.quizWeightage}
+              onChange={handleChange}
+            />
+          </Form.Group>
+          <Form.Group controlId="exampleForm.ControlTextarea1">
+            <Form.Label>Quiz Instructions:</Form.Label>
+            <Form.Control
+              as="textarea"
+              rows={3}
+              name="quizInstructions"
+              value={info.quizInstructions}
+              // defaultValue="Enter instructions here..."
+              onChange={handleChange}
+            />
+          </Form.Group>
+          <Form.Group controlId="formFile">
+            <Form.Label>
+              TA List (.xls and .xlsx):
+              {info.quizTaEmailList.length ? (
+                <span className="badge badge-pill badge-success">
+                  File Uploaded
+                </span>
+              ) : (
+                <span className="badge badge-pill badge-danger">
+                  File Missing
+                </span>
+              )}
+            </Form.Label>
+            <Form.Control
+              type="file"
+              name="taList"
+              onChange={handleFileChange}
+            />
+          </Form.Group>
+          <Form.Group controlId="formFile">
+            <Form.Label>
+              Student List (.xls and .xlsx):
+              {info.quizStudentEmailList.length ? (
+                <span className="badge badge-pill badge-success">
+                  File Uploaded
+                </span>
+              ) : (
+                <span className="badge badge-pill badge-danger">
+                  File Missing
+                </span>
+              )}
+            </Form.Label>
+            <Form.Control
+              type="file"
+              name="taList"
+              onChange={handleFileChange}
+            />
+          </Form.Group>
 
-        <Form.Group controlId="formFile">
-          <Form.Label>
-            Question List (.xls and .xlsx):
-            {questionList.length ? (
-              <span className="badge badge-pill badge-success">
-                File Uploaded
-              </span>
-            ) : (
-              <span className="badge badge-pill badge-danger">
-                File Missing
-              </span>
-            )}
-          </Form.Label>
-          <Form.Control
-            type="file"
-            name="questionList"
-            onChange={handleFileChange}
-          />
-        </Form.Group>
+          <Form.Group controlId="formFile">
+            <Form.Label>
+              Question List (.xls and .xlsx):
+              {questionList.length ? (
+                <span className="badge badge-pill badge-success">
+                  File Uploaded
+                </span>
+              ) : (
+                <span className="badge badge-pill badge-danger">
+                  File Missing
+                </span>
+              )}
+            </Form.Label>
+            <Form.Control
+              type="file"
+              name="questionList"
+              onChange={handleFileChange}
+            />
+          </Form.Group>
 
-        {error && <Alert variant="danger">{error}</Alert>}
+          {error && <Alert variant="danger">{error}</Alert>}
 
-        <Button variant="primary" type="submit">
-          Save Quiz Information
-        </Button>
-      </Form>
+          <Button variant="primary" type="submit">
+            Save Quiz Information
+          </Button>
+        </Form>
+      </div>
+      {info.quizUUID !== "" && (
+        <button className="btn btn-danger mx-3" onClick={deleteQuiz}>
+          Delete Quiz
+        </button>
+      )}
     </div>
   );
 }

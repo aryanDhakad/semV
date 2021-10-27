@@ -1,15 +1,15 @@
 import React from "react";
-import Signup from "./Signup";
+import Signup from "./pages/Signup";
 import { Container } from "react-bootstrap";
-import { AuthProvider } from "../contexts/AuthContext";
+import { AuthProvider } from "./contexts/AuthContext";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-import Login from "./Login";
-import CreateQuiz from "./createQuiz";
-import TakeQuiz from "./TakeQuiz";
-import StudentDash from "./StudentDash";
-import TeacherDash from "./TeacherDash";
-import ReviewTest from "./ReviewTest";
-import CreateQuizForm from "./createQuizForm";
+import Login from "./pages/Login";
+import CreateQuiz from "./pages/createQuiz";
+import TakeQuiz from "./pages/TakeQuiz";
+import StudentDash from "./pages/StudentDash";
+import TeacherDash from "./pages/TeacherDash";
+import ReviewTest from "./pages/ReviewTest";
+import CreateQuizForm from "./pages/createQuizForm";
 function App() {
   return (
     <Container className="" style={{ minHeight: "100vh" }}>

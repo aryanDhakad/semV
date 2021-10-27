@@ -1,15 +1,23 @@
 import React, { useState, useEffect, useRef } from "react";
 import { db } from "../firebase";
 import { Link, useHistory } from "react-router-dom";
-// import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
-// import { Editor } from "react-draft-wysiwyg";
-// import { EditorState, convertToRaw } from "draft-js";
+import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+import { Editor } from "react-draft-wysiwyg";
+import { EditorState, convertToRaw, ContentState } from "draft-js";
+import draftToHtml from "draftjs-to-html";
+import htmlToDraft from "html-to-draftjs";
+import ReactHtmlParser from "react-html-parser";
 
 function CreateQuiz() {
   let quizInfo = localStorage.getItem("quizInfo");
   quizInfo = JSON.parse(quizInfo);
   const [loading, setLoading] = useState(true);
-  // const [editorState, setEditorState] = useState(EditorState.createEmpty());
+  const [editorStateQuestion, setEditorStateQ] = useState(
+    EditorState.createEmpty()
+  );
+  const [editorStateOption, setEditorStateO] = useState(
+    EditorState.createEmpty()
+  );
 
   const [option, setOption] = useState({
     optionContent: "",
@@ -47,6 +55,46 @@ function CreateQuiz() {
     getData();
     setLoading(false);
   }, []);
+
+  useEffect(() => {
+    setQuestion((prev) => {
+      return {
+        ...prev,
+        questionContent: draftToHtml(
+          convertToRaw(editorStateQuestion.getCurrentContent())
+        ),
+      };
+    });
+  }, [editorStateQuestion]);
+
+  useEffect(() => {
+    console.log(
+      draftToHtml(convertToRaw(editorStateOption.getCurrentContent()))
+    );
+    setOption((prev) => {
+      return {
+        ...prev,
+        optionContent: draftToHtml(
+          convertToRaw(editorStateOption.getCurrentContent())
+        ),
+      };
+    });
+  }, [editorStateOption]);
+
+  function convertToDraft(content, type) {
+    const contentBlock = htmlToDraft(content);
+    if (contentBlock) {
+      const contentState = ContentState.createFromBlockArray(
+        contentBlock.contentBlocks
+      );
+      const editorState = EditorState.createWithContent(contentState);
+
+      if (type === "question") setEditorStateQ(editorState);
+      else if (type === "option") {
+        setEditorStateO(editorState);
+      }
+    }
+  }
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -87,6 +135,7 @@ function CreateQuiz() {
       optionWeightage: 1,
       optionIsSelected: false,
     });
+    setEditorStateO(EditorState.createEmpty());
   }
 
   async function addQuestion() {
@@ -119,12 +168,15 @@ function CreateQuiz() {
       optionIsSelected: false,
     });
     setError("");
+    setEditorStateQ(EditorState.createEmpty());
+    setEditorStateO(EditorState.createEmpty());
     setLoading(false);
   }
 
   function updateOption(id) {
     setOptionId(id);
     setOption(question.questionOptions[id]);
+    convertToDraft(question.questionOptions[id].optionContent, "option");
   }
   function updateOptionAndSubmit() {
     setQuestion((prev) => {
@@ -146,10 +198,12 @@ function CreateQuiz() {
       optionWeightage: 1,
       optionIsSelected: false,
     });
+    setEditorStateO(EditorState.createEmpty());
   }
 
   function updateQuestion(id) {
     setQuestion(questionList[id]);
+    convertToDraft(questionList[id].questionContent, "question");
   }
 
   function deleteOption(id) {
@@ -189,7 +243,7 @@ function CreateQuiz() {
       <h3 className="text-danger text-center "> NOTE : {error}</h3>
 
       <div className="row px-5">
-        <div className="col-7 px-1 py-1">
+        <div className="col-6 px-1 py-1">
           <button className="btn btn-success w-100" onClick={addQuestion}>
             Add/Update Question
           </button>
@@ -201,24 +255,17 @@ function CreateQuiz() {
             value={question.questionNo}
             onChange={handleChange}
           />
-          {/* <Editor
-            editorState={editorState}
+          <Editor
+            editorState={editorStateQuestion}
             toolbarClassName="toolbarClassName"
             wrapperClassName="wrapperClassName"
             editorClassName="editorClassName"
-            onEditorStateChange={handleChange12}
-          /> */}
+            onEditorStateChange={setEditorStateQ}
+          />
           <label>Prompt : </label>
-          <textarea
-            name="questionContent"
-            className="form-control"
-            row="30"
-            col="90"
-            value={question.questionContent}
-            onChange={handleChange}
-          ></textarea>
+          <div> {ReactHtmlParser(question.questionContent)} </div>
         </div>
-        <div className="col-5 px-5 py-3">
+        <div className="col-6 px-5 py-3">
           <div className="row p-0">
             <div className="col-6 p-1">
               <button
@@ -264,14 +311,15 @@ function CreateQuiz() {
               </label>
             </div>
           </div>
-          <textarea
-            name="optionContent"
-            className="form-control"
-            row="10"
-            col="60"
-            value={option.optionContent}
-            onChange={handleChange1}
-          ></textarea>
+          <Editor
+            editorState={editorStateOption}
+            toolbarClassName="toolbarClassName"
+            wrapperClassName="wrapperClassName"
+            editorClassName="editorClassName"
+            onEditorStateChange={setEditorStateO}
+          />
+          <label>Prompt : </label>
+          <div> {ReactHtmlParser(option.optionContent)} </div>
         </div>
       </div>
       <div className="my-5 ">
@@ -282,7 +330,7 @@ function CreateQuiz() {
             return (
               <div key={index} className={`row my-2 ${prop1}`}>
                 <div className="col-10">
-                  <p>{itemCurrent.optionContent}</p>
+                  <div> {ReactHtmlParser(itemCurrent.optionContent)} </div>
                 </div>
                 <div className="col-2">
                   {itemCurrent.optionIsCorrect ? <p>CORRECT</p> : <p>WRONG</p>}
@@ -313,7 +361,9 @@ function CreateQuiz() {
                 key={index}
                 className="my-2 p-2 fs-1 w-50 d-flex flex-wrap align-items-center justify-content-center "
               >
-                <h2>{`${item.questionNo}) ${item.questionContent}`}</h2>
+                <div>
+                  {item.questionNo} {ReactHtmlParser(item.questionContent)}{" "}
+                </div>
                 <table className="table table-striped table-dark ">
                   <tbody>
                     {item.questionOptions &&
@@ -321,7 +371,7 @@ function CreateQuiz() {
                         return (
                           <tr key={index}>
                             <td className="col-10">
-                              <p>{item.optionContent}</p>
+                              <div> {ReactHtmlParser(item.optionContent)} </div>
                             </td>
                             <td className="col-2">
                               {item.optionIsCorrect ? (

@@ -17,6 +17,8 @@ function Cam() {
   const [start, setStart] = useState(false);
 
   const [model, setModel] = useState();
+  const [person, setPerson] = useState(false);
+  const [fault, setFault] = useState(false);
 
   const capture = useCallback(() => {
     if (webcamRef.current) {
@@ -68,12 +70,11 @@ function Cam() {
       // );
       // setVideoHeight(webcamRef.current.video.videoHeight);
       // setVideoWidth(webcamRef.current.video.videoWidth);
-
+      var dict = {};
+      dict["person"] = 0;
+      dict["cell phone"] = 0;
       if (predictions.length > 0) {
         // setPredictionData(predictions);
-        var dict = {};
-        dict["person"] = 0;
-        dict["cell phone"] = 0;
 
         for (let n = 0; n < predictions.length; n++) {
           // Check scores
@@ -86,9 +87,10 @@ function Cam() {
             ) {
               continue;
             }
-            console.log(count, predictions[n].class);
+            // console.log(count, predictions[n].class);
 
             if (dict["person"] > 1 || dict["cell phone"] > 0) {
+              setFault(true);
               count += 1;
 
               if (count > 10) {
@@ -98,6 +100,8 @@ function Cam() {
                 count = 0;
                 // take_ss();
               }
+            } else {
+              setFault(false);
             }
 
             // let bboxLeft = predictions[n].bbox[0];
@@ -126,7 +130,9 @@ function Cam() {
           }
         }
       }
-      if (violations <= 5) setTimeout(predictionFunction, 2000);
+      if (dict["person"] === 0) setPerson(false);
+      else setPerson(true);
+      if (violations <= 5) setTimeout(predictionFunction, 200);
       else {
         alert("you have been caught");
       }
@@ -171,7 +177,19 @@ function Cam() {
           videoConstraints={videoConstraints}
         />
         <div>
-          {imgSrc && <img src={imgSrc} alt="N.F." className="m-2 shadow-lg" />}
+          {/* {imgSrc && <img src={imgSrc} alt="N.F." className="m-2 shadow-lg" />} */}
+          {person ? (
+            <div className="badge badge-success badge-pill">
+              Person Detected
+            </div>
+          ) : (
+            <div className="badge badge-danger badge-pill">Not Detected</div>
+          )}
+          {fault ? (
+            <div className="badge badge-danger badge-pill">Person Cheating</div>
+          ) : (
+            <div className="badge badge-success badge-pill">OK, No Problem</div>
+          )}
         </div>
       </div>
       {/* <button onClick={play}>Start</button>
@@ -197,4 +215,4 @@ function Cam() {
   );
 }
 
-export default React.memo(Cam);
+export default Cam;
