@@ -1,58 +1,54 @@
-import React, { useRef, useState, useEffect } from "react";
-import Webcam from "react-webcam";
+import React, { useState, useEffect, useCallback } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import Timer from "./Timer";
-import { Link, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { db } from "../firebase";
-import Cam from "./webcam";
+import Cam from "./Cam";
 import ExitQuizModal from "./ExitQuizModal";
 import QuizCurrentQuestion from "./QuizCurrentQuestion";
 import QuestionPanel from "./QuestionPanel";
 
 function TakeQuiz() {
+  let item1 = localStorage.getItem("quizInfo");
+  item1 = JSON.parse(item1);
+  let endTime = localStorage.getItem("endTime");
+  endTime = new Date(endTime).getTime();
+
   const { currentUser } = useAuth();
 
-  const webcamRef = useRef(null);
   let history = useHistory();
 
   const [loading, setLoading] = useState(true);
-  const [quizInfo, setQuizInfo] = useState({ quizUUID: "default" });
-  const [expireTime, setExpireTime] = useState("");
 
   const [questionList, setQuestionList] = useState([]);
   const [current, setCurrent] = useState(0);
   const [attempt, setAttempt] = useState({ atm: 0, mrk: 0 });
   const [show, setShow] = useState(false);
 
-  let item1 = localStorage.getItem("quizInfo");
-  item1 = JSON.parse(item1);
-  let endTime = localStorage.getItem("endTime");
+  const getData = useCallback(
+    async function () {
+      setLoading(true);
 
-  async function getData() {
-    setLoading(true);
+      // console.log(expireTime, quizInfo);
 
-    // console.log(expireTime, quizInfo);
+      await db
+        .collection("quizInfo/" + item1.quizUUID + "/questions")
+        .get()
+        .then((snapshot) => {
+          let document = snapshot.docs.map((doc) => doc.data());
+          // console.log(document);
+          setQuestionList([...(document || [])]);
+        });
 
-    await db
-      .collection("quizInfo/" + quizInfo.quizUUID + "/questions")
-      .get()
-      .then((snapshot) => {
-        let document = snapshot.docs.map((doc) => doc.data());
-        // console.log(document);
-        setQuestionList([...(document || [])]);
-      });
-
-    setLoading(false);
-  }
-
-  useEffect(() => {
-    setQuizInfo(item1);
-    setExpireTime(new Date(endTime));
-  }, []);
+      setLoading(false);
+    },
+    [item1.quizUUID]
+  );
 
   useEffect(() => {
     getData();
-  }, [quizInfo, expireTime]);
+  }, [getData]);
 
   // useEffect(() => {
   //   // console.log("setCurrent", current, questionList.length);
@@ -133,50 +129,118 @@ function TakeQuiz() {
           questionList={questionList}
           db={db}
           currentUser={currentUser}
-          quizInfo={quizInfo}
+          quizInfo={item1}
           history={history}
         />
-
-        <div className="fs-3 d-inline p-2 mx-2">
-          Quiz ID : {quizInfo.quizUUID} , Name : {quizInfo.quizName},
-          <Timer expiryTimestamp={expireTime} history={history} />
-        </div>
-
-        <button className="btn btn-danger d-inline mx-2" onClick={EndTest}>
-          End Test
-        </button>
-
-        <div className="row ">
-          {/* {Question Panel} */}
-          <div className="col-8 py-2 ">
-            <QuizCurrentQuestion
-              current={current}
-              questionList={questionList}
-              handleClick={handleClick}
-              MarkForReview={MarkForReview}
-              prevQue={prevQue}
-              nextQue={nextQue}
-            />
-          </div>
-          <div className="col-4 flex-wrap py-2">
-            <div style={{ minHeight: "70vh", border: "3px solid black" }}>
-              {questionList.map((item, index) => {
-                return (
-                  <QuestionPanel
-                    key={index}
-                    questionList={questionList}
-                    index={index}
-                    setCurrent={setCurrent}
-                  />
-                );
-              })}
+        <div className="row">
+          <div className="col-8 py-2">
+            <div className="row">
+              <div className="col-4 rgt-border">
+                Name : {item1.quizName}
+                <br />
+                <Link to="/studentDash">Exit to Dashboard</Link>
+              </div>
+              <div className=" py-1 col-5 text-left rgt-border">
+                <strong>Email:</strong> {currentUser.email}
+                <br />
+                <strong>Name:</strong> {currentUser.displayName}
+              </div>
+              <div className="col-3 p-0 rgt-border">
+                <Timer expiryTimestamp={endTime} history={history} />
+              </div>
             </div>
-            <div className="float-right">
-              <Cam />
+
+            <div className=" py-2 ">
+              <QuizCurrentQuestion
+                current={current}
+                questionList={questionList}
+                handleClick={handleClick}
+                MarkForReview={MarkForReview}
+                prevQue={prevQue}
+                nextQue={nextQue}
+              />
             </div>
           </div>
+          <div className="col-4 py-2">
+            {/* {Question Panel} */}
+
+            <div className=" flex-wrap ">
+              <div style={{ minHeight: "70vh", border: "3px solid black" }}>
+                {questionList.map((item, index) => {
+                  return (
+                    <QuestionPanel
+                      key={index}
+                      questionList={questionList}
+                      index={index}
+                      setCurrent={setCurrent}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-8">
+                <Cam />
+              </div>
+              <div className="float-right">
+                <button className="btn btn-danger p-3 my-2" onClick={EndTest}>
+                  End Test
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
+
+        {/* // <div>
+      //   <ExitQuizModal
+      //     show={show}
+      //     setShow={setShow}
+      //     attempt={attempt}
+      //     questionList={questionList}
+      //     db={db}
+      //     currentUser={currentUser}
+      //     quizInfo={item1}
+      //     history={history}
+      //   />
+
+      //   <div className="fs-3 d-inline py-2 mx-2">
+      //     Quiz ID : {item1.quizUUID} , Name : {item1.quizName},
+      //     <Timer expiryTimestamp={endTime} history={history} />
+      //   </div>
+
+      //   <button className="btn btn-danger d-inline mx-2" onClick={EndTest}>
+      //     End Test
+      //   </button>
+
+      //   <div className="row ">
+      //     <div className="col-8 py-2 ">
+      //       <QuizCurrentQuestion
+      //         current={current}
+      //         questionList={questionList}
+      //         handleClick={handleClick}
+      //         MarkForReview={MarkForReview}
+      //         prevQue={prevQue}
+      //         nextQue={nextQue}
+      //       />
+      //     </div>
+      //     <div className="col-4 flex-wrap py-2">
+      //       <div style={{ minHeight: "70vh", border: "3px solid black" }}>
+      //         {questionList.map((item, index) => {
+      //           return (
+      //             <QuestionPanel
+      //               key={index}
+      //               questionList={questionList}
+      //               index={index}
+      //               setCurrent={setCurrent}
+      //             />
+      //           );
+      //         })}
+      //       </div>
+      //       <div className="float-right">{/* <Cam /> */}
       </div>
+      //     </div>
+      //   </div>
+      // </div> */}
     );
   } else {
     return <h1>No Question in Database</h1>;

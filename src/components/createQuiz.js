@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { db } from "../firebase";
-import { Link, useHistory } from "react-router-dom";
+import { Link } from "react-router-dom";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import { Editor } from "react-draft-wysiwyg";
 import { EditorState, convertToRaw, ContentState } from "draft-js";
@@ -11,6 +11,7 @@ import ReactHtmlParser from "react-html-parser";
 function CreateQuiz() {
   let quizInfo = localStorage.getItem("quizInfo");
   quizInfo = JSON.parse(quizInfo);
+
   const [loading, setLoading] = useState(true);
   const [editorStateQuestion, setEditorStateQ] = useState(
     EditorState.createEmpty()
@@ -29,7 +30,7 @@ function CreateQuiz() {
   const [question, setQuestion] = useState({
     questionNo: "",
     questionContent: "",
-    questionOptions: [option, option, option],
+    questionOptions: [],
     questionIsAttempted: false,
     questionIsMarked: false,
   });
@@ -68,9 +69,6 @@ function CreateQuiz() {
   }, [editorStateQuestion]);
 
   useEffect(() => {
-    console.log(
-      draftToHtml(convertToRaw(editorStateOption.getCurrentContent()))
-    );
     setOption((prev) => {
       return {
         ...prev,

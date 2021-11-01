@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 import { Form, Button, Card, Alert } from "react-bootstrap";
 import { useAuth } from "../contexts/AuthContext";
 import { Link, useHistory } from "react-router-dom";
-import { db } from "../firebase";
+// import { db } from "../firebase";
 import PopupSignIn from "./PopupSignIn";
 import loginPage from "../images/loginPage.jpg";
 
@@ -13,52 +13,55 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const [type, setType] = useState("Student");
+  const [type, setType] = useState("");
   const history = useHistory();
+
+  function radioChange(e) {
+    const { value } = e.target;
+    setType(value);
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
-    try {
-      setError("");
-      setLoading(true);
 
-      await login(emailRef.current.value, passwordRef.current.value)
-        .then((cred) => {
-          if (type === "Student") {
-            history.push("/studentDash");
-            // db.collection("Student")
-            //   .doc(cred.user.email)
-            //   .get()
-            //   .then((doc) => {
-            //     if (doc.exists) {
-            //       history.push("/studentDash");
-            //     } else {
-            //       setError("User Not Found");
-            //     }
-            //   });
-          } else if (type === "Teacher") {
-            history.push("/teacherDash");
-            // db.collection("Student")
-            //   .doc(cred.user.email)
-            //   .get()
-            //   .then((doc) => {
-            //     if (doc.exists) {
-            //       history.push("/teacherDash");
-            //     } else {
-            //       setError("User Not Found");
-            //     }
-            //   });
-          } else history.push("/");
-        })
-        .catch((err) => {
-          console.log(err);
-          setError(`${err.message}`);
-        });
-    } catch {
-      setError("Failed");
-    }
+    setError("");
+    setLoading(true);
 
-    setLoading(false);
+    await login(emailRef.current.value, passwordRef.current.value)
+      .then((cred) => {
+        setLoading(false);
+        if (type === "Student") {
+          history.push("/studentDash");
+          // db.collection("Student")
+          //   .doc(cred.user.email)
+          //   .get()
+          //   .then((doc) => {
+          //     if (doc.exists) {
+          //       history.push("/studentDash");
+          //     } else {
+          //       setError("User Not Found");
+          //     }
+          //   });
+        } else if (type === "Teacher") {
+          history.push("/teacherDash");
+          // db.collection("Student")
+          //   .doc(cred.user.email)
+          //   .get()
+          //   .then((doc) => {
+          //     if (doc.exists) {
+          //       history.push("/teacherDash");
+          //     } else {
+          //       setError("User Not Found");
+          //     }
+          //   });
+        } else {
+          history.push("/");
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        setError(`${err.message}`);
+      });
   }
 
   return (
@@ -92,37 +95,45 @@ export default function Login() {
                   <Form.Label>Password</Form.Label>
                   <Form.Control type="password" ref={passwordRef} required />
                 </Form.Group>
-                <Form.Group>
+                <Form.Group className="d-flex justify-content-center">
                   <Form.Label className="mx-4">
                     Student
                     <Form.Control
                       type="radio"
+                      name="type"
+                      value="Student"
                       checked={type === "Student"}
-                      onClick={() => setType("Student")}
-                      onChange={() => console.log("Student Selected")}
+                      onChange={radioChange}
                     />
                   </Form.Label>
                   <Form.Label className="mx-4">
                     Teacher
                     <Form.Control
                       type="radio"
+                      name="type"
+                      value="Teacher"
                       checked={type === "Teacher"}
-                      onClick={() => setType("Teacher")}
-                      onChange={() => console.log("Teacher Select")}
+                      onChange={radioChange}
                     />
                   </Form.Label>
                 </Form.Group>
-                <Link to="/signup">Create Account</Link>
+                {/* <Link to="/signup">Create Account</Link> */}
               </Card.Body>
               <Card.Footer className="d-flex justify-content-between">
-                <Button
-                  disabled={loading}
-                  className="p-3 rounded-pill"
-                  type="submit"
-                >
-                  Log In
-                </Button>
-                <PopupSignIn setError={setError} loading={loading} />
+                <div className="row w-100">
+                  <div className="col-6 p-1">
+                    <Button
+                      disabled={loading}
+                      className=" rounded btn-block "
+                      type="submit"
+                    >
+                      Log In
+                    </Button>
+                  </div>
+                  <div className="col-6 p-1">
+                    <PopupSignIn setError={setError} loading={loading} />
+                  </div>
+                </div>
               </Card.Footer>
             </Card>
           </Form>

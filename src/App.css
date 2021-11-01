@@ -1,9 +1,21 @@
-.blink_me {
-    animation: blinker 1s linear infinite;
-  }
-  
-  @keyframes blinker {
-    50% {
-      opacity: 0;
-    }
-  }
+.rgt-border {
+  border-right: 1px solid #000;
+}
+
+.fss {
+  font-size: 1.8rem;
+}
+
+hr {
+  border: 0;
+  border-bottom: 9px dotted rgb(102, 102, 117);
+  max-width: 10%;
+  text-align: center;
+}
+
+.loader-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}

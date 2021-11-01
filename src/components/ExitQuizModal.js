@@ -17,6 +17,7 @@ function ExitQuizModal({
       onHide={() => setShow(!show)}
       backdrop="static"
       keyboard={false}
+      animation={false}
     >
       <Modal.Header closeButton>
         <Modal.Title> End Test</Modal.Title>
@@ -32,15 +33,15 @@ function ExitQuizModal({
         <Button
           variant="secondary"
           onClick={async () => {
-            await db
-              .collection("Student")
-              .doc(currentUser.email)
-              .collection("Attempt")
-              .doc(quizInfo.quizUUID)
-              .set({
-                Info: quizInfo,
-                questions: questionList,
-              });
+            // await db
+            //   .collection("Student")
+            //   .doc(currentUser.email)
+            //   .collection("Attempt")
+            //   .doc(quizInfo.quizUUID)
+            //   .set({
+            //     Info: quizInfo,
+            //     questions: questionList,
+            //   });
 
             history.push("/studentDash");
           }}

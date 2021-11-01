@@ -3,7 +3,6 @@ import { auth } from "../firebase";
 import Firebase from "firebase/app";
 import { useHistory } from "react-router-dom";
 import { Button } from "react-bootstrap";
-import { useAuth } from "../contexts/AuthContext";
 
 export default function PopupSignIn({ setError, loading }) {
   const history = useHistory();
@@ -28,7 +27,7 @@ export default function PopupSignIn({ setError, loading }) {
   };
   return (
     <Button
-      className="   rounded-pill p-2"
+      className="   rounded  btn-block "
       disabled={loading}
       onClick={handleGoogleLogin}
     >

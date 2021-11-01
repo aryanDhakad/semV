@@ -17,7 +17,7 @@ function QuizListItem({ index, item, showTime, handleSubmit, type }) {
             handleSubmit(type, item, item.quizTimeStart, item.quizTimeEnd)
           }
         >
-          Start
+          {type.charAt(0).toUpperCase() + type.slice(1)}
         </Button>
       </td>
     </tr>
