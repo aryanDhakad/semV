@@ -124,7 +124,7 @@ function StudentDash() {
             Log Out
           </Button>
         </div>
-        <div className="  col-6 fss rgt-border ">
+        <div className="  col-6 fss rgt-border " style={{ color: "#F1732B" }}>
           <strong>STUDENT DASHBOARD</strong>
         </div>
         <div className=" p-1 pl-4 col-4 text-left">
@@ -154,11 +154,11 @@ function StudentDash() {
               </tbody>
             </table>
           ) : (
-            <h3 className="">Nothing to check Here..</h3>
+            <h4 className="">Nothing to check Here..</h4>
           )}
         </div>
         <div className=" p-2 col-8">
-          <h3 className="">Upcoming Quiz</h3>
+          <h4 className="">Upcoming Quizes</h4>
           <hr />
           {quizzesNow.length ? (
             <table className="table my-3">
@@ -189,9 +189,9 @@ function StudentDash() {
               </tbody>
             </table>
           ) : (
-            <h3 className="">No Upcoming Quizzes..</h3>
+            <p className="">No Upcoming Quizzes..</p>
           )}
-          <h3 className="">Past Quizes</h3>
+          <h4 className="">Past Quizes</h4>
           <hr />
           {quizzesDone.length ? (
             <table className="table my-3">
@@ -222,7 +222,7 @@ function StudentDash() {
               </tbody>
             </table>
           ) : (
-            <h3 className="">No Quizzes to see..</h3>
+            <p className="">No Quizzes to see..</p>
           )}
         </div>
       </div>

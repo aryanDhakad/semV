@@ -8,6 +8,7 @@ import Cam from "./Cam";
 import ExitQuizModal from "./ExitQuizModal";
 import QuizCurrentQuestion from "./QuizCurrentQuestion";
 import QuestionPanel from "./QuestionPanel";
+import Loader from "./Loader";
 
 function TakeQuiz() {
   let item1 = localStorage.getItem("quizInfo");
@@ -118,7 +119,7 @@ function TakeQuiz() {
   }
 
   if (loading) {
-    return <h1>Loading ....</h1>;
+    return <Loader />;
   } else if (questionList.length) {
     return (
       <div>

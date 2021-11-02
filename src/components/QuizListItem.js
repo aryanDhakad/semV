@@ -12,7 +12,8 @@ function QuizListItem({ index, item, showTime, handleSubmit, type }) {
         <Button
           key={index}
           type="submit"
-          className="btn btn-primary m-3"
+          style={{ backgroundColor: "#F1732B" }}
+          className="btn btn-warning text-white m-3"
           onClick={() =>
             handleSubmit(type, item, item.quizTimeStart, item.quizTimeEnd)
           }

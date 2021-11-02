@@ -29,6 +29,7 @@ export default function PopupSignIn({ setError, loading }) {
     <Button
       className="   rounded  btn-block "
       disabled={loading}
+      style={{ backgroundColor: "#F1732B" }}
       onClick={handleGoogleLogin}
     >
       Google

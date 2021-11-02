@@ -5,6 +5,7 @@ import { Form, Button, Alert } from "react-bootstrap";
 import { useHistory } from "react-router-dom";
 import { db } from "../firebase";
 import { useAuth } from "../contexts/AuthContext";
+import Loader from "./Loader";
 
 function CreateQuizForm() {
   let item = JSON.parse(localStorage.getItem("quizInfo"));
@@ -210,8 +211,8 @@ function CreateQuizForm() {
     history.push("/teacherDash");
   }
 
-  if (loading) {
-    return <h1>Loading ....</h1>;
+  if (loading || !currentUser) {
+    return <Loader />;
   }
 
   return (

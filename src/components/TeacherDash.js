@@ -3,6 +3,7 @@ import { Card, Button, Alert } from "react-bootstrap";
 import { useAuth } from "../contexts/AuthContext";
 import { useHistory } from "react-router-dom";
 import { db } from "../firebase";
+import Loader from "./Loader";
 
 export default function TeacherDash() {
   const { currentUser, logout } = useAuth();
@@ -117,9 +118,8 @@ export default function TeacherDash() {
   }
 
   if (loading || !currentUser) {
-    return <h1>Loading...</h1>;
+    return <Loader />;
   }
-
   return (
     <div className=" p-3  text-center">
       <p> {error && <Alert variant="danger">{error}</Alert>}</p>
@@ -145,7 +145,7 @@ export default function TeacherDash() {
             className="btn btn-primary my-3 btn-block py-3"
             onClick={() => handleSubmit("create", {})}
           >
-            CREATE QUIZ
+            CREATE NEW QUIZ
           </button>
 
           <div>
@@ -173,13 +173,13 @@ export default function TeacherDash() {
               className="btn btn-primary rounded pill mx-3 "
               onClick={sendNotif}
             >
-              NOTIFY
+              ADD NOTIFICATION
             </button>
           </div>
         </div>
         <div className="col-8">
           <Card className="my-3">
-            <Card.Header>EDIT QUIZ</Card.Header>
+            <Card.Header>CURRENT QUIZES</Card.Header>
 
             <div>
               <Card.Body>
@@ -201,7 +201,7 @@ export default function TeacherDash() {
           </Card>
 
           <Card className="my-3">
-            <Card.Header>PAST QUIZ</Card.Header>
+            <Card.Header>PAST QUIZES</Card.Header>
 
             <div>
               <Card.Body>

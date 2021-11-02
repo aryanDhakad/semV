@@ -11,6 +11,7 @@ import TeacherDash from "./components/TeacherDash";
 import ReviewTest from "./components/ReviewTest";
 import CreateQuizForm from "./components/createQuizForm";
 import "./App.css";
+import "font-awesome/css/font-awesome.min.css";
 function App() {
   return (
     <div className="p-2" style={{ minHeight: "100vh" }}>

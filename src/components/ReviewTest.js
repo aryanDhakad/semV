@@ -3,6 +3,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { Link } from "react-router-dom";
 import { db } from "../firebase";
 import ReactHtmlParser from "react-html-parser";
+import Loader from "./Loader";
 
 function ReviewTest() {
   const { currentUser } = useAuth();
@@ -60,7 +61,7 @@ function ReviewTest() {
   }
 
   if (loading) {
-    return <h1>Loading ....</h1>;
+    return <Loader />;
   } else if (current >= 0) {
     return (
       <div>
