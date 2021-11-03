@@ -1,10 +1,11 @@
-import React, { useState, useCallback, useRef, useEffect } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import XLSX from "xlsx";
 import "bootstrap/dist/css/bootstrap.css";
-import { Form, Button, Card, Alert } from "react-bootstrap";
+import { Form, Button, Alert } from "react-bootstrap";
 import { useHistory } from "react-router-dom";
 import { db } from "../firebase";
 import { useAuth } from "../contexts/AuthContext";
+import Loader from "./Loader";
 
 function CreateQuizForm() {
   let item = JSON.parse(localStorage.getItem("quizInfo"));
@@ -17,37 +18,36 @@ function CreateQuizForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  async function getData() {
-    setLoading(true);
-
-    setInfo((prev) => {
-      return {
-        ...prev,
-        instructorName: currentUser.displayName,
-        instructorEmail: currentUser.email,
-      };
-    });
-
-    // console.log(
-    //   taEmailListRef.current.files,
-    //   studentEmailListRef.current.files
-    // );
-
-    if (info.quizUUID !== "") {
-      await db
-        .collection("quizInfo")
-        .doc(info.quizUUID)
-        .collection("questions")
-        .get()
-        .then((snapshot) => {
-          let data = snapshot.docs.map((doc) => doc.data());
-          setQuestionList([...data]);
-        });
-    }
-    setLoading(false);
-  }
-
   useEffect(() => {
+    async function getData() {
+      setLoading(true);
+
+      setInfo((prev) => {
+        return {
+          ...prev,
+          instructorName: currentUser.displayName,
+          instructorEmail: currentUser.email,
+        };
+      });
+
+      // console.log(
+      //   taEmailListRef.current.files,
+      //   studentEmailListRef.current.files
+      // );
+
+      if (info.quizUUID !== "") {
+        await db
+          .collection("quizInfo")
+          .doc(info.quizUUID)
+          .collection("questions")
+          .get()
+          .then((snapshot) => {
+            let data = snapshot.docs.map((doc) => doc.data());
+            setQuestionList([...data]);
+          });
+      }
+      setLoading(false);
+    }
     getData();
   }, []);
 
@@ -114,7 +114,6 @@ function CreateQuizForm() {
           let optionContent = jsArray[i].optionContent;
           let optionIsCorrect = jsArray[i].optionIsCorrect;
           let optionWeightage = jsArray[i].optionWeightage.toString();
-          let isMultiCorrect = jsArray[i].isMultiCorrect;
 
           let questionOptionArr = questionOption.split(",");
           let optionContentArr = optionContent.split(",,");
@@ -191,8 +190,8 @@ function CreateQuizForm() {
         .doc(questionList[y].questionNo.toString())
         .set(questionList[y]);
     }
-    history.push("/create-quiz");
     setLoading(false);
+    history.push("/create-quiz");
   }
 
   async function deleteQuiz() {
@@ -212,8 +211,8 @@ function CreateQuizForm() {
     history.push("/teacherDash");
   }
 
-  if (loading) {
-    return <h1>Loading ....</h1>;
+  if (loading || !currentUser) {
+    return <Loader />;
   }
 
   return (
@@ -373,9 +372,17 @@ function CreateQuizForm() {
         </Form>
       </div>
       {info.quizUUID !== "" && (
-        <button className="btn btn-danger mx-3" onClick={deleteQuiz}>
-          Delete Quiz
-        </button>
+        <div>
+          <button className="btn btn-danger mx-3" onClick={deleteQuiz}>
+            Delete Quiz
+          </button>
+          <button
+            className="btn btn-warning mx-3"
+            onClick={() => history.push("/show-defaulters")}
+          >
+            Show Defaulters
+          </button>
+        </div>
       )}
     </div>
   );

@@ -19,18 +19,18 @@ function QuizCurrentQuestion({
         }}
         className="p-1"
       >
-        <h4 className="py-3 " style={{ height: "30vh", position: "relative" }}>
+        <h4 className="py-3 " style={{ height: "45vh", position: "relative" }}>
           {current + 1}{" "}
           <div> {ReactHtmlParser(questionList[current].questionContent)} </div>{" "}
         </h4>
         <div className="">
           {questionList[current].questionOptions &&
             questionList[current].questionOptions.map((opt, indexOpt) => {
-              let st1 = "btn btn-primary my-1 p-2 w-100";
+              let st1 = "btn btn-primary btn-block py-3";
               if (opt.optionIsSelected) st1 += " bg-dark";
               else st1 += " bg-primary";
               return (
-                <div key={indexOpt} className="w-50 my-2 ">
+                <div key={indexOpt} className="w-50 my-2 d-inline-block px-3 ">
                   <button
                     className={st1}
                     onClick={() => handleClick(current, indexOpt)}

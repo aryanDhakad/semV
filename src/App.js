@@ -1,18 +1,21 @@
 import React from "react";
-import Signup from "./Signup";
+import Signup from "./components/Signup";
 import { Container } from "react-bootstrap";
-import { AuthProvider } from "../contexts/AuthContext";
+import { AuthProvider } from "./contexts/AuthContext";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-import Login from "./Login";
-import CreateQuiz from "./createQuiz";
-import TakeQuiz from "./TakeQuiz";
-import StudentDash from "./StudentDash";
-import TeacherDash from "./TeacherDash";
-import ReviewTest from "./ReviewTest";
-import CreateQuizForm from "./createQuizForm";
+import Login from "./components/Login";
+import CreateQuiz from "./components/createQuiz";
+import TakeQuiz from "./components/TakeQuiz";
+import StudentDash from "./components/StudentDash";
+import TeacherDash from "./components/TeacherDash";
+import ReviewTest from "./components/ReviewTest";
+import CreateQuizForm from "./components/createQuizForm";
+import Defaulters from "./components/Defaulters";
+import "./App.css";
+import "font-awesome/css/font-awesome.min.css";
 function App() {
   return (
-    <Container className="" style={{ minHeight: "100vh" }}>
+    <div className="p-2" style={{ minHeight: "100vh" }}>
       <div>
         <Router>
           <AuthProvider>
@@ -26,11 +29,12 @@ function App() {
               <Route path="/teacherDash" component={TeacherDash} />
               <Route path="/create-quiz-form" component={CreateQuizForm} />
               <Route path="/review-test" component={ReviewTest} />
+              <Route path="/show-defaulters" component={Defaulters} />
             </Switch>
           </AuthProvider>
         </Router>
       </div>
-    </Container>
+    </div>
   );
 }
 

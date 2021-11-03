@@ -1,23 +1,84 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Button, Alert } from "react-bootstrap";
 import { useAuth } from "../contexts/AuthContext";
 import { useHistory } from "react-router-dom";
 import { db } from "../firebase";
 import Notif from "./Notif";
 import QuizListItem from "./QuizListItem";
+import Cam from "./Cam";
+import Loader from "./Loader";
 
 function StudentDash() {
   const { currentUser, logout } = useAuth();
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [quizzesNow, setQuizzesNow] = useState([]);
   const [quizzesDone, setQuizzesDone] = useState([]);
   const [notifs, setNotifs] = useState([]);
   const history = useHistory();
 
+  const getData = useCallback(
+    async function () {
+      setLoading(true);
+
+      let time = new Date();
+      await db
+        .collection("quizInfo")
+        .get()
+        .then((snapshot) => {
+          snapshot.docs.forEach((doc) => {
+            let time2ed = new Date(doc.data().quizTimeEnd);
+
+            if (time2ed.getTime() < time.getTime()) {
+              if (doc.data().quizLetReview) {
+                setQuizzesDone((prev) => {
+                  // console.log(doc.data());
+                  return [...prev, doc.data()];
+                });
+              }
+            } else {
+              setQuizzesNow((prev) => {
+                return [...prev, doc.data()];
+              });
+              // db.collection(`Student/${currentUser.email || "default"}/Attempt`)
+              //   .doc(doc.id)
+              //   .get()
+              //   .then((doc1) => {
+              //     if (!doc1.exists) {
+              //       setQuizzesNow((prev) => {
+              //         // console.log(doc.data());
+              //         return [...prev, doc.data()];
+              //       });
+              //     }
+              //   });
+            }
+          });
+        })
+        .catch((err) => {
+          setError(err);
+        });
+
+      await db
+        .collection("Student")
+        .doc(currentUser.email)
+        .collection("Notifs")
+        .get()
+        .then((snap) => {
+          let data = snap.docs.map((item) => {
+            return { id: item.id, ...item.data() };
+          });
+
+          setNotifs([...data]);
+        });
+
+      setLoading(false);
+    },
+    [currentUser]
+  );
+
   useEffect(() => {
     if (currentUser) getData();
-  }, [currentUser]);
+  }, [currentUser, getData]);
 
   async function handleLogout() {
     setError("");
@@ -28,59 +89,6 @@ function StudentDash() {
     } catch {
       setError("Failed to log out");
     }
-  }
-
-  async function getData() {
-    setLoading(true);
-
-    let time = new Date();
-    await db
-      .collection("quizInfo")
-      .get()
-      .then((snapshot) => {
-        snapshot.docs.forEach((doc) => {
-          let time2ed = new Date(doc.data().quizTimeEnd);
-
-          if (time2ed.getTime() < time.getTime()) {
-            if (doc.data().quizLetReview) {
-              setQuizzesDone((prev) => {
-                // console.log(doc.data());
-                return [...prev, doc.data()];
-              });
-            }
-          } else {
-            db.collection(`Student/${currentUser.email || "default"}/Attempt`)
-              .doc(doc.id)
-              .get()
-              .then((doc1) => {
-                if (!doc1.exists) {
-                  setQuizzesNow((prev) => {
-                    // console.log(doc.data());
-                    return [...prev, doc.data()];
-                  });
-                }
-              });
-          }
-        });
-      })
-      .catch((err) => {
-        setError(err);
-      });
-
-    await db
-      .collection("Student")
-      .doc(currentUser.email)
-      .collection("Notifs")
-      .get()
-      .then((snap) => {
-        let data = snap.docs.map((item) => {
-          return { id: item.id, ...item.data() };
-        });
-
-        setNotifs([...data]);
-      });
-
-    setLoading(false);
   }
 
   function handleSubmit(type, item, start, end) {
@@ -104,54 +112,54 @@ function StudentDash() {
     return t.toLocaleString("en-US");
   }
   if (loading || !currentUser) {
-    return <h1>Loading...</h1>;
+    return <Loader />;
   }
 
   return (
-    <div className="container p-3  text-center">
-      <div className="row text-left">
-        <div className="col-6">
-          <strong>Email:</strong> {currentUser.email}
-          <br />
-          <strong>Name:</strong> {currentUser.displayName}
-        </div>
-        <div className="col-6">
+    <div className="p-3  text-center">
+      <p> {error && <Alert variant="danger">{error}</Alert>}</p>
+      <div className="row mb-5  ">
+        <div className=" p-2 col-2 rgt-border">
           <Button variant="outline-danger" onClick={handleLogout}>
             Log Out
           </Button>
         </div>
+        <div className="  col-6 fss rgt-border " style={{ color: "#F1732B" }}>
+          <strong>STUDENT DASHBOARD</strong>
+        </div>
+        <div className=" p-1 pl-4 col-4 text-left">
+          <strong>Email:</strong> {currentUser.email}
+          <br />
+          <strong>Name:</strong> {currentUser.displayName}
+        </div>
       </div>
 
-      <p> {error && <Alert variant="danger">{error}</Alert>}</p>
-
-      <div className="row">
-        <div className="col-6">
+      <div className="row mb-2">
+        <div className=" p-2 col-4 rgt-border ">
           {notifs.length ? (
             <table className=" table ">
-              <tbody>
-                <section style={{ maxHeight: "100vh", overflow: "scroll" }}>
-                  {notifs.map((item, index) => {
-                    return (
-                      <Notif
-                        key={index}
-                        item={item}
-                        index={index}
-                        db={db}
-                        currentUser={currentUser}
-                        setNotifs={setNotifs}
-                      />
-                    );
-                  })}
-                </section>
+              <tbody style={{ maxHeight: "100vh", overflow: "scroll" }}>
+                {notifs.map((item, index) => {
+                  return (
+                    <Notif
+                      key={index}
+                      item={item}
+                      index={index}
+                      db={db}
+                      currentUser={currentUser}
+                      setNotifs={setNotifs}
+                    />
+                  );
+                })}
               </tbody>
             </table>
           ) : (
-            <h3 className="shadow-lg">Nothing to check Here..</h3>
+            <h4 className="">Nothing to check Here..</h4>
           )}
         </div>
-
-        <div className="col-6">
-          <h3 className="shadow-lg">Upcoming Quiz</h3>
+        <div className=" p-2 col-8">
+          <h4 className="">Upcoming Quizes</h4>
+          <hr />
           {quizzesNow.length ? (
             <table className="table my-3">
               <thead className="thead-dark">
@@ -181,10 +189,10 @@ function StudentDash() {
               </tbody>
             </table>
           ) : (
-            <h3 className="shadow-lg">No Upcoming Quizzes..</h3>
+            <p className="">No Upcoming Quizzes..</p>
           )}
-
-          <h3 className="shadow-lg">Past Quiz</h3>
+          <h4 className="">Past Quizes</h4>
+          <hr />
           {quizzesDone.length ? (
             <table className="table my-3">
               <thead className="thead-dark">
@@ -214,7 +222,7 @@ function StudentDash() {
               </tbody>
             </table>
           ) : (
-            <h3 className="shadow-lg">No Quizzes to see..</h3>
+            <p className="">No Quizzes to see..</p>
           )}
         </div>
       </div>

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Card, Button, Alert } from "react-bootstrap";
 import { useAuth } from "../contexts/AuthContext";
-import { Link, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { db } from "../firebase";
+import Loader from "./Loader";
 
 export default function TeacherDash() {
   const { currentUser, logout } = useAuth();
@@ -20,36 +21,35 @@ export default function TeacherDash() {
   });
   const history = useHistory();
 
-  async function getData() {
-    setLoading(true);
-
-    let time = new Date();
-    await db
-      .collection("quizInfo")
-      .get()
-      .then((snapshot) => {
-        snapshot.docs.forEach((doc) => {
-          let time2ed = new Date(doc.data().quizTimeEnd);
-
-          if (time2ed.getTime() < time.getTime()) {
-            setQuizzesDone((prev) => {
-              return [...prev, doc.data()];
-            });
-          } else {
-            setQuizzesNow((prev) => {
-              // console.log(doc.data());
-              return [...prev, doc.data()];
-            });
-          }
-        });
-      })
-      .catch((err) => {
-        setError(err);
-      });
-    setLoading(false);
-  }
-
   useEffect(() => {
+    async function getData() {
+      setLoading(true);
+
+      let time = new Date();
+      await db
+        .collection("quizInfo")
+        .get()
+        .then((snapshot) => {
+          snapshot.docs.forEach((doc) => {
+            let time2ed = new Date(doc.data().quizTimeEnd);
+
+            if (time2ed.getTime() < time.getTime()) {
+              setQuizzesDone((prev) => {
+                return [...prev, doc.data()];
+              });
+            } else {
+              setQuizzesNow((prev) => {
+                // console.log(doc.data());
+                return [...prev, doc.data()];
+              });
+            }
+          });
+        })
+        .catch((err) => {
+          setError(err.message);
+        });
+      setLoading(false);
+    }
     if (currentUser) getData();
   }, [currentUser]);
 
@@ -118,63 +118,68 @@ export default function TeacherDash() {
   }
 
   if (loading || !currentUser) {
-    return <h1>Loading...</h1>;
+    return <Loader />;
   }
-
   return (
-    <div className="container p-3  text-center">
-      <h2>Teacher Dashboard</h2>
-      {error && <Alert variant="danger">{error}</Alert>}
-      <div className="row text-left my-4 p-4">
-        <div className="col-6">
-          <strong>Email:</strong> {currentUser.email}
-          <br />
-          <strong>Name:</strong> {currentUser.displayName}
-        </div>
-        <div className="col-6">
+    <div className=" p-3  text-center">
+      <p> {error && <Alert variant="danger">{error}</Alert>}</p>
+      <div className="row mb-2  ">
+        <div className=" p-2 col-2 rgt-border">
           <Button variant="outline-danger" onClick={handleLogout}>
             Log Out
           </Button>
         </div>
+        <div className="  col-6 fss rgt-border ">
+          <strong>Teacher Dashboard</strong>
+        </div>
+        <div className=" p-1 pl-4 col-4 text-left">
+          <strong>Email:</strong> {currentUser.email}
+          <br />
+          <strong>Name:</strong> {currentUser.displayName}
+        </div>
       </div>
-      <div className="row">
-        <div className="col-4">
-          <label>NOTIFICATION :</label>
-          <textarea
-            row="7"
-            col="20"
-            className="form-control"
-            type="text"
-            name="content"
-            value={notif.content}
-            onChange={(e) => {
-              const { name, value } = e.target;
-              setNotif((prev) => {
-                return {
-                  ...prev,
-                  [name]: value,
-                  time: new Date().toLocaleDateString("en-US"),
-                };
-              });
-            }}
-          />
+
+      <div className="row mb-2">
+        <div className="col-4 rgt-border">
           <button
-            disabled={loading}
-            className="btn btn-primary rounded-circle mx-3 "
-            onClick={sendNotif}
-          >
-            +
-          </button>
-          <button
-            className="btn btn-primary m-3"
+            className="btn btn-primary my-3 btn-block py-3"
             onClick={() => handleSubmit("create", {})}
           >
-            Create Quiz
+            CREATE NEW QUIZ
           </button>
+
+          <div>
+            <h4>Notification Panel : </h4>
+            <textarea
+              row="15"
+              col="20"
+              className=" form-control my-3"
+              type="text"
+              name="content"
+              value={notif.content}
+              onChange={(e) => {
+                const { name, value } = e.target;
+                setNotif((prev) => {
+                  return {
+                    ...prev,
+                    [name]: value,
+                    time: new Date().toLocaleDateString("en-US"),
+                  };
+                });
+              }}
+            />
+            <button
+              disabled={loading}
+              className="btn btn-primary rounded pill mx-3 "
+              onClick={sendNotif}
+            >
+              ADD NOTIFICATION
+            </button>
+          </div>
         </div>
         <div className="col-8">
-          <Card>
-            <Card.Header>Edit Quiz</Card.Header>
+          <Card className="my-3">
+            <Card.Header>CURRENT QUIZES</Card.Header>
 
             <div>
               <Card.Body>
@@ -194,8 +199,9 @@ export default function TeacherDash() {
               </Card.Body>
             </div>
           </Card>
-          <Card>
-            <Card.Header>Past Quiz</Card.Header>
+
+          <Card className="my-3">
+            <Card.Header>PAST QUIZES</Card.Header>
 
             <div>
               <Card.Body>

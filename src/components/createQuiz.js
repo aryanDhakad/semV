@@ -1,17 +1,20 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { db } from "../firebase";
-import { Link, useHistory } from "react-router-dom";
+import { Link } from "react-router-dom";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import { Editor } from "react-draft-wysiwyg";
 import { EditorState, convertToRaw, ContentState } from "draft-js";
 import draftToHtml from "draftjs-to-html";
 import htmlToDraft from "html-to-draftjs";
 import ReactHtmlParser from "react-html-parser";
+import Loader from "./Loader";
 
 function CreateQuiz() {
   let quizInfo = localStorage.getItem("quizInfo");
   quizInfo = JSON.parse(quizInfo);
+
   const [loading, setLoading] = useState(true);
+  const [edit, setEdit] = useState("question");
   const [editorStateQuestion, setEditorStateQ] = useState(
     EditorState.createEmpty()
   );
@@ -29,7 +32,7 @@ function CreateQuiz() {
   const [question, setQuestion] = useState({
     questionNo: "",
     questionContent: "",
-    questionOptions: [option, option, option],
+    questionOptions: [],
     questionIsAttempted: false,
     questionIsMarked: false,
   });
@@ -68,9 +71,6 @@ function CreateQuiz() {
   }, [editorStateQuestion]);
 
   useEffect(() => {
-    console.log(
-      draftToHtml(convertToRaw(editorStateOption.getCurrentContent()))
-    );
     setOption((prev) => {
       return {
         ...prev,
@@ -232,179 +232,282 @@ function CreateQuiz() {
     setLoading(false);
   }
 
+  function radioChange(e) {
+    let { value } = e.target;
+
+    setEdit(value);
+  }
+
   if (loading) {
-    return <h1>Loading ....</h1>;
+    return <Loader />;
   }
   return (
     <div className="py-5">
-      <Link to="/create-quiz-form">Edit Quiz Info</Link>
-      <br />
-      <Link to="/teacherDash">Exit</Link>
-      <h3 className="text-danger text-center "> NOTE : {error}</h3>
+      <div className="  fss d-flex justify-content-around align-items-center">
+        <Link to="/create-quiz-form" className="mx-3">
+          Edit Quiz Info
+        </Link>
 
-      <div className="row px-5">
-        <div className="col-6 px-1 py-1">
-          <button className="btn btn-success w-100" onClick={addQuestion}>
-            Add/Update Question
-          </button>
-          <label className="">Sr. No.</label>
-          <input
-            type="text"
-            name="questionNo"
-            className="form-control"
-            value={question.questionNo}
-            onChange={handleChange}
-          />
-          <Editor
-            editorState={editorStateQuestion}
-            toolbarClassName="toolbarClassName"
-            wrapperClassName="wrapperClassName"
-            editorClassName="editorClassName"
-            onEditorStateChange={setEditorStateQ}
-          />
-          <label>Prompt : </label>
-          <div> {ReactHtmlParser(question.questionContent)} </div>
-        </div>
-        <div className="col-6 px-5 py-3">
-          <div className="row p-0">
-            <div className="col-6 p-1">
-              <button
-                className="btn btn-primary  rounded-pill w-100"
-                onClick={addOption}
-              >
-                Add Option
-              </button>
-            </div>
-            <div className="col-6 p-1">
-              <button
-                className="btn btn-primary  rounded-pill w-100"
-                onClick={updateOptionAndSubmit}
-              >
-                Update
-              </button>
-            </div>
-          </div>
-
-          <div className="row">
-            <div className="col-4">
-              <label className="">
-                IsCorrect
-                <input
-                  type="checkbox"
-                  className="form-control"
-                  name="optionIsCorrect"
-                  checked={option.optionIsCorrect}
-                  onChange={handleChange1}
-                />
-              </label>
-            </div>
-            <div className="col-8">
-              <label className="">
-                Weightage :
-                <input
-                  type="number"
-                  className="form-control"
-                  name="optionWeightage"
-                  value={option.optionWeightage}
-                  onChange={handleChange1}
-                />
-              </label>
-            </div>
-          </div>
-          <Editor
-            editorState={editorStateOption}
-            toolbarClassName="toolbarClassName"
-            wrapperClassName="wrapperClassName"
-            editorClassName="editorClassName"
-            onEditorStateChange={setEditorStateO}
-          />
-          <label>Prompt : </label>
-          <div> {ReactHtmlParser(option.optionContent)} </div>
-        </div>
+        <Link to="/teacherDash" className="mx-3">
+          Exit
+        </Link>
       </div>
-      <div className="my-5 ">
-        <div className="">
-          {question.questionOptions.map((item, index) => {
-            let prop1 = index === optionId ? "shadow-lg" : "";
-            let itemCurrent = index === optionId ? option : item;
-            return (
-              <div key={index} className={`row my-2 ${prop1}`}>
-                <div className="col-10">
-                  <div> {ReactHtmlParser(itemCurrent.optionContent)} </div>
+
+      <div className="row">
+        <div className="col-5">
+          {/* Question List */}
+          <div
+            className=" overflow-auto pl-3 pr-5"
+            style={{ maxHeight: "90vh" }}
+          >
+            {questionList &&
+              questionList.map((item, index) => {
+                return (
+                  <div key={index} className="my-5 ">
+                    <div className="row">
+                      <div className="col-4">
+                        <h3>
+                          <strong>{item.questionNo}</strong>
+                        </h3>
+                      </div>
+                      <div className="col-8 d-flex justify-content-end">
+                        <button
+                          type="button"
+                          className="btn btn-primary  mr-4 rounded px-3 py-1"
+                          onClick={() => updateQuestion(index)}
+                          data-bs-toggle="tooltip"
+                          data-bs-placement="right"
+                          title="Edit Question"
+                        >
+                          <i className="fa fa-edit "></i>
+                        </button>
+
+                        <button
+                          type="button"
+                          className="btn btn-danger  mr-4 rounded"
+                          onClick={() => deleteQuestion(item.questionNo)}
+                          data-bs-toggle="tooltip"
+                          data-bs-placement="right"
+                          title="Delete Question"
+                        >
+                          <i className="fa fa-times "></i>
+                        </button>
+                      </div>
+                    </div>
+                    <h5>{ReactHtmlParser(item.questionContent)} </h5>
+
+                    <table className="table table-striped  ">
+                      <tbody>
+                        {item.questionOptions &&
+                          item.questionOptions.map((item, index) => {
+                            return (
+                              <tr key={index}>
+                                <td className="col-10 p-0">
+                                  {ReactHtmlParser(item.optionContent)}
+                                </td>
+                                <td className="col-1 p-0">
+                                  {item.optionIsCorrect ? (
+                                    <i className="fa fa-check-circle fa-2x"></i>
+                                  ) : (
+                                    <i className="fa fa-times-circle fa-2x"></i>
+                                  )}
+                                </td>
+                                <td className="col-1 p-0">
+                                  {item.optionWeightage}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                      </tbody>
+                    </table>
+                  </div>
+                );
+              })}
+          </div>
+        </div>
+
+        <div className="col-7">
+          <div className="row mb-4 page">
+            <div className="col-6 form-label ">
+              <h5 className="d-inline"> Question :</h5>
+
+              <input
+                type="radio"
+                className="mx-5 p-1"
+                name="edit"
+                value="question"
+                checked={edit === "question"}
+                onChange={() => {}}
+                onClick={radioChange}
+              />
+            </div>
+
+            <div className="col-6 form-label">
+              <h5 className="d-inline"> Option :</h5>
+              <input
+                type="radio"
+                className="mx-5 p-1"
+                name="edit"
+                value="option"
+                checked={edit === "option"}
+                onChange={() => {}}
+                onClick={radioChange}
+              />{" "}
+            </div>
+          </div>
+
+          <div className="row px-2">
+            {edit === "question" ? (
+              <div className="px-1 py-1">
+                <div className="row">
+                  <div className="col-6">
+                    <input
+                      type="text"
+                      name="questionNo"
+                      className="form-control"
+                      value={question.questionNo}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  <div className="col-6">
+                    <button
+                      className="btn btn-success w-100"
+                      onClick={addQuestion}
+                    >
+                      Add/Update Question
+                    </button>
+                  </div>
                 </div>
-                <div className="col-2">
-                  {itemCurrent.optionIsCorrect ? <p>CORRECT</p> : <p>WRONG</p>}
-                  <p>{itemCurrent.optionWeightage}</p>
+                <div className="px-5 mx-3 mt-3 pt-3 shadow">
+                  <Editor
+                    editorState={editorStateQuestion}
+                    toolbarClassName="toolbarClassName"
+                    wrapperClassName="wrapperClassName"
+                    editorClassName="editorClassName"
+                    onEditorStateChange={setEditorStateQ}
+                  />
                 </div>
-                <button
-                  className="btn btn-danger ml-3 rounded-pill"
-                  onClick={() => deleteOption(index)}
-                >
-                  Delete Option
-                </button>
-                <button
-                  className="btn btn-primary ml-3 rounded-pill px-3 py-1"
-                  onClick={() => updateOption(index)}
-                >
-                  Select
-                </button>
               </div>
-            );
-          })}
-        </div>
-      </div>
-      <div className="d-flex flex-wrap">
-        {questionList &&
-          questionList.map((item, index) => {
-            return (
-              <div
-                key={index}
-                className="my-2 p-2 fs-1 w-50 d-flex flex-wrap align-items-center justify-content-center "
-              >
-                <div>
-                  {item.questionNo} {ReactHtmlParser(item.questionContent)}{" "}
+            ) : (
+              <div>
+                <div className=" px-5 py-3">
+                  <div className="d-flex justify-content-between align-items- ">
+                    <div className=" p-1">
+                      <button
+                        className="btn btn-primary"
+                        onClick={addOption}
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="right"
+                        title="Add Option"
+                      >
+                        <div>
+                          <i className="fa fa-plus fa-2x"></i>
+                        </div>
+                      </button>
+                    </div>
+                    <div className=" p-1">
+                      <button
+                        className="btn btn-primary "
+                        onClick={updateOptionAndSubmit}
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="right"
+                        title="Edit Option"
+                      >
+                        <i className="fa fa-edit fa-2x"></i>
+                      </button>
+                    </div>
+
+                    <div className="text-center">
+                      <h5 className="">IsCorrect</h5>
+                      <input
+                        type="checkbox"
+                        className=""
+                        name="optionIsCorrect"
+                        checked={option.optionIsCorrect}
+                        onChange={handleChange1}
+                      />
+                    </div>
+                    <div className="">
+                      <label className="">
+                        <h5>Weightage : </h5>
+                        <input
+                          type="number"
+                          className="form-control"
+                          name="optionWeightage"
+                          value={option.optionWeightage}
+                          onChange={handleChange1}
+                        />
+                      </label>
+                    </div>
+                  </div>
+                  <div className="px-5 mx-3 mt-3 pt-3 shadow">
+                    <Editor
+                      editorState={editorStateOption}
+                      toolbarClassName="toolbarClassName"
+                      wrapperClassName="wrapperClassName"
+                      editorClassName="editorClassName"
+                      onEditorStateChange={setEditorStateO}
+                    />
+                  </div>
                 </div>
-                <table className="table table-striped table-dark ">
-                  <tbody>
-                    {item.questionOptions &&
-                      item.questionOptions.map((item, index) => {
-                        return (
-                          <tr key={index}>
-                            <td className="col-10">
-                              <div> {ReactHtmlParser(item.optionContent)} </div>
-                            </td>
-                            <td className="col-2">
-                              {item.optionIsCorrect ? (
-                                <p>Correct</p>
+
+                {/* Options of Editor */}
+                <div className="my-5 ">
+                  <div className="">
+                    {question.questionOptions.map((item, index) => {
+                      let prop1 = index === optionId ? "shadow-lg" : "";
+                      let itemCurrent = index === optionId ? option : item;
+                      return (
+                        <div
+                          key={index}
+                          className={` my-2 ${prop1}  w-50 d-inline-block border border-dark `}
+                        >
+                          <div
+                            className="mb-4 align-items-center p-2 d-flex overflow-hidden"
+                            style={{ maxHeight: "20vh" }}
+                          >
+                            <div>
+                              {ReactHtmlParser(itemCurrent.optionContent)}
+                            </div>
+                          </div>
+
+                          <div className="d-flex justify-content-around">
+                            <div className="">
+                              {itemCurrent.optionIsCorrect ? (
+                                <i className="fa fa-check-circle fa-2x"></i>
                               ) : (
-                                <p>InCorrect</p>
+                                <i className="fa fa-times-circle fa-2x"></i>
                               )}
-                            </td>
-                            <td>{item.optionWeightage}</td>
-                          </tr>
-                        );
-                      })}
-                  </tbody>
-                </table>
-                <div>
-                  <button
-                    type="button"
-                    className="btn btn-primary ml-3 rounded-pill px-3 py-1"
-                    onClick={() => updateQuestion(index)}
-                  >
-                    Update
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-danger ml-3 rounded-pill"
-                    onClick={() => deleteQuestion(item.questionNo)}
-                  >
-                    Delete
-                  </button>
+                            </div>
+                            <div className="">
+                              <h4>{itemCurrent.optionWeightage}</h4>
+                            </div>
+                            <div className="">
+                              <button
+                                className="btn btn-danger ml-3 rounded-pill"
+                                onClick={() => deleteOption(index)}
+                              >
+                                <i className="fa fa-trash"></i>
+                              </button>
+                            </div>
+                            <div className="">
+                              <button
+                                className="btn btn-primary ml-3 rounded-pill px-3 py-1"
+                                onClick={() => updateOption(index)}
+                              >
+                                <i className="fa fa-edit "></i>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
-            );
-          })}
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

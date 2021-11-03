@@ -2,7 +2,7 @@ import React from "react";
 
 function Notif({ item, index, setNotifs, db, currentUser }) {
   return (
-    <tr>
+    <tr className="shadow rounded">
       <th scope="row">{index + 1}</th>
       <td>{item.faculty}</td>
       <td>{item.content}</td>
@@ -47,7 +47,7 @@ function Notif({ item, index, setNotifs, db, currentUser }) {
                 });
             }}
           >
-            Mark As Read
+            <i class="fa fa-bell"></i>
           </button>
         )}{" "}
       </td>
