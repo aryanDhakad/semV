@@ -35,14 +35,27 @@ function Cam() {
   useEffect(() => {
     async function saveSS() {
       await db
-        .collection("Cheat")
+        .collection("quizInfo")
+        .doc(item1.quizUUID)
+        .collection("Defaulters")
         .doc(currentUser.email)
-        .collection(item1.quizUUID || "default")
+        .set({
+          Name: currentUser.displayName,
+          Email: currentUser.email,
+        });
+      await db
+        .collection("quizInfo")
+        .doc(item1.quizUUID)
+        .collection("Defaulters")
+        .doc(currentUser.email)
+        .collection("Images")
         .add({
           src: imgSrc,
         });
     }
-    saveSS();
+    if (imgSrc) {
+      saveSS();
+    }
   }, [imgSrc, currentUser, item1]);
 
   async function loadModel() {

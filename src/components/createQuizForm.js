@@ -372,9 +372,17 @@ function CreateQuizForm() {
         </Form>
       </div>
       {info.quizUUID !== "" && (
-        <button className="btn btn-danger mx-3" onClick={deleteQuiz}>
-          Delete Quiz
-        </button>
+        <div>
+          <button className="btn btn-danger mx-3" onClick={deleteQuiz}>
+            Delete Quiz
+          </button>
+          <button
+            className="btn btn-warning mx-3"
+            onClick={() => history.push("/show-defaulters")}
+          >
+            Show Defaulters
+          </button>
+        </div>
       )}
     </div>
   );

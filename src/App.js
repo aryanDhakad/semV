@@ -10,6 +10,7 @@ import StudentDash from "./components/StudentDash";
 import TeacherDash from "./components/TeacherDash";
 import ReviewTest from "./components/ReviewTest";
 import CreateQuizForm from "./components/createQuizForm";
+import Defaulters from "./components/Defaulters";
 import "./App.css";
 import "font-awesome/css/font-awesome.min.css";
 function App() {
@@ -28,6 +29,7 @@ function App() {
               <Route path="/teacherDash" component={TeacherDash} />
               <Route path="/create-quiz-form" component={CreateQuizForm} />
               <Route path="/review-test" component={ReviewTest} />
+              <Route path="/show-defaulters" component={Defaulters} />
             </Switch>
           </AuthProvider>
         </Router>
