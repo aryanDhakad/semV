@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Alert, Link } from "react-bootstrap";
+import { Alert } from "react-bootstrap";
+import { Link } from "react-router-dom";
 import { useHistory } from "react-router-dom";
 import { db } from "../firebase";
 import { useAuth } from "../contexts/AuthContext";
