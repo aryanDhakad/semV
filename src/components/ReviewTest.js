@@ -65,26 +65,30 @@ function ReviewTest() {
   } else if (current >= 0) {
     return (
       <div>
+        {/* Header row */}
+        <div className="row lft-border mx-3">
+          <div className="col-3 rgt-border">
+            <Link to="/studentDash">Exit to Dashboard</Link>
+          </div>
+          <div className="col-3 rgt-border ">
+            Name : {item1.quizName}
+            <br />
+            ID : {item1.quizUUID}
+          </div>
+          <div className=" p-1 col-3 text-left rgt-border">
+            <strong>Email:</strong> {currentUser.email}
+            <br />
+            <strong>Name:</strong> {currentUser.displayName}
+          </div>
+          <div className=" col-3 ">Score :</div>
+        </div>
         <div className="row">
-          <div className="col-8 p-2">
-            <div className="row">
-              <div className="col-4 lft-border">
-                Name : {item1.quizName}
-                <br />
-                <Link to="/studentDash">Exit to Dashboard</Link>
-              </div>
-              <div className=" p-1 col-8 text-left lft-border">
-                <strong>Email:</strong> {currentUser.email}
-                <br />
-                <strong>Name:</strong> {currentUser.displayName}
-              </div>
-            </div>
-
-            <div className=" py-2 ">
+          <div className="col-8 py-2 px-4">
+            <div className=" lft-border  ">
               <div
                 style={{
                   minHeight: "80vh",
-                  border: "3px solid black",
+
                   position: "relative",
                 }}
                 className="p-1"
@@ -149,11 +153,12 @@ function ReviewTest() {
               </div>
             </div>
           </div>
+
           <div className="col-4 p-2">
             {/* {Question Panel} */}
 
-            <div className=" flex-wrap ">
-              <div style={{ minHeight: "70vh", border: "3px solid black" }}>
+            <div className=" flex-wrap lft-border ">
+              <div style={{ minHeight: "70vh" }}>
                 {questionList.map((item, index) => {
                   let st = "btn  m-2 p-3 rounded  ";
 

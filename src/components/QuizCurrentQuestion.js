@@ -42,15 +42,15 @@ function QuizCurrentQuestion({
             })}
         </div>
       </div>
-      <div className="">
-        <button className="btn btn-primary m-1 w-25 p-2 " onClick={prevQue}>
+      <div className="d-flex justify-content-between align-items-center">
+        <button className="btn btn-primary  my-1 w-25 p-2 " onClick={prevQue}>
           Before
         </button>
-        <button className="btn btn-primary mx-1 w-25 p-2 " onClick={nextQue}>
+        <button className="btn btn-primary my-1  w-25 p-2 " onClick={nextQue}>
           Next
         </button>
         <button
-          className="btn btn-primary mx-1 w-25 p-2 "
+          className="btn btn-primary  my-1 w-25 p-2 "
           onClick={() => MarkForReview(current)}
         >
           Mark For Review

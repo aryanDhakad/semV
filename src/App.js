@@ -1,6 +1,5 @@
 import React from "react";
 import Signup from "./components/Signup";
-import { Container } from "react-bootstrap";
 import { AuthProvider } from "./contexts/AuthContext";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import Login from "./components/Login";
@@ -11,6 +10,7 @@ import TeacherDash from "./components/TeacherDash";
 import ReviewTest from "./components/ReviewTest";
 import CreateQuizForm from "./components/createQuizForm";
 import Defaulters from "./components/Defaulters";
+import Intstructions from "./components/Instructions";
 import "./App.css";
 import "font-awesome/css/font-awesome.min.css";
 function App() {
@@ -30,6 +30,7 @@ function App() {
               <Route path="/create-quiz-form" component={CreateQuizForm} />
               <Route path="/review-test" component={ReviewTest} />
               <Route path="/show-defaulters" component={Defaulters} />
+              <Route path="/instructions" component={Intstructions} />
             </Switch>
           </AuthProvider>
         </Router>

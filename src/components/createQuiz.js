@@ -242,15 +242,27 @@ function CreateQuiz() {
     return <Loader />;
   }
   return (
-    <div className="py-5">
-      <div className="  fss d-flex justify-content-around align-items-center">
-        <Link to="/create-quiz-form" className="mx-3">
-          Edit Quiz Info
-        </Link>
+    <div className="p-2 ">
+      <div className="row px-3 mx-3 my-5 fss d-flex justify-content-around align-items-center lft-border">
+        <div className="  col-8 d-flex justify-content-around ">
+          <ul className="list-group ml-4">
+            <li className="list-group-item">{quizInfo.quizName}</li>
+            <li className="list-group-item">{quizInfo.quizUUID}</li>
+          </ul>
+          <ul className="list-group ml-4">
+            <li className="list-group-item">{quizInfo.quizTimeStart}</li>
+            <li className="list-group-item">{quizInfo.quizTimeEnd}</li>
+          </ul>
+        </div>
+        <div className="  col-4 ">
+          <Link to="/create-quiz-form" className="mx-3">
+            Edit Quiz Info
+          </Link>
 
-        <Link to="/teacherDash" className="mx-3">
-          Exit
-        </Link>
+          <Link to="/teacherDash" className="mx-3">
+            Exit
+          </Link>
+        </div>
       </div>
 
       <div className="row">
@@ -258,12 +270,12 @@ function CreateQuiz() {
           {/* Question List */}
           <div
             className=" overflow-auto pl-3 pr-5"
-            style={{ maxHeight: "90vh" }}
+            style={{ maxHeight: "140vh" }}
           >
             {questionList &&
               questionList.map((item, index) => {
                 return (
-                  <div key={index} className="my-5 ">
+                  <div key={index} className="my-5 lft-border ">
                     <div className="row">
                       <div className="col-4">
                         <h3>
@@ -327,13 +339,13 @@ function CreateQuiz() {
         </div>
 
         <div className="col-7">
-          <div className="row mb-4 page">
-            <div className="col-6 form-label ">
-              <h5 className="d-inline"> Question :</h5>
+          <div className="row mb-4 page ">
+            <div className="col-5 form-label lft-border  ">
+              <h5 className="d-inline ">Edit Question :</h5>
 
               <input
                 type="radio"
-                className="mx-5 p-1"
+                className="mx-5 px-3 "
                 name="edit"
                 value="question"
                 checked={edit === "question"}
@@ -342,11 +354,11 @@ function CreateQuiz() {
               />
             </div>
 
-            <div className="col-6 form-label">
-              <h5 className="d-inline"> Option :</h5>
+            <div className="col-5 offset-1 form-label lft-border  ">
+              <h5 className="d-inline "> Edit Option :</h5>
               <input
                 type="radio"
-                className="mx-5 p-1"
+                className="mx-5 px-3 "
                 name="edit"
                 value="option"
                 checked={edit === "option"}
@@ -356,7 +368,7 @@ function CreateQuiz() {
             </div>
           </div>
 
-          <div className="row px-2">
+          <div className="row px-2 page">
             {edit === "question" ? (
               <div className="px-1 py-1">
                 <div className="row">
@@ -378,7 +390,7 @@ function CreateQuiz() {
                     </button>
                   </div>
                 </div>
-                <div className="px-5 mx-3 mt-3 pt-3 shadow">
+                <div className="px-5 mx-3 mt-3 pt-3 lft-border">
                   <Editor
                     editorState={editorStateQuestion}
                     toolbarClassName="toolbarClassName"
@@ -390,9 +402,9 @@ function CreateQuiz() {
               </div>
             ) : (
               <div>
-                <div className=" px-5 py-3">
-                  <div className="d-flex justify-content-between align-items- ">
-                    <div className=" p-1">
+                <div className=" px-4 py-3">
+                  <div className="d-flex justify-content-between align-items-center ">
+                    <div className=" px-3 lft-border">
                       <button
                         className="btn btn-primary"
                         onClick={addOption}
@@ -405,7 +417,7 @@ function CreateQuiz() {
                         </div>
                       </button>
                     </div>
-                    <div className=" p-1">
+                    <div className=" px-3 lft-border">
                       <button
                         className="btn btn-primary "
                         onClick={updateOptionAndSubmit}
@@ -417,7 +429,7 @@ function CreateQuiz() {
                       </button>
                     </div>
 
-                    <div className="text-center">
+                    <div className="text-center px-3 lft-border">
                       <h5 className="">IsCorrect</h5>
                       <input
                         type="checkbox"
@@ -427,9 +439,9 @@ function CreateQuiz() {
                         onChange={handleChange1}
                       />
                     </div>
-                    <div className="">
+                    <div className="text-center px-3 lft-border">
                       <label className="">
-                        <h5>Weightage : </h5>
+                        <h5>Weightage </h5>
                         <input
                           type="number"
                           className="form-control"
@@ -440,7 +452,7 @@ function CreateQuiz() {
                       </label>
                     </div>
                   </div>
-                  <div className="px-5 mx-3 mt-3 pt-3 shadow">
+                  <div className="px-5 mx-3 mt-3 pt-3 lft-border">
                     <Editor
                       editorState={editorStateOption}
                       toolbarClassName="toolbarClassName"
@@ -460,7 +472,7 @@ function CreateQuiz() {
                       return (
                         <div
                           key={index}
-                          className={` my-2 ${prop1}  w-50 d-inline-block border border-dark `}
+                          className={` my-2 ${prop1}  w-50 d-inline-block lft-border `}
                         >
                           <div
                             className="mb-4 align-items-center p-2 d-flex overflow-hidden"

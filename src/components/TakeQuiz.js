@@ -117,6 +117,18 @@ function TakeQuiz() {
     setAttempt({ atm: n, mrk: m });
     setShow(!show);
   }
+  function onTimerExpire() {
+    let n = 0;
+    let m = 0;
+    questionList.forEach((item) => {
+      if (item.questionIsAttempted) n += 1;
+      if (item.questionIsMarked) m += 1;
+    });
+    alert(
+      `Time has ended. Total Attempted : ${n}.  Total Mark For Review : ${m}.`
+    );
+    history.push("/");
+  }
 
   if (loading) {
     return <Loader />;
@@ -133,25 +145,33 @@ function TakeQuiz() {
           quizInfo={item1}
           history={history}
         />
-        <div className="row">
+        <div className="row lft-border mx-3">
+          <div className="col-3 rgt-border">
+            Name : {item1.quizName}
+            <br />
+            <Link to="/studentDash">Exit to Dashboard</Link>
+          </div>
+          <div className=" py-1 col-3 text-left rgt-border">
+            <strong>Email:</strong> {currentUser.email}
+            <br />
+            <strong>Name:</strong> {currentUser.displayName}
+          </div>
+          <div className="col-3 p-0 rgt-border jic">
+            <Timer
+              expiryTimestamp={endTime}
+              history={history}
+              onTimerExpire={onTimerExpire}
+            />
+          </div>
+          <div className="col-3 jic">
+            <button className="btn btn-danger p-3 my-2" onClick={EndTest}>
+              End Test
+            </button>
+          </div>
+        </div>
+        <div className="row ">
           <div className="col-8 py-2">
-            <div className="row">
-              <div className="col-4 rgt-border">
-                Name : {item1.quizName}
-                <br />
-                <Link to="/studentDash">Exit to Dashboard</Link>
-              </div>
-              <div className=" py-1 col-5 text-left rgt-border">
-                <strong>Email:</strong> {currentUser.email}
-                <br />
-                <strong>Name:</strong> {currentUser.displayName}
-              </div>
-              <div className="col-3 p-0 rgt-border">
-                <Timer expiryTimestamp={endTime} history={history} />
-              </div>
-            </div>
-
-            <div className=" py-2 ">
+            <div className=" py-2  lft-border">
               <QuizCurrentQuestion
                 current={current}
                 questionList={questionList}
@@ -162,11 +182,14 @@ function TakeQuiz() {
               />
             </div>
           </div>
-          <div className="col-4 py-2">
+          <div
+            className="col-4 py-2"
+            style={{ position: "relative", height: "100vh" }}
+          >
             {/* {Question Panel} */}
 
-            <div className=" flex-wrap ">
-              <div style={{ minHeight: "70vh", border: "3px solid black" }}>
+            <div className=" flex-wrap lft-border overflow-auto ">
+              <div style={{ height: "60vh" }}>
                 {questionList.map((item, index) => {
                   return (
                     <QuestionPanel
@@ -179,69 +202,15 @@ function TakeQuiz() {
                 })}
               </div>
             </div>
-            <div className="row">
-              <div className="col-8">
-                <Cam />
-              </div>
-              <div className="float-right">
-                <button className="btn btn-danger p-3 my-2" onClick={EndTest}>
-                  End Test
-                </button>
-              </div>
+            <div
+              className="lft-border "
+              style={{ position: "absolute", bottom: "10px", height: "30vh" }}
+            >
+              <Cam />
             </div>
           </div>
         </div>
-
-        {/* // <div>
-      //   <ExitQuizModal
-      //     show={show}
-      //     setShow={setShow}
-      //     attempt={attempt}
-      //     questionList={questionList}
-      //     db={db}
-      //     currentUser={currentUser}
-      //     quizInfo={item1}
-      //     history={history}
-      //   />
-
-      //   <div className="fs-3 d-inline py-2 mx-2">
-      //     Quiz ID : {item1.quizUUID} , Name : {item1.quizName},
-      //     <Timer expiryTimestamp={endTime} history={history} />
-      //   </div>
-
-      //   <button className="btn btn-danger d-inline mx-2" onClick={EndTest}>
-      //     End Test
-      //   </button>
-
-      //   <div className="row ">
-      //     <div className="col-8 py-2 ">
-      //       <QuizCurrentQuestion
-      //         current={current}
-      //         questionList={questionList}
-      //         handleClick={handleClick}
-      //         MarkForReview={MarkForReview}
-      //         prevQue={prevQue}
-      //         nextQue={nextQue}
-      //       />
-      //     </div>
-      //     <div className="col-4 flex-wrap py-2">
-      //       <div style={{ minHeight: "70vh", border: "3px solid black" }}>
-      //         {questionList.map((item, index) => {
-      //           return (
-      //             <QuestionPanel
-      //               key={index}
-      //               questionList={questionList}
-      //               index={index}
-      //               setCurrent={setCurrent}
-      //             />
-      //           );
-      //         })}
-      //       </div>
-      //       <div className="float-right">{/* <Cam /> */}
       </div>
-      //     </div>
-      //   </div>
-      // </div> */}
     );
   } else {
     return <h1>No Question in Database</h1>;

@@ -5,6 +5,7 @@ import * as tf from "@tensorflow/tfjs";
 
 // import * as posenet from '@tensorflow-models/posenet';
 import Webcam from "react-webcam";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 // import * as cvstfjs from '@microsoft/customvision-tfjs';
 
@@ -180,60 +181,37 @@ function Cam() {
   // }, [start]);
 
   const videoConstraints = {
-    height: 170,
-    width: 250,
+    height: 160,
+    width: 270,
     maxWidth: "100vw",
     facingMode: "environment",
   };
 
   return (
     <div>
-      {/* <button onClick={play}>Start</button> */}
-      {/* <div style={{ position: "absolute", top: "400px", zIndex: "9999" }}>
-        <canvas
-          id="myCanvas"
-          width={videoWidth}
-          height={videoHeight}
-          style={{ backgroundColor: "transparent" }}
-        />
-      </div> */}
-      <div className=" ">
-        <Webcam
-          audio={false}
-          id="img"
-          ref={webcamRef}
-          // width={640}
-          screenshotQuality={1}
-          screenshotFormat="image/jpeg"
-          videoConstraints={videoConstraints}
-        />
-        <div>
+      <div className="row ">
+        <div className="col-9 ">
+          <Webcam
+            audio={false}
+            id="img"
+            ref={webcamRef}
+            screenshotQuality={1}
+            screenshotFormat="image/jpeg"
+            videoConstraints={videoConstraints}
+          />
+        </div>
+        <div className="col-3 ">
           {person ? (
-            <div className=" m-0 bg-success  px-4 ">Person Detected</div>
+            <div className=" ml-1 bg-success jic  ">
+              <FontAwesomeIcon icon={["fas", "user-check"]} size="lg" />
+            </div>
           ) : (
-            <div className=" m-0 bg-danger  px-4 ">Not Detected</div>
+            <div className=" ml-1 bg-danger jic ">
+              <FontAwesomeIcon icon={["fas", "user-alt-slash"]} size="lg" />
+            </div>
           )}
         </div>
       </div>
-      {/* <button onClick={play}>Start</button>
-      <div style={{ position: "absolute", top: "400px", zIndex: "9999" }}>
-        <Webcam
-          audio={false}
-          id="img"
-          ref={webcamRef}
-          // width={640}
-          screenshotQuality={1}
-          screenshotFormat="image/jpeg"
-          videoConstraints={videoConstraints}
-        />
-        <canvas
-          id="myCanvas"
-          width={videoWidth}
-          height={videoHeight}
-          style={{ backgroundColor: "transparent" }}
-        />
-      </div>
-      <div>{imgSrc && <img src={imgSrc} alt="N.F." />}</div> */}
     </div>
   );
 }

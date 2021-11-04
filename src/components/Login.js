@@ -6,6 +6,8 @@ import { Link, useHistory } from "react-router-dom";
 import PopupSignIn from "./PopupSignIn";
 import loginPage from "../images/loginPage.jpeg";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 export default function Login() {
   const emailRef = useRef();
   const passwordRef = useRef();
@@ -74,6 +76,7 @@ export default function Login() {
             fontWeight: "bold",
           }}
         >
+          <FontAwesomeIcon icon={["fas", "atom"]} spin className="mr-4" />
           Quizzy
         </h3>
       </div>
@@ -135,7 +138,7 @@ export default function Login() {
                         type="submit"
                         style={{ backgroundColor: "#F1732B" }}
                       >
-                        Log In
+                        <FontAwesomeIcon icon={["fas", "sign-in-alt"]} />
                       </Button>
                     </div>
                     <div className="col-6 p-1">

@@ -1,0 +1,86 @@
+import React, { useState, useRef } from "react";
+import Webcam from "react-webcam";
+import Timer from "./Timer";
+import { useHistory } from "react-router-dom";
+
+function Instructions() {
+  let item1 = localStorage.getItem("quizInfo");
+  item1 = JSON.parse(item1);
+  let startAt = new Date();
+  startAt = startAt.setSeconds(startAt.getSeconds() + 10);
+  const webcamRef = useRef(null);
+  const history = useHistory();
+  const [show, setShow] = useState(false);
+
+  const videoConstraints = {
+    height: 170,
+    width: 250,
+    maxWidth: "100vw",
+    facingMode: "environment",
+  };
+  function onTimerExpire() {
+    alert("You May Begin. Best of Luck.");
+    setShow(true);
+  }
+
+  return (
+    <div className="p-1">
+      <div className="row my-3">
+        <div className="col-8 rgt-border">
+          <div className="display-4 ">
+            This is a <strong>Proctored TEST</strong>{" "}
+          </div>
+        </div>
+        <div className="col-4 px-4">
+          {show ? (
+            <button
+              className="btn btn-success btn-block my-1"
+              onClick={() => history.push("/take-quiz")}
+            >
+              Start{" "}
+            </button>
+          ) : (
+            <div>
+              <p className="d-inline mr-3 fss text-center">
+                You May begin in :{" "}
+              </p>
+              <Timer
+                expiryTimestamp={startAt}
+                history={history}
+                onTimerExpire={onTimerExpire}
+              />
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="row px-3 py-5">
+        <div className="col-8 fss rgt-border text-center">
+          <h4> Quiz Instructions</h4>
+          <pre>{item1.quizInstructions}</pre>
+        </div>
+        <div className="col-4">
+          <h3>Please Allow the Camera Permission</h3>
+          <Webcam
+            audio={false}
+            id="img"
+            ref={webcamRef}
+            // width={640}
+            screenshotQuality={1}
+            screenshotFormat="image/jpeg"
+            videoConstraints={videoConstraints}
+          />
+          <ul className="list-group">
+            <li className="list-group-item">Cras justo odio</li>
+            <li className="list-group-item">Dapibus ac facilisis in</li>
+            <li className="list-group-item">Morbi leo risus</li>
+            <li className="list-group-item">Porta ac consectetur ac</li>
+            <li className="list-group-item">Vestibulum at eros</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default Instructions;

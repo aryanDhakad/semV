@@ -7,6 +7,7 @@ import Notif from "./Notif";
 import QuizListItem from "./QuizListItem";
 import Cam from "./Cam";
 import Loader from "./Loader";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 function StudentDash() {
   const { currentUser, logout } = useAuth();
@@ -103,7 +104,7 @@ function StudentDash() {
     } else if (type === "take") {
       localStorage.setItem("quizInfo", JSON.stringify(item));
       localStorage.setItem("endTime", end);
-      history.push("/take-quiz");
+      history.push("/instructions");
     }
   }
 
@@ -121,7 +122,7 @@ function StudentDash() {
       <div className="row mb-5  ">
         <div className=" p-2 col-2 rgt-border">
           <Button variant="outline-danger" onClick={handleLogout}>
-            Log Out
+            <FontAwesomeIcon icon={["fas", "sign-out-alt"]} size="lg" />
           </Button>
         </div>
         <div className="  col-6 fss rgt-border " style={{ color: "#F1732B" }}>

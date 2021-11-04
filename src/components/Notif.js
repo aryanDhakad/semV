@@ -2,9 +2,9 @@ import React from "react";
 
 function Notif({ item, index, setNotifs, db, currentUser }) {
   return (
-    <tr className="shadow rounded">
-      <th scope="row">{index + 1}</th>
-      <td>{item.faculty}</td>
+    <tr className="lft-border">
+      <th scope="row">{item.faculty}</th>
+
       <td>{item.content}</td>
       <td>
         {item.isRead ? (

@@ -229,24 +229,6 @@ function CreateQuizForm() {
               onChange={handleChange}
             />
           </Form.Group>
-          {/* <Form.Group controlId="exampleForm.ControlInput1">
-          <Form.Label>Instructor Name:</Form.Label>
-          <Form.Control
-            type="text"
-            name="instructorName"
-            value={info.instructorName}
-            onChange={handleChange}
-          />
-        </Form.Group>
-        <Form.Group controlId="exampleForm.ControlInput1">
-          <Form.Label>Instructor Email:</Form.Label>
-          <Form.Control
-            type="email"
-            name="instructorEmail"
-            value={info.instructorEmail}
-            onChange={handleChange}
-          />
-        </Form.Group> */}
 
           <Form.Group controlId="exampleForm.ControlInput1">
             <Form.Label>Quiz Time Start:</Form.Label>

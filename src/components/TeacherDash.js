@@ -4,6 +4,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { useHistory } from "react-router-dom";
 import { db } from "../firebase";
 import Loader from "./Loader";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function TeacherDash() {
   const { currentUser, logout } = useAuth();
@@ -126,7 +127,7 @@ export default function TeacherDash() {
       <div className="row mb-2  ">
         <div className=" p-2 col-2 rgt-border">
           <Button variant="outline-danger" onClick={handleLogout}>
-            Log Out
+            <FontAwesomeIcon icon={["fas", "sign-out-alt"]} size="lg" />
           </Button>
         </div>
         <div className="  col-6 fss rgt-border ">
@@ -140,7 +141,7 @@ export default function TeacherDash() {
       </div>
 
       <div className="row mb-2">
-        <div className="col-4 rgt-border">
+        <div className="col-4 ">
           <button
             className="btn btn-primary my-3 btn-block py-3"
             onClick={() => handleSubmit("create", {})}
@@ -148,7 +149,7 @@ export default function TeacherDash() {
             CREATE NEW QUIZ
           </button>
 
-          <div>
+          <div className="lft-border">
             <h4>Notification Panel : </h4>
             <textarea
               row="15"
@@ -178,7 +179,7 @@ export default function TeacherDash() {
           </div>
         </div>
         <div className="col-8">
-          <Card className="my-3">
+          <Card className="my-3 lft-border">
             <Card.Header>CURRENT QUIZES</Card.Header>
 
             <div>
@@ -200,7 +201,7 @@ export default function TeacherDash() {
             </div>
           </Card>
 
-          <Card className="my-3">
+          <Card className="my-3 lft-border">
             <Card.Header>PAST QUIZES</Card.Header>
 
             <div>
