@@ -5,6 +5,8 @@ import { Form, Button, Card, Alert } from "react-bootstrap";
 import { useHistory } from "react-router-dom";
 import { db } from "../firebase";
 import { useAuth } from "../contexts/AuthContext";
+import { indexToLoc } from "@tensorflow/tfjs-core/dist/util_base";
+import * as emailjs from 'emailjs-com';
 
 function CreateQuizForm() {
   let item = JSON.parse(localStorage.getItem("quizInfo"));
@@ -147,6 +149,12 @@ function CreateQuizForm() {
     if (file) reader.readAsArrayBuffer(file);
   }, []);
 
+  // Sending emails
+  // Allowing access for emailjs
+  (function () {
+    emailjs.init('user_a1Gz7NxOzg08tk9jMMEmL');
+  })();
+
   // Making random string for uuid
   function makeId(length) {
     var result = "";
@@ -165,17 +173,22 @@ function CreateQuizForm() {
     e.preventDefault();
 
     // generating uuid
-    var tempUUID = info.quizName.split(" ")[0].concat(makeId(5));
-    info.quizUUID = info.quizUUID ? info.quizUUID : tempUUID;
-    // console.log("tempUUID: " + tempUUID);
-
+    var tempUUID = info.quizName.split(" ");
+        
+    var finalID = "";
+    for(var i=0; i<tempUUID.length; i++){
+      finalID += tempUUID[i];
+      finalID += "_";
+    }
+    finalID += makeId(5);
+    info.quizUUID = info.quizUUID ? info.quizUUID : finalID;
+        
     if (questionList.length === 0) {
       setError("No questions provided!");
       return;
     }
 
     // final quiz information
-
     await db
       .collection("quizInfo")
       .doc(info.quizUUID)
@@ -191,6 +204,29 @@ function CreateQuizForm() {
         .doc(questionList[y].questionNo.toString())
         .set(questionList[y]);
     }
+
+    // sending emails to students
+    var studentEmailList = info.quizStudentEmailList;
+    var n = studentEmailList.length;
+    if(n == 0){
+      alert("No Emails Provided!");
+    }
+    else{
+      for(var i=0; i<n; i++){
+        var contactParam = {
+          to_email: studentEmailList[i],
+          quizUUID: info.quizUUID,
+          quiz_start: info.quizTimeStart,
+          quiz_end: info.quizTimeEnd,
+          instructor_name: info.instructorName,
+          instructor_email: info.instructorEmail,
+          quiz_weightage: info.quizWeightage,
+        };
+        // console.log("sending email to " + userEmail);
+        emailjs.send('service_quizzy', 'template_iszrcak', contactParam, 'user_a1Gz7NxOzg08tk9jMMEmL').then(function (res) {})
+      }
+    }
+
     history.push("/create-quiz");
     setLoading(false);
   }

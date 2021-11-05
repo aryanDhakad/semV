@@ -3,6 +3,7 @@ import { Card, Button, Alert } from "react-bootstrap";
 import { useAuth } from "../contexts/AuthContext";
 import { Link, useHistory } from "react-router-dom";
 import { db } from "../firebase";
+import * as emailjs from 'emailjs-com';
 
 export default function TeacherDash() {
   const { currentUser, logout } = useAuth();
@@ -91,8 +92,51 @@ export default function TeacherDash() {
     }
   }
 
+  // Sending emails
+  // Allowing access for emailjs
+  (function () {
+    emailjs.init('user_a1Gz7NxOzg08tk9jMMEmL');
+  })();
+
   async function sendNotif() {
     setLoading(true);
+    var quizID = notif.content.split(' ')[0];
+    var studentEmailList = [];
+    var instructorName = "";
+    var instructorEmail = "";
+    // check if quizUUID is valid or not
+    await db
+    .collection("quizInfo")
+    .doc(quizID)
+    .get()
+    .then((snapshot) => {
+      if(snapshot.exists){
+        studentEmailList = snapshot.data().quizStudentEmailList;
+        instructorName = snapshot.data().instructorName;
+        instructorEmail = snapshot.data().instructorEmail;
+      }
+      else{
+        alert("Quiz doesn't exist");
+      }
+    });
+    var n = studentEmailList.length;
+    // send emails to students
+    if(n == 0){
+      alert("No Emails Provided!");
+    }
+    else{
+      for(var i=0; i<n; i++){
+        var contactParam = {
+          to_email: studentEmailList[i],
+          quizUUID: quizID,
+          instructor_name: instructorName,
+          instructor_email: instructorEmail,
+          message: notif.content,
+        };
+        // console.log("sending email to " + userEmail);
+        emailjs.send('service_quizzy', 'template_fl0r0kb', contactParam, 'user_a1Gz7NxOzg08tk9jMMEmL').then(function (res) {})
+      }
+    }
     await db
       .collection("Student")
       .get()
@@ -146,6 +190,7 @@ export default function TeacherDash() {
             className="form-control"
             type="text"
             name="content"
+            placeholder="Example: New1SSQkE - Quiz postponed"
             value={notif.content}
             onChange={(e) => {
               const { name, value } = e.target;
