@@ -1,7 +1,9 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import Webcam from "react-webcam";
 import Timer from "./Timer";
 import { useHistory } from "react-router-dom";
+
+var elem = document.documentElement;
 
 function Instructions() {
   let item1 = localStorage.getItem("quizInfo");
@@ -12,16 +14,32 @@ function Instructions() {
   const history = useHistory();
   const [show, setShow] = useState(false);
 
+  useEffect(() => {
+    const goFullScreen = () => {
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+      } else if (elem.webkitRequestFullscreen) {
+        /* Safari */
+        elem.webkitRequestFullscreen();
+      } else if (elem.msRequestFullscreen) {
+        /* IE11 */
+        elem.msRequestFullscreen();
+      }
+    };
+
+    goFullScreen();
+  }, []);
+
   const videoConstraints = {
     height: 170,
     width: 250,
     maxWidth: "100vw",
     facingMode: "environment",
   };
-  function onTimerExpire() {
+  const onTimerExpire = useCallback(() => {
     alert("You May Begin. Best of Luck.");
     setShow(true);
-  }
+  }, []);
 
   return (
     <div className="p-1">
@@ -32,24 +50,17 @@ function Instructions() {
           </div>
         </div>
         <div className="col-4 px-4">
-          {show ? (
+          <div>
+            <p className="d-inline mr-3 fss text-center">You May begin in : </p>
+            <Timer expiryTimestamp={startAt} onTimerExpire={onTimerExpire} />
+          </div>
+          {show && (
             <button
               className="btn btn-success btn-block my-1"
               onClick={() => history.push("/take-quiz")}
             >
               Start{" "}
             </button>
-          ) : (
-            <div>
-              <p className="d-inline mr-3 fss text-center">
-                You May begin in :{" "}
-              </p>
-              <Timer
-                expiryTimestamp={startAt}
-                history={history}
-                onTimerExpire={onTimerExpire}
-              />
-            </div>
           )}
         </div>
       </div>

@@ -10,6 +10,7 @@ function ExitQuizModal({
   currentUser,
   quizInfo,
   history,
+  setStopCam,
 }) {
   return (
     <Modal
@@ -42,7 +43,6 @@ function ExitQuizModal({
             //     Info: quizInfo,
             //     questions: questionList,
             //   });
-
             history.push("/studentDash");
           }}
         >

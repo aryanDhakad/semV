@@ -10,6 +10,63 @@ import QuizCurrentQuestion from "./QuizCurrentQuestion";
 import QuestionPanel from "./QuestionPanel";
 import Loader from "./Loader";
 
+var elem = document.documentElement;
+
+//disable mouse drag select start
+
+document.addEventListener("contextmenu", (event) => event.preventDefault());
+
+document.onselectstart = new Function("return false");
+
+function dMDown(e) {
+  return false;
+}
+
+function dOClick() {
+  return true;
+}
+
+document.onmousedown = dMDown;
+
+document.onclick = dOClick;
+
+// $("#document").attr("unselectable", "on");
+
+//disable mouse drag select end
+
+//disable right click - context menu
+
+document.oncontextmenu = new Function("return false");
+
+//disable CTRL+A/CTRL+C through key board start
+
+//use this function
+
+function disableSelectCopy(e) {
+  // current pressed key
+
+  var pressedKey = String.fromCharCode(e.keyCode).toLowerCase();
+
+  if (
+    e.ctrlKey &&
+    (pressedKey == "c" ||
+      pressedKey == "x" ||
+      pressedKey == "v" ||
+      pressedKey == "a")
+  ) {
+    return false;
+  }
+  // else if (
+  //   e.ctrlKey &&
+  //   e.shiftKey &&
+  //   (pressedKey == "i" || pressedKey == "c")
+  // ) {
+  //   return false;
+  // }
+}
+
+document.onkeydown = disableSelectCopy;
+
 function TakeQuiz() {
   let item1 = localStorage.getItem("quizInfo");
   item1 = JSON.parse(item1);
@@ -26,6 +83,7 @@ function TakeQuiz() {
   const [current, setCurrent] = useState(0);
   const [attempt, setAttempt] = useState({ atm: 0, mrk: 0 });
   const [show, setShow] = useState(false);
+  const [disp, setDisp] = useState("block");
 
   const getData = useCallback(
     async function () {
@@ -47,7 +105,32 @@ function TakeQuiz() {
     [item1.quizUUID]
   );
 
+  const closeScreen = async () => {
+    if (!document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) {
+      /* Safari */
+      document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) {
+      /* IE11 */
+      document.msExitFullscreen();
+    }
+  };
+
+  const goFullScreen = () => {
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen();
+    } else if (elem.webkitRequestFullscreen) {
+      /* Safari */
+      elem.webkitRequestFullscreen();
+    } else if (elem.msRequestFullscreen) {
+      /* IE11 */
+      elem.msRequestFullscreen();
+    }
+  };
+
   useEffect(() => {
+    // goFullScreen();
     getData();
   }, [getData]);
 
@@ -115,6 +198,7 @@ function TakeQuiz() {
       if (item.questionIsMarked) m += 1;
     });
     setAttempt({ atm: n, mrk: m });
+
     setShow(!show);
   }
   function onTimerExpire() {
@@ -127,6 +211,7 @@ function TakeQuiz() {
     alert(
       `Time has ended. Total Attempted : ${n}.  Total Mark For Review : ${m}.`
     );
+    closeScreen();
     history.push("/");
   }
 
@@ -171,7 +256,7 @@ function TakeQuiz() {
         </div>
         <div className="row ">
           <div className="col-8 py-2">
-            <div className=" py-2  lft-border">
+            <div className=" py-2  lft-border" style={{ display: `${disp}` }}>
               <QuizCurrentQuestion
                 current={current}
                 questionList={questionList}
@@ -188,7 +273,10 @@ function TakeQuiz() {
           >
             {/* {Question Panel} */}
 
-            <div className=" flex-wrap lft-border overflow-auto ">
+            <div
+              className=" flex-wrap lft-border overflow-auto "
+              style={{ display: `${disp}` }}
+            >
               <div style={{ height: "60vh" }}>
                 {questionList.map((item, index) => {
                   return (
@@ -206,7 +294,7 @@ function TakeQuiz() {
               className="lft-border "
               style={{ position: "absolute", bottom: "10px", height: "30vh" }}
             >
-              <Cam />
+              <Cam history={history} setDisp={setDisp} />
             </div>
           </div>
         </div>

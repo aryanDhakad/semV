@@ -7,6 +7,14 @@
   border-radius: 5px;
   padding: 0.7rem;
 }
+.createForm {
+  border-left: 4px solid rgb(233, 135, 8);
+  border-top: 4px solid rgb(233, 135, 8);
+
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  border-radius: 5px;
+  padding: 0.7rem;
+}
 .jic {
   display: flex;
   justify-content: center;
@@ -14,7 +22,7 @@
 }
 
 .fss {
-  font-size: 1.8rem;
+  font-size: 1.5rem;
 }
 
 hr {

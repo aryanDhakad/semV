@@ -12,11 +12,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { db } from "../firebase";
 import { useAuth } from "../contexts/AuthContext";
 
-function Cam() {
+function Cam({ history, setDisp }) {
   let item1 = localStorage.getItem("quizInfo");
   item1 = JSON.parse(item1);
   const webcamRef = useRef(null);
   const [imgSrc, setImgSrc] = useState(null);
+
   const { currentUser } = useAuth();
 
   // const [videoWidth, setVideoWidth] = useState(960);
@@ -63,7 +64,7 @@ function Cam() {
     try {
       const model = await cocoSsd.load();
       setModel(model);
-      console.log("setloadedModel");
+
       setStart(true);
     } catch (err) {
       console.log(err);
@@ -75,90 +76,62 @@ function Cam() {
     async function () {
       let count = 0;
       let violations = 0;
+
       predictionFunction();
 
       async function predictionFunction() {
-        const predictions = await model.detect(document.getElementById("img"));
+        try {
+          const predictions = await model.detect(
+            document.getElementById("img")
+          );
 
-        // var cnvs = document.getElementById("myCanvas");
+          var dict = {};
+          dict["person"] = 0;
+          dict["cell phone"] = 0;
+          if (predictions.length > 0) {
+            // setPredictionData(predictions);
 
-        // // cnvs.style.position = "absolute";
+            for (let n = 0; n < predictions.length; n++) {
+              // Check scores
 
-        // var ctx = cnvs.getContext("2d");
-        // ctx.clearRect(
-        //   0,
-        //   0,
-        //   webcamRef.current.video.videoWidth,
-        //   webcamRef.current.video.videoHeight
-        // );
-        // setVideoHeight(webcamRef.current.video.videoHeight);
-        // setVideoWidth(webcamRef.current.video.videoWidth);
-        var dict = {};
-        dict["person"] = 0;
-        dict["cell phone"] = 0;
-        if (predictions.length > 0) {
-          // setPredictionData(predictions);
+              if (predictions[n].score > 0.5) {
+                dict[predictions[n].class] += 1;
+                if (
+                  predictions[n].class !== "person" &&
+                  predictions[n].class !== "cell phone"
+                ) {
+                  continue;
+                }
+                // console.log(count, predictions[n].class);
 
-          for (let n = 0; n < predictions.length; n++) {
-            // Check scores
+                if (dict["person"] > 1 || dict["cell phone"] > 0) {
+                  count += 1;
 
-            if (predictions[n].score > 0.5) {
-              dict[predictions[n].class] += 1;
-              if (
-                predictions[n].class !== "person" &&
-                predictions[n].class !== "cell phone"
-              ) {
-                continue;
-              }
-              // console.log(count, predictions[n].class);
-
-              if (dict["person"] > 1 || dict["cell phone"] > 0) {
-                count += 1;
-
-                if (count > 15) {
-                  console.log("Violation");
-                  violations++;
-                  capture();
-                  count = 0;
-                  // take_ss();
+                  if (count > 15) {
+                    console.log("Violation");
+                    violations++;
+                    capture();
+                    count = 0;
+                    // take_ss();
+                  }
                 }
               }
-
-              // let bboxLeft = predictions[n].bbox[0];
-              // let bboxTop = predictions[n].bbox[1];
-              // let bboxWidth = predictions[n].bbox[2];
-              // let bboxHeight = predictions[n].bbox[3] - bboxTop;
-
-              // ctx.beginPath();
-              // ctx.font = "28px Arial";
-              // ctx.fillStyle = "red";
-
-              // ctx.fillText(
-              //   predictions[n].class +
-              //     ": " +
-              //     Math.round(parseFloat(predictions[n].score) * 100) +
-              //     "%",
-              //   bboxLeft,
-              //   bboxTop
-              // );
-
-              // ctx.rect(bboxLeft, bboxTop, bboxWidth, bboxHeight);
-              // ctx.strokeStyle = "#FF0000";
-
-              // ctx.lineWidth = 3;
-              // ctx.stroke();
             }
           }
-        }
-        if (dict["person"] === 0) setPerson(false);
-        else setPerson(true);
-        if (violations <= 5) setTimeout(predictionFunction, 200);
-        else {
-          alert("you have been caught");
+          if (dict["person"] === 0) setPerson(false);
+          else setPerson(true);
+
+          if (violations <= 5) setTimeout(predictionFunction, 1000);
+          else {
+            alert("you have been caught");
+            history.push("/");
+          }
+        } catch {
+          console.log("error");
         }
       }
     },
-    [capture, model]
+    [capture, model, history]
   );
 
   useEffect(() => {
@@ -170,6 +143,14 @@ function Cam() {
   useEffect(() => {
     if (start) setTimeout(play, 5000);
   }, [start]);
+
+  useEffect(() => {
+    if (!person) {
+      setDisp("none");
+    } else {
+      setDisp("block");
+    }
+  }, [person]);
 
   // useEffect(() => {
   //   //prevent initial triggering

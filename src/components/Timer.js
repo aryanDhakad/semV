@@ -1,7 +1,7 @@
 import React from "react";
 import { useTimer } from "react-timer-hook";
 
-export default function Timer({ expiryTimestamp, history, onTimerExpire }) {
+export default function Timer({ expiryTimestamp, onTimerExpire }) {
   const { seconds, minutes, hours } = useTimer({
     expiryTimestamp,
     onExpire: () => {

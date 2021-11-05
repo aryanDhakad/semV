@@ -8,6 +8,7 @@ import draftToHtml from "draftjs-to-html";
 import htmlToDraft from "html-to-draftjs";
 import ReactHtmlParser from "react-html-parser";
 import Loader from "./Loader";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 function CreateQuiz() {
   let quizInfo = localStorage.getItem("quizInfo");
@@ -238,23 +239,32 @@ function CreateQuiz() {
     setEdit(value);
   }
 
+  function showTime(time) {
+    let t = new Date(time);
+    return t.toLocaleString("en-US");
+  }
+
   if (loading) {
     return <Loader />;
   }
   return (
     <div className="p-2 ">
       <div className="row px-3 mx-3 my-5 fss d-flex justify-content-around align-items-center lft-border">
-        <div className="  col-8 d-flex justify-content-around ">
+        <div className="  col-md-8 d-flex justify-content-around ">
           <ul className="list-group ml-4">
             <li className="list-group-item">{quizInfo.quizName}</li>
             <li className="list-group-item">{quizInfo.quizUUID}</li>
           </ul>
           <ul className="list-group ml-4">
-            <li className="list-group-item">{quizInfo.quizTimeStart}</li>
-            <li className="list-group-item">{quizInfo.quizTimeEnd}</li>
+            <li className="list-group-item">
+              {showTime(quizInfo.quizTimeStart)}
+            </li>
+            <li className="list-group-item">
+              {showTime(quizInfo.quizTimeEnd)}
+            </li>
           </ul>
         </div>
-        <div className="  col-4 ">
+        <div className="  col-md-4 ">
           <Link to="/create-quiz-form" className="mx-3">
             Edit Quiz Info
           </Link>
@@ -266,7 +276,7 @@ function CreateQuiz() {
       </div>
 
       <div className="row">
-        <div className="col-5">
+        <div className="col-md-5">
           {/* Question List */}
           <div
             className=" overflow-auto pl-3 pr-5"
@@ -277,12 +287,12 @@ function CreateQuiz() {
                 return (
                   <div key={index} className="my-5 lft-border ">
                     <div className="row">
-                      <div className="col-4">
+                      <div className="col-md-4">
                         <h3>
                           <strong>{item.questionNo}</strong>
                         </h3>
                       </div>
-                      <div className="col-8 d-flex justify-content-end">
+                      <div className="col-md-8 d-flex justify-content-end">
                         <button
                           type="button"
                           className="btn btn-primary  mr-4 rounded px-3 py-1"
@@ -291,7 +301,7 @@ function CreateQuiz() {
                           data-bs-placement="right"
                           title="Edit Question"
                         >
-                          <i className="fa fa-edit "></i>
+                          <FontAwesomeIcon icon={["fas", "edit"]} />
                         </button>
 
                         <button
@@ -302,7 +312,7 @@ function CreateQuiz() {
                           data-bs-placement="right"
                           title="Delete Question"
                         >
-                          <i className="fa fa-times "></i>
+                          <FontAwesomeIcon icon={["fas", "trash"]} />
                         </button>
                       </div>
                     </div>
@@ -314,17 +324,21 @@ function CreateQuiz() {
                           item.questionOptions.map((item, index) => {
                             return (
                               <tr key={index}>
-                                <td className="col-10 p-0">
+                                <td className="col-md-10 p-0">
                                   {ReactHtmlParser(item.optionContent)}
                                 </td>
-                                <td className="col-1 p-0">
+                                <td className="col-md-1 p-0">
                                   {item.optionIsCorrect ? (
-                                    <i className="fa fa-check-circle fa-2x"></i>
+                                    <FontAwesomeIcon
+                                      icon={["fas", "check-circle"]}
+                                    />
                                   ) : (
-                                    <i className="fa fa-times-circle fa-2x"></i>
+                                    <FontAwesomeIcon
+                                      icon={["fas", "times-circle"]}
+                                    />
                                   )}
                                 </td>
-                                <td className="col-1 p-0">
+                                <td className="col-md-1 p-0">
                                   {item.optionWeightage}
                                 </td>
                               </tr>
@@ -338,9 +352,9 @@ function CreateQuiz() {
           </div>
         </div>
 
-        <div className="col-7">
+        <div className="col-md-7">
           <div className="row mb-4 page ">
-            <div className="col-5 form-label lft-border  ">
+            <div className="col-md-5 form-label lft-border  ">
               <h5 className="d-inline ">Edit Question :</h5>
 
               <input
@@ -354,7 +368,7 @@ function CreateQuiz() {
               />
             </div>
 
-            <div className="col-5 offset-1 form-label lft-border  ">
+            <div className="col-md-5 offset-1 form-label lft-border  ">
               <h5 className="d-inline "> Edit Option :</h5>
               <input
                 type="radio"
@@ -372,7 +386,7 @@ function CreateQuiz() {
             {edit === "question" ? (
               <div className="px-1 py-1">
                 <div className="row">
-                  <div className="col-6">
+                  <div className="col-md-6">
                     <input
                       type="text"
                       name="questionNo"
@@ -381,7 +395,7 @@ function CreateQuiz() {
                       onChange={handleChange}
                     />
                   </div>
-                  <div className="col-6">
+                  <div className="col-md-6">
                     <button
                       className="btn btn-success w-100"
                       onClick={addQuestion}
@@ -413,7 +427,7 @@ function CreateQuiz() {
                         title="Add Option"
                       >
                         <div>
-                          <i className="fa fa-plus fa-2x"></i>
+                          <FontAwesomeIcon icon={["fas", "plus"]} />
                         </div>
                       </button>
                     </div>
@@ -425,7 +439,7 @@ function CreateQuiz() {
                         data-bs-placement="right"
                         title="Edit Option"
                       >
-                        <i className="fa fa-edit fa-2x"></i>
+                        <FontAwesomeIcon icon={["fas", "edit"]} />
                       </button>
                     </div>
 
@@ -486,9 +500,15 @@ function CreateQuiz() {
                           <div className="d-flex justify-content-around">
                             <div className="">
                               {itemCurrent.optionIsCorrect ? (
-                                <i className="fa fa-check-circle fa-2x"></i>
+                                <FontAwesomeIcon
+                                  icon={["fas", "check-circle"]}
+                                  size="2x"
+                                />
                               ) : (
-                                <i className="fa fa-times-circle fa-2x"></i>
+                                <FontAwesomeIcon
+                                  icon={["fas", "times-circle"]}
+                                  size="2x"
+                                />
                               )}
                             </div>
                             <div className="">
@@ -499,7 +519,7 @@ function CreateQuiz() {
                                 className="btn btn-danger ml-3 rounded-pill"
                                 onClick={() => deleteOption(index)}
                               >
-                                <i className="fa fa-trash"></i>
+                                <FontAwesomeIcon icon={["fas", "trash"]} />
                               </button>
                             </div>
                             <div className="">

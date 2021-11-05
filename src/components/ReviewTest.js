@@ -95,7 +95,7 @@ function ReviewTest() {
               >
                 {questionList.length && (
                   <div>
-                    <h3
+                    <h5
                       className="py-3 "
                       style={{ height: "30vh", position: "relative" }}
                     >
@@ -103,7 +103,7 @@ function ReviewTest() {
                       <div>
                         {ReactHtmlParser(questionList[current].questionContent)}
                       </div>
-                    </h3>
+                    </h5>
                     <div className=" px-2">
                       {questionList[current].questionOptions &&
                         questionList[current].questionOptions.map(

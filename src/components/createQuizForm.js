@@ -216,8 +216,8 @@ function CreateQuizForm() {
   }
 
   return (
-    <div>
-      <div style={{ display: "block", width: 700, padding: 30 }}>
+    <div className="justify-content-center ">
+      <div className="mx-auto mb-3 createForm" style={{ width: "60%" }}>
         <h2>Enter Quiz Information</h2>
         <Form onSubmit={handleSubmit}>
           <Form.Group controlId="exampleForm.ControlInput1">
@@ -250,9 +250,10 @@ function CreateQuizForm() {
           </Form.Group>
           <Form.Group controlId="exampleForm.ControlInput1">
             <Form.Label>
-              Let Review Test :
+              Let students review test after it ends :
               <Form.Control
                 type="checkbox"
+                className="d-inline"
                 name="quizLetReview"
                 checked={info.quizLetReview}
                 onChange={() => {}}
@@ -287,7 +288,7 @@ function CreateQuizForm() {
               onChange={handleChange}
             />
           </Form.Group>
-          <Form.Group controlId="formFile">
+          {/* <Form.Group controlId="formFile">
             <Form.Label>
               TA List (.xls and .xlsx):
               {info.quizTaEmailList.length ? (
@@ -305,7 +306,7 @@ function CreateQuizForm() {
               name="taList"
               onChange={handleFileChange}
             />
-          </Form.Group>
+          </Form.Group> */}
           <Form.Group controlId="formFile">
             <Form.Label>
               Student List (.xls and .xlsx):
@@ -353,19 +354,21 @@ function CreateQuizForm() {
           </Button>
         </Form>
       </div>
-      {info.quizUUID !== "" && (
-        <div>
-          <button className="btn btn-danger mx-3" onClick={deleteQuiz}>
-            Delete Quiz
-          </button>
-          <button
-            className="btn btn-warning mx-3"
-            onClick={() => history.push("/show-defaulters")}
-          >
-            Show Defaulters
-          </button>
-        </div>
-      )}
+      <div className="text-center">
+        {info.quizUUID !== "" && (
+          <div>
+            <button className="btn btn-danger mx-3" onClick={deleteQuiz}>
+              Delete Quiz
+            </button>
+            <button
+              className="btn btn-warning mx-3"
+              onClick={() => history.push("/show-defaulters")}
+            >
+              Show Defaulters
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

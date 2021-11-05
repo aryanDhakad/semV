@@ -130,7 +130,7 @@ export default function TeacherDash() {
             <FontAwesomeIcon icon={["fas", "sign-out-alt"]} size="lg" />
           </Button>
         </div>
-        <div className="  col-6 fss rgt-border ">
+        <div className="  col-6 fss rgt-border " style={{ color: "#F1732B" }}>
           <strong>Teacher Dashboard</strong>
         </div>
         <div className=" p-1 pl-4 col-4 text-left">
