@@ -12,61 +12,6 @@ import Loader from "./Loader";
 
 var elem = document.documentElement;
 
-//disable mouse drag select start
-
-document.addEventListener("contextmenu", (event) => event.preventDefault());
-
-document.onselectstart = new Function("return false");
-
-function dMDown(e) {
-  return false;
-}
-
-function dOClick() {
-  return true;
-}
-
-document.onmousedown = dMDown;
-
-document.onclick = dOClick;
-
-// $("#document").attr("unselectable", "on");
-
-//disable mouse drag select end
-
-//disable right click - context menu
-
-document.oncontextmenu = new Function("return false");
-
-//disable CTRL+A/CTRL+C through key board start
-
-//use this function
-
-function disableSelectCopy(e) {
-  // current pressed key
-
-  var pressedKey = String.fromCharCode(e.keyCode).toLowerCase();
-
-  if (
-    e.ctrlKey &&
-    (pressedKey == "c" ||
-      pressedKey == "x" ||
-      pressedKey == "v" ||
-      pressedKey == "a")
-  ) {
-    return false;
-  }
-  // else if (
-  //   e.ctrlKey &&
-  //   e.shiftKey &&
-  //   (pressedKey == "i" || pressedKey == "c")
-  // ) {
-  //   return false;
-  // }
-}
-
-document.onkeydown = disableSelectCopy;
-
 function TakeQuiz() {
   let item1 = localStorage.getItem("quizInfo");
   item1 = JSON.parse(item1);
@@ -128,6 +73,63 @@ function TakeQuiz() {
       elem.msRequestFullscreen();
     }
   };
+
+  useEffect(() => {
+    //disable mouse drag select start
+
+    document.addEventListener("contextmenu", (event) => event.preventDefault());
+
+    document.onselectstart = new Function("return false");
+
+    function dMDown(e) {
+      return false;
+    }
+
+    function dOClick() {
+      return true;
+    }
+
+    document.onmousedown = dMDown;
+
+    document.onclick = dOClick;
+
+    // $("#document").attr("unselectable", "on");
+
+    //disable mouse drag select end
+
+    //disable right click - context menu
+
+    document.oncontextmenu = new Function("return false");
+
+    //disable CTRL+A/CTRL+C through key board start
+
+    //use this function
+
+    function disableSelectCopy(e) {
+      // current pressed key
+
+      var pressedKey = String.fromCharCode(e.keyCode).toLowerCase();
+
+      if (
+        e.ctrlKey &&
+        (pressedKey == "c" ||
+          pressedKey == "x" ||
+          pressedKey == "v" ||
+          pressedKey == "a")
+      ) {
+        return false;
+      }
+      // else if (
+      //   e.ctrlKey &&
+      //   e.shiftKey &&
+      //   (pressedKey == "i" || pressedKey == "c")
+      // ) {
+      //   return false;
+      // }
+    }
+
+    document.onkeydown = disableSelectCopy;
+  });
 
   useEffect(() => {
     // goFullScreen();

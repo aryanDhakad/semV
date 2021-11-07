@@ -37,7 +37,6 @@ function Instructions() {
     facingMode: "environment",
   };
   const onTimerExpire = useCallback(() => {
-    alert("You May Begin. Best of Luck.");
     setShow(true);
   }, []);
 

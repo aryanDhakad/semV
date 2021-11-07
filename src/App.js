@@ -12,7 +12,7 @@ import CreateQuizForm from "./components/createQuizForm";
 import Defaulters from "./components/Defaulters";
 import Intstructions from "./components/Instructions";
 import "./App.css";
-import "font-awesome/css/font-awesome.min.css";
+
 function App() {
   return (
     <div className="p-2" style={{ minHeight: "100vh" }}>

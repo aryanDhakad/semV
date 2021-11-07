@@ -439,7 +439,7 @@ function CreateQuiz() {
                         data-bs-placement="right"
                         title="Edit Option"
                       >
-                        <FontAwesomeIcon icon={["fas", "edit"]} />
+                        <FontAwesomeIcon icon={["fas", "check-double"]} />
                       </button>
                     </div>
 

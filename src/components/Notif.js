@@ -1,4 +1,5 @@
 import React from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 function Notif({ item, index, setNotifs, db, currentUser }) {
   return (
@@ -23,7 +24,7 @@ function Notif({ item, index, setNotifs, db, currentUser }) {
                 .delete();
             }}
           >
-            X
+            <FontAwesomeIcon icon={["fas", "times-circle"]} />
           </button>
         ) : (
           <button
@@ -47,7 +48,7 @@ function Notif({ item, index, setNotifs, db, currentUser }) {
                 });
             }}
           >
-            <i class="fa fa-bell"></i>
+            <FontAwesomeIcon icon={["fas", "bell"]} />
           </button>
         )}{" "}
       </td>
