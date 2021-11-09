@@ -16,9 +16,9 @@ export default function PopupSignIn({ setError, loading }) {
       .signInWithPopup(provider)
       .then(function (result) {
         if (result.additionalUserInfo.profile.hd === "iiita.ac.in") {
-          history.push("/studentDash");
+          history.push("/teacherDash");
         } else {
-          setError("Use Instute ID");
+          setError("Use Institute ID");
         }
       })
       .catch((error) => {

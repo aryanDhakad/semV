@@ -5,6 +5,7 @@ import { Form, Button, Alert } from "react-bootstrap";
 import { useHistory } from "react-router-dom";
 import { db } from "../firebase";
 import { useAuth } from "../contexts/AuthContext";
+import * as emailjs from "emailjs-com";
 import Loader from "./Loader";
 
 function CreateQuizForm() {
@@ -190,7 +191,37 @@ function CreateQuizForm() {
         .doc(questionList[y].questionNo.toString())
         .set(questionList[y]);
     }
+
+    // sending emails to students
+    var studentEmailList = info.quizStudentEmailList;
+    var n = studentEmailList.length;
+    if (n === 0) {
+      alert("No Emails Provided!");
+    } else {
+      for (var i = 0; i < n; i++) {
+        var contactParam = {
+          to_email: studentEmailList[i],
+          quizUUID: info.quizUUID,
+          quiz_start: info.quizTimeStart,
+          quiz_end: info.quizTimeEnd,
+          instructor_name: info.instructorName,
+          instructor_email: info.instructorEmail,
+          quiz_weightage: info.quizWeightage,
+        };
+        // console.log("sending email to " + userEmail);
+        emailjs
+          .send(
+            "service_quizzy",
+            "template_iszrcak",
+            contactParam,
+            "user_a1Gz7NxOzg08tk9jMMEmL"
+          )
+          .then(function (res) {});
+      }
+    }
+
     setLoading(false);
+
     history.push("/create-quiz");
   }
 
