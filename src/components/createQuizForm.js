@@ -2,11 +2,12 @@ import React, { useState, useCallback, useEffect } from "react";
 import XLSX from "xlsx";
 import "bootstrap/dist/css/bootstrap.css";
 import { Form, Button, Alert } from "react-bootstrap";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import { db } from "../firebase";
 import { useAuth } from "../contexts/AuthContext";
 import * as emailjs from "emailjs-com";
 import Loader from "./Loader";
+import {v4 as uuid} from "uuid"; 
 
 function CreateQuizForm() {
   let item = JSON.parse(localStorage.getItem("quizInfo"));
@@ -165,8 +166,15 @@ function CreateQuizForm() {
     e.preventDefault();
 
     // generating uuid
-    var tempUUID = info.quizName.split(" ")[0].concat(makeId(5));
-    info.quizUUID = info.quizUUID ? info.quizUUID : tempUUID;
+    var tempUUID = info.quizName.split(" ");
+        
+    var finalID = "";
+    for(var i=0; i<tempUUID.length; i++){
+      finalID += tempUUID[i];
+      finalID += "_";
+    }
+    finalID += makeId(5);
+    info.quizUUID = info.quizUUID ? info.quizUUID : finalID;
     // console.log("tempUUID: " + tempUUID);
 
     if (questionList.length === 0) {
@@ -199,6 +207,23 @@ function CreateQuizForm() {
       alert("No Emails Provided!");
     } else {
       for (var i = 0; i < n; i++) {
+        // store token in db 
+        var token=uuid();
+        var tokenInfo = {
+          token: token,
+          quizUUID: info.quizUUID,
+          studentEmail: studentEmailList[i],
+        };
+
+        console.log(tokenInfo);
+        await db
+          .collection("tokens")
+          .doc(token)
+          .set(tokenInfo)
+          .then(() => {
+            console.log("created token");
+          });
+
         var contactParam = {
           to_email: studentEmailList[i],
           quizUUID: info.quizUUID,
@@ -207,6 +232,7 @@ function CreateQuizForm() {
           instructor_name: info.instructorName,
           instructor_email: info.instructorEmail,
           quiz_weightage: info.quizWeightage,
+          token: token,
         };
         // console.log("sending email to " + userEmail);
         emailjs
