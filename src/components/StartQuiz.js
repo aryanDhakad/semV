@@ -10,7 +10,7 @@ export default function StartQuiz() {
     const history = useHistory();
 
     const { currentUser } = useAuth();
-    var token, quizID, studentEmail, quizStartTime;
+    var token, quizID, studentEmail, quizStartTime, quizEndTime;
     const [loading, setLoading] = useState(false);
 
     // http://localhost:3000/startQuiz/?token=cb1a956c-3934-435a-8ab5-3ebd8dd0791b
@@ -53,26 +53,26 @@ export default function StartQuiz() {
                 .get()
                 .then((snapshot) => {                    
                     quizStartTime = snapshot.data().quizTimeStart;
+                    quizEndTime = snapshot.data().quizTimeEnd;
                 });
 
             if(currentUser.email !== studentEmail){
-                alert("You can only access this quiz with your own link");
+                alert("You can only access this quiz with your own link!");
                 history.push("/login");
                 return;
             }
             else{
                 let time = new Date();
-                let quizTime = new Date(quizStartTime);
+                let quizTimeStart = new Date(quizStartTime);
+                let quizTimeEnd = new Date(quizEndTime);
 
-                if(quizTime < time){
-                    alert("The quiz was at " + quizTime + " and you missed it.");
+                if(quizTimeEnd < time){
+                    alert("The quiz lasted till " + quizEndTime + " and you missed it!");
                     history.push("/login");
                     return;
                 }
-                else if((quizTime > time) && ((quizTime.getTime() - time.getTime())/1000 > 300)){
-                    let temp = (quizTime.getTime() - time.getTime())/1000;
-                    console.log("time left: " + temp);
-                    alert("Quiz hasn't started yet, come back at the specified time");
+                else if((quizTimeStart > time) && ((quizTimeStart.getTime() - time.getTime())/1000 > 300)){
+                    alert("The quiz hasn't started yet, come back at the specified time!");
                     history.push("/login");
                     return;
                 }
