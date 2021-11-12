@@ -1,15 +1,12 @@
 # MINI PROJECT 
-## **QUIZZY  PLATFORM**    (PREVENT CHEATING)
-### Group No
+## **QUIZZY  PLATFORM**    (ANTI-CHEATING QUIZ PLATFORM)
 ### Faculty Name - Ashutosh Mishra
 
 <!-- TABLE OF CONTENTS -->
 <details open="open">
   <summary>Table of Contents</summary>
   <ol>
-    <li>
-      <a href="#introduction">Introduction</a>
-    </li>
+    <li><a href="#introduction">Introduction</a></li>
     <li><a href="#team-members">Team Members</a></li>
     <li><a href="#built-with">Built With</a></li>
     <li><a href="#installation">Installation</a></li>
@@ -21,7 +18,7 @@
 
 
 ## Introduction
-This project is aimed at building a web-based multiple-choice question examination system namely Quizzy. This web application is developed for educational purposes, allowing the users to prepare multiple-choice questions for different examinations conducted at the college or university level. Our quiz application mainly focuses on preventing users from cheating by using multi-factor authentication along with a camera proctoring feature allowed to the users 
+This project is aimed at building a web-based multiple-choice question examination system namely Quizzy. This web application is developed for educational purposes, allowing the users to prepare multiple-choice questions for different examinations conducted at the college or university level. Our quiz application mainly focuses on preventing users from cheating by using multi-factor authentication along with a camera proctoring feature allowed to the users.
 
 ## Team Members
 |   Enrollment No.  |   Name   |  
@@ -38,9 +35,7 @@ This project is aimed at building a web-based multiple-choice question examinati
 <ul>
    <li>Languages used in this project: Javascript, HTML, CSS</li>
    <li>Frameworks used: Reactjs, Nodejs, Expressjs</li>
-   <li>Frameworks used: Reactjs, Nodejs, Expressjs </li>
-  <li>Database used: Firebase</li>
- 
+   <li>Database used: Firebase</li>
 </ul>
 
 
@@ -53,14 +48,19 @@ This project is aimed at building a web-based multiple-choice question examinati
    ```
 2. Change directory to main file
    ```sh
-   cd semV
+   cd semV/
    ```
 
-5. Run 
+3. Run 
    ```sh
-   Runs the app in the development mode.
+   yarn install
    ```
-Visit  http://localhost:3000 to see your app in action 
+
+4. Run 
+   ```sh
+   yarn start
+   ```
+<strong>Visit:</strong>  http://localhost:3000 to see your app in action.
 
 <!-- Usage -->
 ### How to use
