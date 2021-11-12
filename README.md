@@ -26,9 +26,9 @@ This project is aimed at building a web-based multiple-choice question examinati
 ## Team Members
 |   Enrollment No.  |   Name   |  
 |   --------------  |   ----   | 
-|    IIT2019158  |  Aryan Dhakad  |  
+|    IIT2019156  |  Bhupesh Sardana  |  
 |    IIT2019157  |  Aviral Gupta| 
-|    IIT2019156  |  Bhupesh Sardana |
+|    IIT2019158  |  Aryan Dhakad|
 |    IIT2019160  |  Tejas Dutta    |
 |    IIT2019200  |   Raj chandra  |
 
