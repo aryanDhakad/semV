@@ -55,7 +55,7 @@ This project is aimed at building a web-based multiple-choice question examinati
    yarn install
    ```
 
-4. Run 
+4. After all the files are installed, run:
    ```sh
    yarn start
    ```
