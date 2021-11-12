@@ -1,5 +1,4 @@
-# MINI PROJECT 
-## **QUIZZY  PLATFORM**    (ANTI-CHEATING QUIZ PLATFORM)
+# ANTI-CHEATING QUIZ PLATFORM
 ### Faculty Name - Ashutosh Mishra
 
 <!-- TABLE OF CONTENTS -->
@@ -66,7 +65,7 @@ This project is aimed at building a web-based multiple-choice question examinati
 ### How to use
 This application will also lead to an error-free, secure, reliable, and fast management system. It can assist the user to concentrate on their other activities rather than concentrating on the record-keeping. Thus it will help organizations in better utilization of resources.  This web application is developed for educational purposes, allowing the users to prepare multiple-choice questions for different examinations conducted at the college or university level. Our quiz application mainly focuses on preventing users from cheating by using multi-factor authentication along with a camera proctoring feature allowed to the users.
 This application will also lead to an error-free, secure, reliable, and fast management system. It can assist the user to concentrate on their other activities rather than concentrating on the record-keeping. Thus it will help organizations in better utilization of resources. 
-### Feature 
+### Features 
 <ul>
         <li><a>Disabling Copy Past</a></li>
         <li><a>Full Screen</a></li>
