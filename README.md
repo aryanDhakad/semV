@@ -67,11 +67,11 @@ This application will also lead to an error-free, secure, reliable, and fast man
 This application will also lead to an error-free, secure, reliable, and fast management system. It can assist the user to concentrate on their other activities rather than concentrating on the record-keeping. Thus it will help organizations in better utilization of resources. 
 ### Features 
 <ul>
-  <li>Copy-paste is Disabled</li>
-  <li>Test in Full Screen Mode</li>
+  <li>Copy-paste is disabled</li>
+  <li>Test in fullscreen mode</li>
   <li>Video is constantly proctored for any use of unfair means</li>
   <li>Students can't open new tabs</li>
-  <li>OAuth Authorization</li>
+  <li>OAuth Authentication</li>
   <li>Unique tokenized link for each student</li>
-  <li>Task Manager app, to take care if the students are not using any meet app to share screen and answers</li>
+  <li>Task Manager app, to take care if the students are not using any meet app to share screen/li>
 </ul>
