@@ -9,9 +9,7 @@
     <li><a href="#team-members">Team Members</li>
     <li><a href="#built-with">Built With</li>
     <li><a href="#installation">Installation</li>
-    <li><a href="#How-to-use">How to use</li>
     <li><a href="#Features">Features</li>
-    <li><a href="#acknowledgements">Acknowledgements</li>
   </ol>
 </details>
 
@@ -38,7 +36,7 @@ This project is aimed at building a web-based multiple-choice question examinati
 </ul>
 
 
- ### Installation
+## Installation
 
 
 1. Clone the repo
@@ -61,10 +59,6 @@ This project is aimed at building a web-based multiple-choice question examinati
    ```
 <strong>Visit:</strong>  http://localhost:3000 to see your app in action.
 
-<!-- Usage -->
-### How to use
-This application will also lead to an error-free, secure, reliable, and fast management system. It can assist the user to concentrate on their other activities rather than concentrating on the record-keeping. Thus it will help organizations in better utilization of resources.  This web application is developed for educational purposes, allowing the users to prepare multiple-choice questions for different examinations conducted at the college or university level. Our quiz application mainly focuses on preventing users from cheating by using multi-factor authentication along with a camera proctoring feature allowed to the users.
-This application will also lead to an error-free, secure, reliable, and fast management system. It can assist the user to concentrate on their other activities rather than concentrating on the record-keeping. Thus it will help organizations in better utilization of resources. 
 ### Features 
 <ul>
   <li>Copy-paste is disabled</li>
