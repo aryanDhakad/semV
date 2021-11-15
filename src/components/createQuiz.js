@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { db } from "../firebase";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
+
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import { Editor } from "react-draft-wysiwyg";
 import { EditorState, convertToRaw, ContentState } from "draft-js";
@@ -13,6 +14,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 function CreateQuiz() {
   let quizInfo = localStorage.getItem("quizInfo");
   quizInfo = JSON.parse(quizInfo);
+  const history = useHistory();
 
   const [loading, setLoading] = useState(true);
   const [edit, setEdit] = useState("question");
@@ -239,9 +241,21 @@ function CreateQuiz() {
     setEdit(value);
   }
 
-  function showTime(time) {
-    let t = new Date(time);
-    return t.toLocaleString("en-US");
+  async function deleteQuiz() {
+    await db.collection("quizInfo").doc(quizInfo.quizUUID).delete();
+
+    await db
+      .collection("Student")
+      .get()
+      .then((snapshot) => {
+        snapshot.docs.forEach(async (doc) => {
+          await db
+            .doc("Student/" + doc.id + "/Attempt/" + quizInfo.quizUUID)
+            .delete();
+        });
+      });
+    localStorage.setItem("quizUUID", "");
+    history.push("/teacherDash");
   }
 
   if (loading) {
@@ -257,10 +271,17 @@ function CreateQuiz() {
           </ul>
           <ul className="list-group ml-4">
             <li className="list-group-item">
-              {showTime(quizInfo.quizTimeStart)}
+              <button className="btn btn-danger mx-3" onClick={deleteQuiz}>
+                Delete Quiz
+              </button>
             </li>
             <li className="list-group-item">
-              {showTime(quizInfo.quizTimeEnd)}
+              <button
+                className="btn btn-warning mx-3"
+                onClick={() => history.push("/show-defaulters")}
+              >
+                Show Defaulters
+              </button>
             </li>
           </ul>
         </div>

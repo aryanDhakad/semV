@@ -180,7 +180,7 @@ export default function TeacherDash() {
         </div>
         <div className="col-8">
           <Card className="my-3 lft-border">
-            <Card.Header>CURRENT QUIZES</Card.Header>
+            <Card.Header>CURRENT/ONGOING QUIZZES</Card.Header>
 
             <div>
               <Card.Body>
@@ -202,7 +202,7 @@ export default function TeacherDash() {
           </Card>
 
           <Card className="my-3 lft-border">
-            <Card.Header>PAST QUIZES</Card.Header>
+            <Card.Header>PAST QUIZZES</Card.Header>
 
             <div>
               <Card.Body>

@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useHistory } from "react-router-dom";
 import { db } from "../firebase";
 import { useAuth } from "../contexts/AuthContext";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Loader from "./Loader";
 
 function Defaulters() {
@@ -65,9 +66,9 @@ function Defaulters() {
   return (
     <div>
       <div className="row p-2">
-        <div className="col-3 px-2">
+        <div className="col-3 px-2 rgt-border">
           <h1>Defaulters</h1>
-          <Link to="/create-quiz-form" className="m-3">
+          <Link to="/create-quiz" className="m-3">
             {" "}
             Exit{" "}
           </Link>
@@ -77,14 +78,14 @@ function Defaulters() {
 
           {defaulters.map((item, index) => {
             return (
-              <div key={index}>
+              <div key={index} className="lft-border my-1">
                 <h3>{item.Name}</h3>
                 <p>{item.Email}</p>
                 <button
                   className="btn btn-primary"
                   onClick={() => setDefaulter(item.Email)}
                 >
-                  Show Images.
+                  Show <FontAwesomeIcon icon={["fas", "eye"]} />
                 </button>
               </div>
             );

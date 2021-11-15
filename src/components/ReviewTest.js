@@ -12,9 +12,10 @@ function ReviewTest() {
 
   const [questionList, setQuestionList] = useState([]);
   const [current, setCurrent] = useState(-1);
+  const [info, setInfo] = useState({});
 
-  let item1 = localStorage.getItem("quizInfo");
-  item1 = JSON.parse(item1);
+  let quizInfo = localStorage.getItem("quizInfo");
+  quizInfo = JSON.parse(quizInfo);
 
   useEffect(() => {
     async function getData() {
@@ -23,11 +24,15 @@ function ReviewTest() {
       db.collection("Student")
         .doc(currentUser.email)
         .collection("Attempt")
-        .doc(item1.quizUUID)
+        .doc(quizInfo.quizUUID)
         .get()
         .then((doc) => {
           if (doc.exists) {
             let data = doc.data();
+            setInfo({
+              quizInfo: data.Info,
+              Score: data.Score,
+            });
             // console.log(data.questions);
             setQuestionList([...(data.questions || [])]);
           }
@@ -35,9 +40,9 @@ function ReviewTest() {
           db.collection("Student")
             .doc(currentUser.email)
             .collection("Attempt")
-            .doc(item1.quizUUID)
+            .doc(quizInfo.quizUUID)
             .update({
-              Info: item1,
+              Info: quizInfo,
             });
         })
         .catch((err) => {
@@ -71,9 +76,9 @@ function ReviewTest() {
             <Link to="/studentDash">Exit to Dashboard</Link>
           </div>
           <div className="col-3 rgt-border ">
-            Name : {item1.quizName}
+            Name : {quizInfo.quizName}
             <br />
-            ID : {item1.quizUUID}
+            ID : {quizInfo.quizUUID}
           </div>
           <div className=" p-1 col-3 text-left rgt-border">
             <strong>Email:</strong> {currentUser.email}

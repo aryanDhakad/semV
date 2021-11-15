@@ -138,22 +138,20 @@ function StudentDash() {
       <div className="row mb-2">
         <div className=" p-2 col-4 rgt-border ">
           {notifs.length ? (
-            <table className=" table ">
-              <tbody style={{ maxHeight: "100vh", overflow: "scroll" }}>
-                {notifs.map((item, index) => {
-                  return (
-                    <Notif
-                      key={index}
-                      item={item}
-                      index={index}
-                      db={db}
-                      currentUser={currentUser}
-                      setNotifs={setNotifs}
-                    />
-                  );
-                })}
-              </tbody>
-            </table>
+            <div style={{ maxHeight: "80vh" }} className="overflow-auto">
+              {notifs.map((item, index) => {
+                return (
+                  <Notif
+                    key={index}
+                    item={item}
+                    index={index}
+                    db={db}
+                    currentUser={currentUser}
+                    setNotifs={setNotifs}
+                  />
+                );
+              })}
+            </div>
           ) : (
             <h4 className="">Nothing to check Here..</h4>
           )}

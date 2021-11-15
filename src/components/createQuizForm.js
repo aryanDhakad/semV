@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from "react";
 import XLSX from "xlsx";
 import "bootstrap/dist/css/bootstrap.css";
 import { Form, Button, Alert } from "react-bootstrap";
-import { useHistory } from "react-router-dom";
+import { useHistory, Link } from "react-router-dom";
 import { db } from "../firebase";
 import { useAuth } from "../contexts/AuthContext";
 import * as emailjs from "emailjs-com";
@@ -192,54 +192,37 @@ function CreateQuizForm() {
         .set(questionList[y]);
     }
 
-    // sending emails to students
-    var studentEmailList = info.quizStudentEmailList;
-    var n = studentEmailList.length;
-    if (n === 0) {
-      alert("No Emails Provided!");
-    } else {
-      for (var i = 0; i < n; i++) {
-        var contactParam = {
-          to_email: studentEmailList[i],
-          quizUUID: info.quizUUID,
-          quiz_start: info.quizTimeStart,
-          quiz_end: info.quizTimeEnd,
-          instructor_name: info.instructorName,
-          instructor_email: info.instructorEmail,
-          quiz_weightage: info.quizWeightage,
-        };
-        // console.log("sending email to " + userEmail);
-        emailjs
-          .send(
-            "service_quizzy",
-            "template_iszrcak",
-            contactParam,
-            "user_a1Gz7NxOzg08tk9jMMEmL"
-          )
-          .then(function (res) {});
-      }
-    }
+    // // sending emails to students
+    // var studentEmailList = info.quizStudentEmailList;
+    // var n = studentEmailList.length;
+    // if (n === 0) {
+    //   alert("No Emails Provided!");
+    // } else {
+    //   for (var i = 0; i < n; i++) {
+    //     var contactParam = {
+    //       to_email: studentEmailList[i],
+    //       quizUUID: info.quizUUID,
+    //       quiz_start: info.quizTimeStart,
+    //       quiz_end: info.quizTimeEnd,
+    //       instructor_name: info.instructorName,
+    //       instructor_email: info.instructorEmail,
+    //       quiz_weightage: info.quizWeightage,
+    //     };
+    //     // console.log("sending email to " + userEmail);
+    //     emailjs
+    //       .send(
+    //         "service_quizzy",
+    //         "template_iszrcak",
+    //         contactParam,
+    //         "user_a1Gz7NxOzg08tk9jMMEmL"
+    //       )
+    //       .then(function (res) {});
+    //   }
+    // }
 
     setLoading(false);
 
     history.push("/create-quiz");
-  }
-
-  async function deleteQuiz() {
-    await db.collection("quizInfo").doc(info.quizUUID).delete();
-
-    await db
-      .collection("Student")
-      .get()
-      .then((snapshot) => {
-        snapshot.docs.forEach(async (doc) => {
-          await db
-            .doc("Student/" + doc.id + "/Attempt/" + info.quizUUID)
-            .delete();
-        });
-      });
-    localStorage.setItem("quizUUID", "");
-    history.push("/teacherDash");
   }
 
   if (loading || !currentUser) {
@@ -300,7 +283,7 @@ function CreateQuizForm() {
             </Form.Label>
           </Form.Group>
           <Form.Group controlId="exampleForm.ControlInput1">
-            <Form.Label>Quiz Weightage:</Form.Label>
+            <Form.Label>Quiz Total Points :</Form.Label>
             <Form.Control
               type="text"
               name="quizWeightage"
@@ -383,22 +366,10 @@ function CreateQuizForm() {
           <Button variant="primary" type="submit">
             Save Quiz Information
           </Button>
+          <Link to="/create-quiz" className="mx-3">
+            Go To Editing{" "}
+          </Link>
         </Form>
-      </div>
-      <div className="text-center">
-        {info.quizUUID !== "" && (
-          <div>
-            <button className="btn btn-danger mx-3" onClick={deleteQuiz}>
-              Delete Quiz
-            </button>
-            <button
-              className="btn btn-warning mx-3"
-              onClick={() => history.push("/show-defaulters")}
-            >
-              Show Defaulters
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );

@@ -6,8 +6,8 @@ import { useHistory } from "react-router-dom";
 var elem = document.documentElement;
 
 function Instructions() {
-  let item1 = localStorage.getItem("quizInfo");
-  item1 = JSON.parse(item1);
+  let quizInfo = localStorage.getItem("quizInfo");
+  quizInfo = JSON.parse(quizInfo);
   let startAt = new Date();
   startAt = startAt.setSeconds(startAt.getSeconds() + 10);
   const webcamRef = useRef(null);
@@ -67,7 +67,7 @@ function Instructions() {
       <div className="row px-3 py-5">
         <div className="col-8 fss rgt-border text-center">
           <h4> Quiz Instructions</h4>
-          <pre>{item1.quizInstructions}</pre>
+          <pre>{quizInfo.quizInstructions}</pre>
         </div>
         <div className="col-4">
           <h3>Please Allow the Camera Permission</h3>

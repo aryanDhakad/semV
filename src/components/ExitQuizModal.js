@@ -11,6 +11,7 @@ function ExitQuizModal({
   quizInfo,
   history,
   setStopCam,
+  closeScreen,
 }) {
   return (
     <Modal
@@ -40,9 +41,11 @@ function ExitQuizModal({
             //   .collection("Attempt")
             //   .doc(quizInfo.quizUUID)
             //   .set({
-            //     Info: quizInfo,
+            //     quizInfo: quizInfo,
             //     questions: questionList,
+            //     score: attempt.sc,
             //   });
+            closeScreen();
             history.push("/studentDash");
           }}
         >

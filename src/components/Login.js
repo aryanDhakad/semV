@@ -63,6 +63,7 @@ export default function Login() {
       .catch((err) => {
         console.log(err);
         setError(`${err.message}`);
+        setLoading(false);
       });
   }
 
@@ -142,7 +143,11 @@ export default function Login() {
                       </Button>
                     </div>
                     <div className="col-6 p-1">
-                      <PopupSignIn setError={setError} loading={loading} />
+                      <PopupSignIn
+                        setError={setError}
+                        loading={loading}
+                        type={type}
+                      />
                     </div>
                   </div>
                 </Card.Footer>

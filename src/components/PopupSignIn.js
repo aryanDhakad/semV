@@ -5,7 +5,7 @@ import { useHistory } from "react-router-dom";
 import { Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-export default function PopupSignIn({ setError, loading }) {
+export default function PopupSignIn({ setError, loading, type }) {
   const history = useHistory();
 
   const handleGoogleLogin = (event) => {
@@ -16,7 +16,8 @@ export default function PopupSignIn({ setError, loading }) {
       .signInWithPopup(provider)
       .then(function (result) {
         if (result.additionalUserInfo.profile.hd === "iiita.ac.in") {
-          history.push("/teacherDash");
+          if (type === "Student") history.push("/studentDash");
+          else if (type === "Teacher") history.push("/teacherDash");
         } else {
           setError("Use Institute ID");
         }
