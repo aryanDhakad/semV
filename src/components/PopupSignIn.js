@@ -15,6 +15,7 @@ export default function PopupSignIn({ setError, loading, type }) {
     auth
       .signInWithPopup(provider)
       .then(function (result) {
+        console.log(result);
         if (result.additionalUserInfo.profile.hd === "iiita.ac.in") {
           if (type === "Student") history.push("/studentDash");
           else if (type === "Teacher") history.push("/teacherDash");

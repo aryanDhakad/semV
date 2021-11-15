@@ -18,68 +18,51 @@ function StudentDash() {
   const [notifs, setNotifs] = useState([]);
   const history = useHistory();
 
-  const getData = useCallback(
-    async function () {
-      setLoading(true);
+  const getData = useCallback(async function () {
+    setLoading(true);
 
-      let time = new Date();
-      await db
-        .collection("quizInfo")
-        .get()
-        .then((snapshot) => {
-          snapshot.docs.forEach((doc) => {
-            let time2ed = new Date(doc.data().quizTimeEnd);
+    let time = new Date();
+    await db
+      .collection("quizInfo")
+      .get()
+      .then((snapshot) => {
+        let Done = [];
+        let Now = [];
+        snapshot.docs.forEach((doc) => {
+          let time2ed = new Date(doc.data().quizTimeEnd);
 
-            if (time2ed.getTime() < time.getTime()) {
-              if (doc.data().quizLetReview) {
-                setQuizzesDone((prev) => {
-                  // console.log(doc.data());
-                  return [...prev, doc.data()];
-                });
-              }
-            } else {
-              setQuizzesNow((prev) => {
-                return [...prev, doc.data()];
-              });
-              // db.collection(`Student/${currentUser.email || "default"}/Attempt`)
-              //   .doc(doc.id)
-              //   .get()
-              //   .then((doc1) => {
-              //     if (!doc1.exists) {
-              //       setQuizzesNow((prev) => {
-              //         // console.log(doc.data());
-              //         return [...prev, doc.data()];
-              //       });
-              //     }
-              //   });
-            }
-          });
-        })
-        .catch((err) => {
-          setError(err);
+          if (time2ed.getTime() < time.getTime()) {
+            Done.push(doc.data());
+          } else {
+            Now.push(doc.data());
+          }
+        });
+        setQuizzesDone(Done);
+        setQuizzesNow(Now);
+      })
+      .catch((err) => {
+        setError(err);
+      });
+
+    await db
+      .collection("Student")
+      .doc(currentUser.email)
+      .collection("Notifs")
+      .get()
+      .then((snap) => {
+        let data = snap.docs.map((item) => {
+          return { id: item.id, ...item.data() };
         });
 
-      await db
-        .collection("Student")
-        .doc(currentUser.email)
-        .collection("Notifs")
-        .get()
-        .then((snap) => {
-          let data = snap.docs.map((item) => {
-            return { id: item.id, ...item.data() };
-          });
+        setNotifs([...data]);
+      });
 
-          setNotifs([...data]);
-        });
-
-      setLoading(false);
-    },
-    [currentUser]
-  );
+    setLoading(false);
+  }, []);
 
   useEffect(() => {
     if (currentUser) getData();
-  }, [currentUser, getData]);
+  }, [currentUser]);
 
   async function handleLogout() {
     setError("");

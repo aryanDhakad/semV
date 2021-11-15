@@ -30,25 +30,22 @@ function TakeQuiz() {
   const [show, setShow] = useState(false);
   const [disp, setDisp] = useState("block");
 
-  const getData = useCallback(
-    async function () {
-      setLoading(true);
+  const getData = useCallback(async function () {
+    setLoading(true);
 
-      // console.log(expireTime, quizInfo);
+    // console.log(expireTime, quizInfo);
 
-      await db
-        .collection("quizInfo/" + quizInfo.quizUUID + "/questions")
-        .get()
-        .then((snapshot) => {
-          let document = snapshot.docs.map((doc) => doc.data());
-          // console.log(document);
-          setQuestionList([...(document || [])]);
-        });
+    await db
+      .collection("quizInfo/" + quizInfo.quizUUID + "/questions")
+      .get()
+      .then((snapshot) => {
+        let document = snapshot.docs.map((doc) => doc.data());
+        // console.log(document);
+        setQuestionList([...(document || [])]);
+      });
 
-      setLoading(false);
-    },
-    [quizInfo.quizUUID]
-  );
+    setLoading(false);
+  }, []);
 
   const closeScreen = async () => {
     if (!document.exitFullscreen) {

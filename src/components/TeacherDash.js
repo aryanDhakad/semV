@@ -31,20 +31,19 @@ export default function TeacherDash() {
         .collection("quizInfo")
         .get()
         .then((snapshot) => {
+          let Done = [];
+          let Now = [];
           snapshot.docs.forEach((doc) => {
             let time2ed = new Date(doc.data().quizTimeEnd);
 
             if (time2ed.getTime() < time.getTime()) {
-              setQuizzesDone((prev) => {
-                return [...prev, doc.data()];
-              });
+              Done.push(doc.data());
             } else {
-              setQuizzesNow((prev) => {
-                // console.log(doc.data());
-                return [...prev, doc.data()];
-              });
+              Now.push(doc.data());
             }
           });
+          setQuizzesDone(Done);
+          setQuizzesNow(Now);
         })
         .catch((err) => {
           setError(err.message);
