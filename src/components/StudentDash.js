@@ -18,51 +18,54 @@ function StudentDash() {
   const [notifs, setNotifs] = useState([]);
   const history = useHistory();
 
-  const getData = useCallback(async function () {
-    setLoading(true);
+  const getData = useCallback(
+    async function () {
+      setLoading(true);
 
-    let time = new Date();
-    await db
-      .collection("quizInfo")
-      .get()
-      .then((snapshot) => {
-        let Done = [];
-        let Now = [];
-        snapshot.docs.forEach((doc) => {
-          let time2ed = new Date(doc.data().quizTimeEnd);
+      let time = new Date();
+      await db
+        .collection("quizInfo")
+        .get()
+        .then((snapshot) => {
+          let Done = [];
+          let Now = [];
+          snapshot.docs.forEach((doc) => {
+            let time2ed = new Date(doc.data().quizTimeEnd);
 
-          if (time2ed.getTime() < time.getTime()) {
-            Done.push(doc.data());
-          } else {
-            Now.push(doc.data());
-          }
-        });
-        setQuizzesDone(Done);
-        setQuizzesNow(Now);
-      })
-      .catch((err) => {
-        setError(err);
-      });
-
-    await db
-      .collection("Student")
-      .doc(currentUser.email)
-      .collection("Notifs")
-      .get()
-      .then((snap) => {
-        let data = snap.docs.map((item) => {
-          return { id: item.id, ...item.data() };
+            if (time2ed.getTime() < time.getTime()) {
+              Done.push(doc.data());
+            } else {
+              Now.push(doc.data());
+            }
+          });
+          setQuizzesDone(Done);
+          setQuizzesNow(Now);
+        })
+        .catch((err) => {
+          setError(err);
         });
 
-        setNotifs([...data]);
-      });
+      await db
+        .collection("Student")
+        .doc(currentUser.email)
+        .collection("Notifs")
+        .get()
+        .then((snap) => {
+          let data = snap.docs.map((item) => {
+            return { id: item.id, ...item.data() };
+          });
 
-    setLoading(false);
-  }, []);
+          setNotifs([...data]);
+        });
+
+      setLoading(false);
+    },
+    [currentUser]
+  );
 
   useEffect(() => {
     if (currentUser) getData();
-  }, [currentUser]);
+  }, [currentUser, getData]);
 
   async function handleLogout() {
     setError("");
