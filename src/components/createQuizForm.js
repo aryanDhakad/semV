@@ -284,6 +284,7 @@ function CreateQuizForm() {
               name="quizName"
               value={info.quizName}
               onChange={handleChange}
+              required
             />
           </Form.Group>
 
@@ -294,6 +295,7 @@ function CreateQuizForm() {
               name="quizTimeStart"
               value={info.quizTimeStart}
               onChange={handleChange}
+              required
             />
           </Form.Group>
           <Form.Group controlId="exampleForm.ControlInput1">
@@ -303,6 +305,7 @@ function CreateQuizForm() {
               name="quizTimeEnd"
               value={info.quizTimeEnd}
               onChange={handleChange}
+              required
             />
           </Form.Group>
           <Form.Group controlId="exampleForm.ControlInput1">
@@ -332,6 +335,7 @@ function CreateQuizForm() {
               name="quizWeightage"
               value={info.quizWeightage}
               onChange={handleChange}
+              required
             />
           </Form.Group>
           <Form.Group controlId="exampleForm.ControlTextarea1">
@@ -343,6 +347,7 @@ function CreateQuizForm() {
               value={info.quizInstructions}
               // defaultValue="Enter instructions here..."
               onChange={handleChange}
+              required
             />
           </Form.Group>
           {/* <Form.Group controlId="formFile">
@@ -381,6 +386,7 @@ function CreateQuizForm() {
               type="file"
               name="taList"
               onChange={handleFileChange}
+              required
             />
           </Form.Group>
 
@@ -401,6 +407,7 @@ function CreateQuizForm() {
               type="file"
               name="questionList"
               onChange={handleFileChange}
+              required
             />
           </Form.Group>
 
