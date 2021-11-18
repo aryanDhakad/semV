@@ -11,6 +11,7 @@ import ReviewTest from "./components/ReviewTest";
 import CreateQuizForm from "./components/createQuizForm";
 import Defaulters from "./components/Defaulters";
 import Intstructions from "./components/Instructions";
+import StartQuiz from "./components/StartQuiz";
 import "./App.css";
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
               <Route path="/review-test" component={ReviewTest} />
               <Route path="/show-defaulters" component={Defaulters} />
               <Route path="/instructions" component={Intstructions} />
+              <Route path="/startQuiz" component={StartQuiz} />
             </Switch>
           </AuthProvider>
         </Router>
