@@ -64,87 +64,92 @@ function CreateQuizForm() {
     });
   }
   const handleFileChange = useCallback((e) => {
-    // Reading data from excel file
-    const file = e.target.files[0];
+    try {
+      // Reading data from excel file
+      const file = e.target.files[0];
 
-    var reader = new FileReader();
-    reader.onload = function (e) {
-      var data = new Uint8Array(e.target.result);
-      var workbook = XLSX.read(data, { type: "array" });
-      var firstSheet = workbook.SheetNames[0];
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        var data = new Uint8Array(e.target.result);
+        var workbook = XLSX.read(data, { type: "array" });
+        var firstSheet = workbook.SheetNames[0];
 
-      const elements = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet]);
+        const elements = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet]);
 
-      // Converting json to array
-      var jsArray = JSON.parse(JSON.stringify(elements));
+        // Converting json to array
+        var jsArray = JSON.parse(JSON.stringify(elements));
 
-      if (file.name === "ta-list.xlsx" || file.name === "ta-list.xls") {
-        let taEmailList = [];
-        for (let i = 0; i < jsArray.length; i++) {
-          taEmailList.push(jsArray[i].Email);
-        }
-
-        setInfo((prev) => {
-          return {
-            ...prev,
-            quizTaEmailList: taEmailList,
-          };
-        });
-      } else if (
-        file.name === "student-list.xlsx" ||
-        file.name === "student-list.xls"
-      ) {
-        let studentEmailList = [];
-        for (let i = 0; i < jsArray.length; i++) {
-          studentEmailList.push(jsArray[i].Email);
-        }
-
-        setInfo((prev) => {
-          return {
-            ...prev,
-            quizStudentEmailList: studentEmailList,
-          };
-        });
-      } else {
-        let arr = [];
-        for (let i = 0; i < jsArray.length; i++) {
-          let questionTemp = {};
-          let questionNo = jsArray[i].questionNo.toString();
-          let questionContent = jsArray[i].questionContent;
-          let questionOption = jsArray[i].questionOption;
-          let optionContent = jsArray[i].optionContent;
-          let optionIsCorrect = jsArray[i].optionIsCorrect;
-          let optionWeightage = jsArray[i].optionWeightage.toString();
-
-          let questionOptionArr = questionOption.split(",");
-          let optionContentArr = optionContent.split(",,");
-          let optionWeightageArr = optionWeightage.split(",");
-          let optionIsCorrectArr = optionIsCorrect.split(",");
-
-          let allOptions = [];
-          for (var x = 0; x < questionOptionArr.length; x++) {
-            allOptions.push({
-              optionContent: optionContentArr[x],
-              optionIsCorrect: optionIsCorrectArr[x] === "True" ? true : false,
-              optionWeightage: optionWeightageArr[x],
-              optionIsSelected: false,
-            });
+        if (file.name === "ta-list.xlsx" || file.name === "ta-list.xls") {
+          let taEmailList = [];
+          for (let i = 0; i < jsArray.length; i++) {
+            taEmailList.push(jsArray[i].Email);
           }
-          questionTemp = {
-            questionNo: questionNo,
-            questionContent: questionContent,
-            questionOptions: allOptions,
-            questionIsAttempted: false,
-            questionIsMarked: false,
-          };
-          arr.push(questionTemp);
+
+          setInfo((prev) => {
+            return {
+              ...prev,
+              quizTaEmailList: taEmailList,
+            };
+          });
+        } else if (
+          file.name === "student-list.xlsx" ||
+          file.name === "student-list.xls"
+        ) {
+          let studentEmailList = [];
+          for (let i = 0; i < jsArray.length; i++) {
+            studentEmailList.push(jsArray[i].Email);
+          }
+
+          setInfo((prev) => {
+            return {
+              ...prev,
+              quizStudentEmailList: studentEmailList,
+            };
+          });
+        } else {
+          let arr = [];
+          for (let i = 0; i < jsArray.length; i++) {
+            let questionTemp = {};
+            let questionNo = jsArray[i].questionNo.toString();
+            let questionContent = jsArray[i].questionContent;
+            let questionOption = jsArray[i].questionOption;
+            let optionContent = jsArray[i].optionContent;
+            let optionIsCorrect = jsArray[i].optionIsCorrect;
+            let optionWeightage = jsArray[i].optionWeightage.toString();
+
+            let questionOptionArr = questionOption.split(",");
+            let optionContentArr = optionContent.split(",,");
+            let optionWeightageArr = optionWeightage.split(",");
+            let optionIsCorrectArr = optionIsCorrect.split(",");
+
+            let allOptions = [];
+            for (var x = 0; x < questionOptionArr.length; x++) {
+              allOptions.push({
+                optionContent: optionContentArr[x],
+                optionIsCorrect:
+                  optionIsCorrectArr[x] === "True" ? true : false,
+                optionWeightage: optionWeightageArr[x],
+                optionIsSelected: false,
+              });
+            }
+            questionTemp = {
+              questionNo: questionNo,
+              questionContent: questionContent,
+              questionOptions: allOptions,
+              questionIsAttempted: false,
+              questionIsMarked: false,
+            };
+            arr.push(questionTemp);
+          }
+
+          setQuestionList(arr);
         }
+      };
 
-        setQuestionList(arr);
-      }
-    };
-
-    if (file) reader.readAsArrayBuffer(file);
+      if (file) reader.readAsArrayBuffer(file);
+    } catch (e) {
+      console.log(e);
+    }
   }, []);
 
   // Making random string for uuid
@@ -169,10 +174,17 @@ function CreateQuizForm() {
     info.quizUUID = info.quizUUID ? info.quizUUID : tempUUID;
     // console.log("tempUUID: " + tempUUID);
 
-    if (questionList.length === 0) {
-      setError("No questions provided!");
-      return;
-    }
+    // if(info.quizName === "" || info.quizTimeStart === "" || info.quizTimeEnd === "" ||){
+    //   setError("Fill All detais");
+    //   setLoading(false);
+    //   return;
+    // }
+
+    // if (info.quizStudentEmailList.length === 0) {
+    //   setError("No Student Email Listprovided!");
+    //   setLoading(false);
+    //   return;
+    // }
 
     // final quiz information
 
@@ -241,6 +253,8 @@ function CreateQuizForm() {
               name="quizName"
               value={info.quizName}
               onChange={handleChange}
+              required
+              required
             />
           </Form.Group>
 
@@ -251,6 +265,7 @@ function CreateQuizForm() {
               name="quizTimeStart"
               value={info.quizTimeStart}
               onChange={handleChange}
+              required
             />
           </Form.Group>
           <Form.Group controlId="exampleForm.ControlInput1">
@@ -260,27 +275,26 @@ function CreateQuizForm() {
               name="quizTimeEnd"
               value={info.quizTimeEnd}
               onChange={handleChange}
+              required
             />
           </Form.Group>
-          <Form.Group controlId="exampleForm.ControlInput1">
-            <Form.Label>
-              Let students review test after it ends :
-              <Form.Control
-                type="checkbox"
-                className="d-inline"
-                name="quizLetReview"
-                checked={info.quizLetReview}
-                onChange={() => {}}
-                onClick={() =>
-                  setInfo((prev) => {
-                    return {
-                      ...prev,
-                      quizLetReview: !prev.quizLetReview,
-                    };
-                  })
-                }
-              />
-            </Form.Label>
+          <Form.Group controlId="exampleForm.ControlInput1" className="page">
+            <Form.Label>Let students review test after it ends :</Form.Label>
+            <input
+              type="checkbox"
+              className=" mx-4"
+              name="quizLetReview"
+              checked={info.quizLetReview}
+              onChange={() => {}}
+              onClick={() =>
+                setInfo((prev) => {
+                  return {
+                    ...prev,
+                    quizLetReview: !prev.quizLetReview,
+                  };
+                })
+              }
+            />
           </Form.Group>
           <Form.Group controlId="exampleForm.ControlInput1">
             <Form.Label>Quiz Total Points :</Form.Label>
@@ -319,8 +333,19 @@ function CreateQuizForm() {
               type="file"
               name="taList"
               onChange={handleFileChange}
-            />
+           required
+              />
           </Form.Group> */}
+
+          <a
+            className="badge badge-info badge-pill p-2 m-2"
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://docs.google.com/document/d/1HLln3DDiDUr0q4Bs0brsxgEJVRPVr9QlYTzrUefeYTI/edit?usp=sharing"
+          >
+            Quizzy Documentation
+          </a>
+
           <Form.Group controlId="formFile">
             <Form.Label>
               Student List (.xls and .xlsx):
@@ -336,8 +361,13 @@ function CreateQuizForm() {
             </Form.Label>
             <Form.Control
               type="file"
-              name="taList"
+              name="studentList"
+              accept=".xls,.xlsx"
+              data-bs-toggle="tooltip"
+              data-bs-placement="right"
+              title="Format :  student-list.(xls/xlsx)"
               onChange={handleFileChange}
+              required
             />
           </Form.Group>
 
@@ -357,6 +387,10 @@ function CreateQuizForm() {
             <Form.Control
               type="file"
               name="questionList"
+              accept=".xls,.xlsx"
+              data-bs-toggle="tooltip"
+              data-bs-placement="right"
+              title="Format :  quiz_questions.(xls/xlsx)"
               onChange={handleFileChange}
             />
           </Form.Group>

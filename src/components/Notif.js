@@ -3,9 +3,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 function Notif({ item, index, setNotifs, db, currentUser }) {
   return (
-    <div className="lft-border">
+    <div className="lft-border my-1 text-left  ">
       <div className="row">
-        <div className="col-9">{item.faculty}</div>
+        <div className="col-9" style={{ fontWeight: "bold" }}>
+          {item.faculty}
+        </div>
 
         <div className="col-3">
           {item.isRead ? (
@@ -54,7 +56,7 @@ function Notif({ item, index, setNotifs, db, currentUser }) {
         </div>
       </div>
 
-      <div className="flex-wrap">{item.content}</div>
+      <div className="px-1 text-break">{item.content}</div>
     </div>
   );
 }

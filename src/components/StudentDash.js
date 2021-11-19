@@ -121,10 +121,10 @@ function StudentDash() {
         </div>
       </div>
 
-      <div className="row mb-2">
+      <div className="row mb-2 overflowCustom" style={{ maxHeight: "100vh" }}>
         <div className=" p-2 col-4 rgt-border ">
           {notifs.length ? (
-            <div style={{ maxHeight: "80vh" }} className="overflow-auto">
+            <div>
               {notifs.map((item, index) => {
                 return (
                   <Notif
