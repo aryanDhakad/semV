@@ -49,7 +49,14 @@ function CreateQuizForm() {
       }
       setLoading(false);
     }
-    getData();
+
+    const type = localStorage.getItem("type");
+    if (type !== "Teacher") {
+      alert("Access Denied");
+      history.push("/login");
+    } else {
+      getData();
+    }
   }, []);
 
   function handleChange(e) {
@@ -180,11 +187,11 @@ function CreateQuizForm() {
     //   return;
     // }
 
-    // if (info.quizStudentEmailList.length === 0) {
-    //   setError("No Student Email Listprovided!");
-    //   setLoading(false);
-    //   return;
-    // }
+    if (info.quizStudentEmailList.length === 0) {
+      setError("No Student Email Listprovided!");
+      setLoading(false);
+      return;
+    }
 
     // final quiz information
 
@@ -367,7 +374,6 @@ function CreateQuizForm() {
               data-bs-placement="right"
               title="Format :  student-list.(xls/xlsx)"
               onChange={handleFileChange}
-              required
             />
           </Form.Group>
 

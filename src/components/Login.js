@@ -32,6 +32,7 @@ export default function Login() {
     await login(emailRef.current.value, passwordRef.current.value)
       .then((cred) => {
         setLoading(false);
+        localStorage.setItem("type", type);
         if (type === "Student") {
           history.push("/studentDash");
           // db.collection("Student")

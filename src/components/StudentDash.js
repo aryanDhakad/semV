@@ -10,6 +10,7 @@ import Loader from "./Loader";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 function StudentDash() {
+  const type = localStorage.getItem("type");
   const { currentUser, logout } = useAuth();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
@@ -18,8 +19,8 @@ function StudentDash() {
   const [notifs, setNotifs] = useState([]);
   const history = useHistory();
 
-  const getData = useCallback(
-    async function () {
+  useEffect(() => {
+    async function getData() {
       setLoading(true);
 
       let time = new Date();
@@ -59,13 +60,15 @@ function StudentDash() {
         });
 
       setLoading(false);
-    },
-    [currentUser]
-  );
+    }
 
-  useEffect(() => {
-    if (currentUser) getData();
-  }, [currentUser, getData]);
+    if (type !== "Student") {
+      alert("Access Denied");
+      history.push("/login");
+    } else {
+      if (currentUser) getData();
+    }
+  }, [currentUser]);
 
   async function handleLogout() {
     setError("");

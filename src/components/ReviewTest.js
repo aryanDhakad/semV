@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { db } from "../firebase";
 import ReactHtmlParser from "react-html-parser";
 import Loader from "./Loader";
 
 function ReviewTest() {
   const { currentUser } = useAuth();
+
+  const history = useHistory();
 
   const [loading, setLoading] = useState(true);
 
@@ -51,11 +53,21 @@ function ReviewTest() {
       setLoading(false);
       setCurrent(0);
     }
-    getData();
+
+    const type = localStorage.getItem("type");
+    if (type !== "Student") {
+      alert("Access Denied");
+      history.push("/login");
+    } else {
+      getData();
+    }
   }, []);
 
   useEffect(() => {
-    if (current === -1 && questionList.length) setCurrent(0);
+    const type = localStorage.getItem("type");
+    if (type === "Student") {
+      if (current === -1 && questionList.length) setCurrent(0);
+    }
   }, [questionList, current]);
 
   function nextQue() {

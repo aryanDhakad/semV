@@ -50,7 +50,13 @@ export default function TeacherDash() {
         });
       setLoading(false);
     }
-    if (currentUser) getData();
+    const type = localStorage.getItem("type");
+    if (type !== "Teacher") {
+      alert("Access Denied");
+      history.push("/login");
+    } else {
+      if (currentUser) getData();
+    }
   }, [currentUser]);
 
   function handleSubmit(type, item) {

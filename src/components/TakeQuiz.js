@@ -40,6 +40,7 @@ function TakeQuiz() {
       .get()
       .then((snapshot) => {
         let document = snapshot.docs.map((doc) => doc.data());
+        document.sort(() => Math.random() - 0.5);
         // console.log(document);
         setQuestionList([...(document || [])]);
       });
@@ -130,7 +131,14 @@ function TakeQuiz() {
 
   useEffect(() => {
     // goFullScreen();
-    getData();
+
+    const type = localStorage.getItem("type");
+    if (type !== "Student") {
+      alert("Access Denied");
+      history.push("/login");
+    } else {
+      getData();
+    }
   }, [getData]);
 
   // useEffect(() => {

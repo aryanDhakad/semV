@@ -58,19 +58,28 @@ function CreateQuiz() {
 
   useEffect(() => {
     setLoading(true);
-    getData();
+    const type = localStorage.getItem("type");
+    if (type !== "Teacher") {
+      alert("Access Denied");
+      history.push("/login");
+    } else {
+      getData();
+    }
     setLoading(false);
   }, []);
 
   useEffect(() => {
-    setQuestion((prev) => {
-      return {
-        ...prev,
-        questionContent: draftToHtml(
-          convertToRaw(editorStateQuestion.getCurrentContent())
-        ),
-      };
-    });
+    const type = localStorage.getItem("type");
+    if (type === "Teacher") {
+      setQuestion((prev) => {
+        return {
+          ...prev,
+          questionContent: draftToHtml(
+            convertToRaw(editorStateQuestion.getCurrentContent())
+          ),
+        };
+      });
+    }
   }, [editorStateQuestion]);
 
   useEffect(() => {
@@ -242,6 +251,27 @@ function CreateQuiz() {
   }
 
   async function deleteQuiz() {
+    await db
+      .collection("quizInfo")
+      .doc(quizInfo.quizUUID)
+      .collection("questions")
+      .get()
+      .then((snapshot) => {
+        snapshot.forEach((doc) => {
+          doc.ref.delete();
+        });
+      });
+    await db
+      .collection("quizInfo")
+      .doc(quizInfo.quizUUID)
+      .collection("Defaulters")
+      .get()
+      .then((snapshot) => {
+        snapshot.forEach((doc) => {
+          doc.ref.delete();
+        });
+      });
+
     await db.collection("quizInfo").doc(quizInfo.quizUUID).delete();
 
     await db
