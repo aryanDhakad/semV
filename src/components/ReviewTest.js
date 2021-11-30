@@ -15,6 +15,7 @@ function ReviewTest() {
   const [questionList, setQuestionList] = useState([]);
   const [current, setCurrent] = useState(-1);
   const [info, setInfo] = useState({});
+  const [score, setScore] = useState(0);
 
   let quizInfo = localStorage.getItem("quizInfo");
   quizInfo = JSON.parse(quizInfo);
@@ -64,6 +65,20 @@ function ReviewTest() {
   }, []);
 
   useEffect(() => {
+    let sc = 0;
+    questionList.forEach((item) => {
+      if (item.questionIsAttempted) {
+        item.questionOptions.forEach((option) => {
+          if (option.optionIsSelected && option.optionIsCorrect) {
+            sc += parseInt(option.optionWeightage);
+          }
+        });
+      }
+    });
+    setScore(sc);
+  }, [questionList]);
+
+  useEffect(() => {
     const type = localStorage.getItem("type");
     if (type === "Student") {
       if (current === -1 && questionList.length) setCurrent(0);
@@ -97,7 +112,7 @@ function ReviewTest() {
             <br />
             <strong>Name:</strong> {currentUser.displayName}
           </div>
-          <div className=" col-3 ">Score :</div>
+          <div className=" col-3 fss ">Score : {score}</div>
         </div>
         <div className="row">
           <div className="col-8 py-2 px-4">

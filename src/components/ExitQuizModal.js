@@ -54,16 +54,16 @@ function ExitQuizModal({
         <Button
           variant="secondary"
           onClick={async () => {
-            // await db
-            //   .collection("Student")
-            //   .doc(currentUser.email)
-            //   .collection("Attempt")
-            //   .doc(quizInfo.quizUUID)
-            //   .set({
-            //     quizInfo: quizInfo,
-            //     questions: questionList,
-            //     score: attempt.sc,
-            //   });
+            await db
+              .collection("Student")
+              .doc(currentUser.email)
+              .collection("Attempt")
+              .doc(quizInfo.quizUUID)
+              .set({
+                quizInfo: quizInfo,
+                questions: questionList,
+                score: attempt.sc,
+              });
             closeScreen();
             history.push("/studentDash");
           }}

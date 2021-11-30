@@ -78,7 +78,7 @@ function Instructions() {
             <h4> Quiz Instructions</h4>
             <pre>{quizInfo.quizInstructions}</pre>
           </div>
-          <div className="col-4">
+          <div className="col-4 text-center">
             <h3>Please Allow the Camera Permission</h3>
             <Webcam
               audio={false}
@@ -89,12 +89,25 @@ function Instructions() {
               screenshotFormat="image/jpeg"
               videoConstraints={videoConstraints}
             />
-            <ul className="list-group">
-              <li className="list-group-item">Cras justo odio</li>
-              <li className="list-group-item">Dapibus ac facilisis in</li>
-              <li className="list-group-item">Morbi leo risus</li>
-              <li className="list-group-item">Porta ac consectetur ac</li>
-              <li className="list-group-item">Vestibulum at eros</li>
+            <ul className="list-group flex-wrap">
+              <li className="list-group-item">
+                Keep the Camera on at all Times.
+              </li>
+              <li className="list-group-item">
+                If you are not detected by the Camera,Questions will not be
+                visible to you.
+              </li>
+              <li className="list-group-item">
+                When the test starts, wait for about 30s to let the ML Model
+                load.
+              </li>
+              <li className="list-group-item">
+                If caught multiple times cheating, you will be automatically
+                logged out of quiz.
+              </li>
+              <li className="list-group-item">
+                Maintain proper lighting and best of luck!
+              </li>
             </ul>
           </div>
         </div>

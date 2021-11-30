@@ -23,7 +23,6 @@ export default function PopupSignIn({ setError, loading, type }) {
             last_Visited: new Date().toLocaleString(),
           };
 
-          console.log(details, type);
           localStorage.setItem("type", type);
           if (type === "Student") {
             await db
