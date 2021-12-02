@@ -198,17 +198,24 @@ function TakeQuiz() {
     if (current - 1 >= 0) setCurrent(current - 1);
   }
 
+  function calcScore() {
+    let score = 0;
+    questionList.forEach((item) => {
+      if (item.questionIsAttempted) {
+        item.questionOptions.forEach((option) => {
+          if (option.optionIsSelected) {
+            score += parseFloat(option.optionWeightage);
+          }
+        });
+      }
+    });
+    return score;
+  }
+
   function EndTest() {
     let n = 0;
     let m = 0;
-    let score = 0;
-    questionList.forEach((item) => {
-      if (item.questionIsAttempted) n += 1;
-      if (item.questionIsMarked) m += 1;
-      item.questionOptions.forEach((opt) => {
-        if (opt.optionIsSelected) score += opt.optionScore;
-      });
-    });
+    let score = calcScore();
     setAttempt({ atm: n, mrk: m, sc: score });
 
     setShow(!show);
@@ -216,28 +223,20 @@ function TakeQuiz() {
   async function onTimerExpire() {
     let n = 0;
     let m = 0;
-    let score = 0;
-    questionList.forEach((item) => {
-      if (item.questionIsAttempted) n += 1;
-      if (item.questionIsMarked) m += 1;
-      item.questionOptions.forEach((opt) => {
-        if (opt.optionIsSelected) score += parseFloat(opt.optionScore);
-      });
-    });
+    let score = calcScore();
     alert(
       `Time has ended. Total Attempted : ${n}.  Total Mark For Review : ${m}.`
     );
 
-    // await db
-    //   .collection("Student")
-    //   .doc(currentUser.email)
-    //   .collection("Attempt")
-    //   .doc(quizInfo.quizUUID)
-    //   .set({
-    //     quizInfo: quizInfo,
-    //     questions: questionList,
-    //     score: attempt.sc,
-    //   });
+    await db
+      .collection("Student")
+      .doc(currentUser.email)
+      .collection("Attempt")
+      .doc(quizInfo.quizUUID)
+      .set({
+        questions: questionList,
+        Score: attempt.sc,
+      });
     closeScreen();
     history.push("/");
   }
@@ -262,7 +261,7 @@ function TakeQuiz() {
           <div className="col-3 rgt-border">
             Name : {quizInfo.quizName}
             <br />
-            <Link to="/studentDash">Exit to Dashboard</Link>
+            {/* <Link to="/studentDash">Exit to Dashboard</Link> */}
           </div>
           <div className=" py-1 col-3 text-left rgt-border">
             <strong>Email:</strong> {currentUser.email}

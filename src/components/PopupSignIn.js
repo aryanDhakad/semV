@@ -15,7 +15,6 @@ export default function PopupSignIn({ setError, loading, type }) {
     auth
       .signInWithPopup(provider)
       .then(async function (result) {
-        console.log(result);
         if (result.additionalUserInfo.profile.hd === "iiita.ac.in") {
           let details = {
             name: result.additionalUserInfo.profile.name,

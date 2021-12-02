@@ -127,7 +127,7 @@ function Cam({ history, setDisp }) {
             history.push("/");
           }
         } catch {
-          console.log("error");
+          // console.log("error");
         }
       }
     },

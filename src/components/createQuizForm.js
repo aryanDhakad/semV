@@ -7,6 +7,7 @@ import { db } from "../firebase";
 import { useAuth } from "../contexts/AuthContext";
 import * as emailjs from "emailjs-com";
 import Loader from "./Loader";
+import { v4 as uuid } from "uuid";
 
 function CreateQuizForm() {
   let item = JSON.parse(localStorage.getItem("quizInfo"));
@@ -201,7 +202,7 @@ function CreateQuizForm() {
       .set(Object.assign({}, info))
       .then(() => {
         localStorage.setItem("quizInfo", JSON.stringify(info));
-        console.log("Created quiz");
+        // console.log("Created quiz");
       });
 
     for (var y = 0; y < questionList.length; y++) {
@@ -211,33 +212,51 @@ function CreateQuizForm() {
         .set(questionList[y]);
     }
 
-    // // sending emails to students
-    // var studentEmailList = info.quizStudentEmailList;
-    // var n = studentEmailList.length;
-    // if (n === 0) {
-    //   alert("No Emails Provided!");
-    // } else {
-    //   for (var i = 0; i < n; i++) {
-    //     var contactParam = {
-    //       to_email: studentEmailList[i],
-    //       quizUUID: info.quizUUID,
-    //       quiz_start: info.quizTimeStart,
-    //       quiz_end: info.quizTimeEnd,
-    //       instructor_name: info.instructorName,
-    //       instructor_email: info.instructorEmail,
-    //       quiz_weightage: info.quizWeightage,
-    //     };
-    //     // console.log("sending email to " + userEmail);
-    //     emailjs
-    //       .send(
-    //         "service_quizzy",
-    //         "template_iszrcak",
-    //         contactParam,
-    //         "user_a1Gz7NxOzg08tk9jMMEmL"
-    //       )
-    //       .then(function (res) {});
-    //   }
-    // }
+    // sending emails to students
+    var studentEmailList = info.quizStudentEmailList;
+    var n = studentEmailList.length;
+    if (n === 0) {
+      alert("No Emails Provided!");
+    } else {
+      for (var i = 0; i < n; i++) {
+        // store token in db
+        var token = uuid();
+        var tokenInfo = {
+          token: token,
+          quizUUID: info.quizUUID,
+          studentEmail: studentEmailList[i],
+        };
+
+        console.log(tokenInfo);
+        await db
+          .collection("tokens")
+          .doc(token)
+          .set(tokenInfo)
+          .then(() => {
+            console.log("created token");
+          });
+
+        var contactParam = {
+          to_email: studentEmailList[i],
+          quizUUID: info.quizUUID,
+          quiz_start: info.quizTimeStart,
+          quiz_end: info.quizTimeEnd,
+          instructor_name: info.instructorName,
+          instructor_email: info.instructorEmail,
+          quiz_weightage: info.quizWeightage,
+          token: token,
+        };
+        // console.log("sending email to " + userEmail);
+        emailjs
+          .send(
+            "service_quizzy",
+            "template_iszrcak",
+            contactParam,
+            "user_a1Gz7NxOzg08tk9jMMEmL"
+          )
+          .then(function (res) {});
+      }
+    }
 
     setLoading(false);
 

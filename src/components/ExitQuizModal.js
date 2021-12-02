@@ -60,9 +60,8 @@ function ExitQuizModal({
               .collection("Attempt")
               .doc(quizInfo.quizUUID)
               .set({
-                quizInfo: quizInfo,
                 questions: questionList,
-                score: attempt.sc,
+                Score: attempt.sc,
               });
             closeScreen();
             history.push("/studentDash");

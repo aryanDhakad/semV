@@ -14,7 +14,6 @@ function ReviewTest() {
 
   const [questionList, setQuestionList] = useState([]);
   const [current, setCurrent] = useState(-1);
-  const [info, setInfo] = useState({});
   const [score, setScore] = useState(0);
 
   let quizInfo = localStorage.getItem("quizInfo");
@@ -32,21 +31,18 @@ function ReviewTest() {
         .then((doc) => {
           if (doc.exists) {
             let data = doc.data();
-            setInfo({
-              quizInfo: data.Info,
-              Score: data.Score,
-            });
+            setScore(data.Score);
             // console.log(data.questions);
             setQuestionList([...(data.questions || [])]);
           }
 
-          db.collection("Student")
-            .doc(currentUser.email)
-            .collection("Attempt")
-            .doc(quizInfo.quizUUID)
-            .update({
-              Info: quizInfo,
-            });
+          // db.collection("Student")
+          //   .doc(currentUser.email)
+          //   .collection("Attempt")
+          //   .doc(quizInfo.quizUUID)
+          //   .update({
+          //     Info: quizInfo,
+          //   });
         })
         .catch((err) => {
           console.log(err);
@@ -63,20 +59,6 @@ function ReviewTest() {
       getData();
     }
   }, []);
-
-  useEffect(() => {
-    let sc = 0;
-    questionList.forEach((item) => {
-      if (item.questionIsAttempted) {
-        item.questionOptions.forEach((option) => {
-          if (option.optionIsSelected && option.optionIsCorrect) {
-            sc += parseInt(option.optionWeightage);
-          }
-        });
-      }
-    });
-    setScore(sc);
-  }, [questionList]);
 
   useEffect(() => {
     const type = localStorage.getItem("type");

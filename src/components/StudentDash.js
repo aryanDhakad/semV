@@ -36,6 +36,14 @@ function StudentDash() {
             if (time2ed.getTime() < time.getTime()) {
               Done.push(doc.data());
             } else {
+              // db.doc("Student/" + currentUser.email + "/Attempt/" + doc.id)
+              //   .get()
+              //   .then((doc2) => {
+              //     if (!doc2.exists) {
+              //       Now.push(doc.data());
+              //     }
+              //   });
+
               Now.push(doc.data());
             }
           });

@@ -74,7 +74,7 @@ function Instructions() {
         </div>
 
         <div className="row px-3 py-5">
-          <div className="col-8 fss rgt-border text-center">
+          <div className="col-8 fss rgt-border flex-wrap ">
             <h4> Quiz Instructions</h4>
             <pre>{quizInfo.quizInstructions}</pre>
           </div>
