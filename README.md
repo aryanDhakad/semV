@@ -1,68 +1,71 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# ANTI-CHEATING QUIZ PLATFORM
+### Faculty Name - Ashutosh Mishra
 
-## Available Scripts
+<!-- TABLE OF CONTENTS -->
+<details open="open">
+  <summary>Table of Contents</summary>
+  <ol>
+    <li><a href="#introduction">Introduction</li>
+    <li><a href="#team-members">Team Members</li>
+    <li><a href="#built-with">Built With</li>
+    <li><a href="#installation">Installation</li>
+    <li><a href="#Features">Features</li>
+  </ol>
+</details>
 
-In the project directory, you can run:
 
-### `yarn start`
+## Introduction
+This project is aimed at building a web-based multiple-choice question examination system namely Quizzy. This web application is developed for educational purposes, allowing the users to prepare multiple-choice questions for different examinations conducted at the college or university level. Our quiz application mainly focuses on preventing users from cheating by using multi-factor authentication along with a camera proctoring feature allowed to the users.
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Team Members
+|   Enrollment No.  |   Name   |  
+|   --------------  |   ----   | 
+|    IIT2019156  |  Bhupesh Sardana  |  
+|    IIT2019157  |  Aviral Gupta| 
+|    IIT2019158  |  Aryan Dhakad|
+|    IIT2019160  |  Tejas Dutta    |
+|    IIT2019200  |   Raj chandra  |
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
 
-### `yarn test`
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Built With
+<ul>
+   <li>Languages used in this project: Javascript, HTML, CSS</li>
+   <li>Frameworks used: Reactjs, Nodejs, Expressjs</li>
+   <li>Database used: Firebase</li>
+</ul>
 
-### `yarn build`
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Installation
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+1. Clone the repo
+   ```sh
+   git clone https://github.com/aryanDhakad/semV
+   ```
+2. Change directory to main file
+   ```sh
+   cd semV/
+   ```
 
-### `yarn eject`
+3. Run 
+   ```sh
+   yarn install
+   ```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+4. After all the files are installed, run:
+   ```sh
+   yarn start
+   ```
+<strong>Visit:</strong>  http://localhost:3000 to see your app in action.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `yarn build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+### Features 
+<ul>
+  <li>Copy-paste is disabled</li>
+  <li>Test in fullscreen mode</li>
+  <li>Video is constantly proctored for any use of unfair means</li>
+  <li>Students can't open new tabs</li>
+  <li>OAuth Authentication</li>
+  <li>Unique tokenized link for each student</li>
+  <li>Task Manager app, to take care if the students are not using any meet app to share screen/li>
+</ul>

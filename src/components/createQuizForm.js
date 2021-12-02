@@ -2,12 +2,16 @@ import React, { useState, useCallback, useEffect } from "react";
 import XLSX from "xlsx";
 import "bootstrap/dist/css/bootstrap.css";
 import { Form, Button, Alert } from "react-bootstrap";
-import { useHistory, Link } from "react-router-dom";
+
+import { useHistory, Link ,  useLocation } from "react-router-dom";
+
 import { db } from "../firebase";
 import { useAuth } from "../contexts/AuthContext";
 import * as emailjs from "emailjs-com";
 import Loader from "./Loader";
+
 import { v4 as uuid } from "uuid";
+
 
 function CreateQuizForm() {
   let item = JSON.parse(localStorage.getItem("quizInfo"));
@@ -178,8 +182,15 @@ function CreateQuizForm() {
     e.preventDefault();
 
     // generating uuid
-    var tempUUID = info.quizName.split(" ")[0].concat(makeId(5));
-    info.quizUUID = info.quizUUID ? info.quizUUID : tempUUID;
+    var tempUUID = info.quizName.split(" ");
+        
+    var finalID = "";
+    for(var i=0; i<tempUUID.length; i++){
+      finalID += tempUUID[i];
+      finalID += "_";
+    }
+    finalID += makeId(5);
+    info.quizUUID = info.quizUUID ? info.quizUUID : finalID;
     // console.log("tempUUID: " + tempUUID);
 
     // if(info.quizName === "" || info.quizTimeStart === "" || info.quizTimeEnd === "" ||){
@@ -219,8 +230,10 @@ function CreateQuizForm() {
       alert("No Emails Provided!");
     } else {
       for (var i = 0; i < n; i++) {
+
         // store token in db
         var token = uuid();
+
         var tokenInfo = {
           token: token,
           quizUUID: info.quizUUID,
@@ -280,7 +293,9 @@ function CreateQuizForm() {
               value={info.quizName}
               onChange={handleChange}
               required
+
               required
+
             />
           </Form.Group>
 
@@ -329,6 +344,7 @@ function CreateQuizForm() {
               name="quizWeightage"
               value={info.quizWeightage}
               onChange={handleChange}
+              required
             />
           </Form.Group>
           <Form.Group controlId="exampleForm.ControlTextarea1">
@@ -340,6 +356,7 @@ function CreateQuizForm() {
               value={info.quizInstructions}
               // defaultValue="Enter instructions here..."
               onChange={handleChange}
+              required
             />
           </Form.Group>
           {/* <Form.Group controlId="formFile">
@@ -393,6 +410,7 @@ function CreateQuizForm() {
               data-bs-placement="right"
               title="Format :  student-list.(xls/xlsx)"
               onChange={handleFileChange}
+              required
             />
           </Form.Group>
 
@@ -417,6 +435,7 @@ function CreateQuizForm() {
               data-bs-placement="right"
               title="Format :  quiz_questions.(xls/xlsx)"
               onChange={handleFileChange}
+              required
             />
           </Form.Group>
 
