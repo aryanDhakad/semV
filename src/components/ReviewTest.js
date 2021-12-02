@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { db } from "../firebase";
 import ReactHtmlParser from "react-html-parser";
 import Loader from "./Loader";
@@ -8,13 +8,16 @@ import Loader from "./Loader";
 function ReviewTest() {
   const { currentUser } = useAuth();
 
+  const history = useHistory();
+
   const [loading, setLoading] = useState(true);
 
   const [questionList, setQuestionList] = useState([]);
   const [current, setCurrent] = useState(-1);
+  const [score, setScore] = useState(0);
 
-  let item1 = localStorage.getItem("quizInfo");
-  item1 = JSON.parse(item1);
+  let quizInfo = localStorage.getItem("quizInfo");
+  quizInfo = JSON.parse(quizInfo);
 
   useEffect(() => {
     async function getData() {
@@ -23,22 +26,23 @@ function ReviewTest() {
       db.collection("Student")
         .doc(currentUser.email)
         .collection("Attempt")
-        .doc(item1.quizUUID)
+        .doc(quizInfo.quizUUID)
         .get()
         .then((doc) => {
           if (doc.exists) {
             let data = doc.data();
+            setScore(data.Score);
             // console.log(data.questions);
             setQuestionList([...(data.questions || [])]);
           }
 
-          db.collection("Student")
-            .doc(currentUser.email)
-            .collection("Attempt")
-            .doc(item1.quizUUID)
-            .update({
-              Info: item1,
-            });
+          // db.collection("Student")
+          //   .doc(currentUser.email)
+          //   .collection("Attempt")
+          //   .doc(quizInfo.quizUUID)
+          //   .update({
+          //     Info: quizInfo,
+          //   });
         })
         .catch((err) => {
           console.log(err);
@@ -46,11 +50,21 @@ function ReviewTest() {
       setLoading(false);
       setCurrent(0);
     }
-    getData();
+
+    const type = localStorage.getItem("type");
+    if (type !== "Student") {
+      alert("Access Denied");
+      history.push("/login");
+    } else {
+      getData();
+    }
   }, []);
 
   useEffect(() => {
-    if (current === -1 && questionList.length) setCurrent(0);
+    const type = localStorage.getItem("type");
+    if (type === "Student") {
+      if (current === -1 && questionList.length) setCurrent(0);
+    }
   }, [questionList, current]);
 
   function nextQue() {
@@ -71,16 +85,16 @@ function ReviewTest() {
             <Link to="/studentDash">Exit to Dashboard</Link>
           </div>
           <div className="col-3 rgt-border ">
-            Name : {item1.quizName}
+            Name : {quizInfo.quizName}
             <br />
-            ID : {item1.quizUUID}
+            ID : {quizInfo.quizUUID}
           </div>
           <div className=" p-1 col-3 text-left rgt-border">
             <strong>Email:</strong> {currentUser.email}
             <br />
             <strong>Name:</strong> {currentUser.displayName}
           </div>
-          <div className=" col-3 ">Score :</div>
+          <div className=" col-3 fss ">Score : {score}</div>
         </div>
         <div className="row">
           <div className="col-8 py-2 px-4">

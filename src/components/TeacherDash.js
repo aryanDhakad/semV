@@ -31,27 +31,32 @@ export default function TeacherDash() {
         .collection("quizInfo")
         .get()
         .then((snapshot) => {
+          let Done = [];
+          let Now = [];
           snapshot.docs.forEach((doc) => {
             let time2ed = new Date(doc.data().quizTimeEnd);
 
             if (time2ed.getTime() < time.getTime()) {
-              setQuizzesDone((prev) => {
-                return [...prev, doc.data()];
-              });
+              Done.push(doc.data());
             } else {
-              setQuizzesNow((prev) => {
-                // console.log(doc.data());
-                return [...prev, doc.data()];
-              });
+              Now.push(doc.data());
             }
           });
+          setQuizzesDone(Done);
+          setQuizzesNow(Now);
         })
         .catch((err) => {
           setError(err.message);
         });
       setLoading(false);
     }
-    if (currentUser) getData();
+    const type = localStorage.getItem("type");
+    if (type !== "Teacher") {
+      alert("Access Denied");
+      history.push("/login");
+    } else {
+      if (currentUser) getData();
+    }
   }, [currentUser]);
 
   function handleSubmit(type, item) {
@@ -180,7 +185,7 @@ export default function TeacherDash() {
         </div>
         <div className="col-8">
           <Card className="my-3 lft-border">
-            <Card.Header>CURRENT QUIZES</Card.Header>
+            <Card.Header>CURRENT/ONGOING QUIZZES</Card.Header>
 
             <div>
               <Card.Body>
@@ -202,7 +207,7 @@ export default function TeacherDash() {
           </Card>
 
           <Card className="my-3 lft-border">
-            <Card.Header>PAST QUIZES</Card.Header>
+            <Card.Header>PAST QUIZZES</Card.Header>
 
             <div>
               <Card.Body>

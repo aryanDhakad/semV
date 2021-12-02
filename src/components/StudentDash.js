@@ -10,6 +10,7 @@ import Loader from "./Loader";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 function StudentDash() {
+  const type = localStorage.getItem("type");
   const { currentUser, logout } = useAuth();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
@@ -18,8 +19,8 @@ function StudentDash() {
   const [notifs, setNotifs] = useState([]);
   const history = useHistory();
 
-  const getData = useCallback(
-    async function () {
+  useEffect(() => {
+    async function getData() {
       setLoading(true);
 
       let time = new Date();
@@ -27,33 +28,27 @@ function StudentDash() {
         .collection("quizInfo")
         .get()
         .then((snapshot) => {
+          let Done = [];
+          let Now = [];
           snapshot.docs.forEach((doc) => {
             let time2ed = new Date(doc.data().quizTimeEnd);
 
             if (time2ed.getTime() < time.getTime()) {
-              if (doc.data().quizLetReview) {
-                setQuizzesDone((prev) => {
-                  // console.log(doc.data());
-                  return [...prev, doc.data()];
-                });
-              }
+              Done.push(doc.data());
             } else {
-              setQuizzesNow((prev) => {
-                return [...prev, doc.data()];
-              });
-              // db.collection(`Student/${currentUser.email || "default"}/Attempt`)
-              //   .doc(doc.id)
+              // db.doc("Student/" + currentUser.email + "/Attempt/" + doc.id)
               //   .get()
-              //   .then((doc1) => {
-              //     if (!doc1.exists) {
-              //       setQuizzesNow((prev) => {
-              //         // console.log(doc.data());
-              //         return [...prev, doc.data()];
-              //       });
+              //   .then((doc2) => {
+              //     if (!doc2.exists) {
+              //       Now.push(doc.data());
               //     }
               //   });
+
+              Now.push(doc.data());
             }
           });
+          setQuizzesDone(Done);
+          setQuizzesNow(Now);
         })
         .catch((err) => {
           setError(err);
@@ -73,13 +68,15 @@ function StudentDash() {
         });
 
       setLoading(false);
-    },
-    [currentUser]
-  );
+    }
 
-  useEffect(() => {
-    if (currentUser) getData();
-  }, [currentUser, getData]);
+    if (type !== "Student") {
+      alert("Access Denied");
+      history.push("/login");
+    } else {
+      if (currentUser) getData();
+    }
+  }, [currentUser]);
 
   async function handleLogout() {
     setError("");
@@ -135,25 +132,23 @@ function StudentDash() {
         </div>
       </div>
 
-      <div className="row mb-2">
+      <div className="row mb-2 overflowCustom" style={{ maxHeight: "100vh" }}>
         <div className=" p-2 col-4 rgt-border ">
           {notifs.length ? (
-            <table className=" table ">
-              <tbody style={{ maxHeight: "100vh", overflow: "scroll" }}>
-                {notifs.map((item, index) => {
-                  return (
-                    <Notif
-                      key={index}
-                      item={item}
-                      index={index}
-                      db={db}
-                      currentUser={currentUser}
-                      setNotifs={setNotifs}
-                    />
-                  );
-                })}
-              </tbody>
-            </table>
+            <div>
+              {notifs.map((item, index) => {
+                return (
+                  <Notif
+                    key={index}
+                    item={item}
+                    index={index}
+                    db={db}
+                    currentUser={currentUser}
+                    setNotifs={setNotifs}
+                  />
+                );
+              })}
+            </div>
           ) : (
             <h4 className="">Nothing to check Here..</h4>
           )}

@@ -1,11 +1,11 @@
 import React from "react";
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
 import Firebase from "firebase/app";
 import { useHistory } from "react-router-dom";
 import { Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-export default function PopupSignIn({ setError, loading }) {
+export default function PopupSignIn({ setError, loading, type }) {
   const history = useHistory();
 
   const handleGoogleLogin = (event) => {
@@ -14,9 +14,32 @@ export default function PopupSignIn({ setError, loading }) {
 
     auth
       .signInWithPopup(provider)
-      .then(function (result) {
+      .then(async function (result) {
         if (result.additionalUserInfo.profile.hd === "iiita.ac.in") {
-          history.push("/teacherDash");
+          let details = {
+            name: result.additionalUserInfo.profile.name,
+            email: result.additionalUserInfo.profile.email,
+            last_Visited: new Date().toLocaleString(),
+          };
+
+          localStorage.setItem("type", type);
+          if (type === "Student") {
+            await db
+              .collection("Student")
+              .doc(result.additionalUserInfo.profile.email)
+              .get()
+              .then((doc) => {
+                if (doc.exists) {
+                  doc.ref.update(details);
+                } else {
+                  doc.ref.set(details);
+                }
+              });
+
+            history.push("/studentDash");
+          } else if (type === "Teacher") {
+            history.push("/teacherDash");
+          }
         } else {
           setError("Use Institute ID");
         }

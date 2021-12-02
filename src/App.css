@@ -73,3 +73,8 @@ td {
   -webkit-box-reflect: below 0 px
     linear-gradient(transparent, transparent, #0004);
 }
+
+.overflowCustom {
+  overflow-x: hidden;
+  overflow-y: auto;
+}

@@ -13,8 +13,8 @@ import Loader from "./Loader";
 var elem = document.documentElement;
 
 function TakeQuiz() {
-  let item1 = localStorage.getItem("quizInfo");
-  item1 = JSON.parse(item1);
+  let quizInfo = localStorage.getItem("quizInfo");
+  quizInfo = JSON.parse(quizInfo);
   let endTime = localStorage.getItem("endTime");
   endTime = new Date(endTime).getTime();
 
@@ -26,29 +26,27 @@ function TakeQuiz() {
 
   const [questionList, setQuestionList] = useState([]);
   const [current, setCurrent] = useState(0);
-  const [attempt, setAttempt] = useState({ atm: 0, mrk: 0 });
+  const [attempt, setAttempt] = useState({ atm: 0, mrk: 0, sc: 0 });
   const [show, setShow] = useState(false);
   const [disp, setDisp] = useState("block");
 
-  const getData = useCallback(
-    async function () {
-      setLoading(true);
+  const getData = useCallback(async function () {
+    setLoading(true);
 
-      // console.log(expireTime, quizInfo);
+    // console.log(expireTime, quizInfo);
 
-      await db
-        .collection("quizInfo/" + item1.quizUUID + "/questions")
-        .get()
-        .then((snapshot) => {
-          let document = snapshot.docs.map((doc) => doc.data());
-          // console.log(document);
-          setQuestionList([...(document || [])]);
-        });
+    await db
+      .collection("quizInfo/" + quizInfo.quizUUID + "/questions")
+      .get()
+      .then((snapshot) => {
+        let document = snapshot.docs.map((doc) => doc.data());
+        document.sort(() => Math.random() - 0.5);
+        // console.log(document);
+        setQuestionList([...(document || [])]);
+      });
 
-      setLoading(false);
-    },
-    [item1.quizUUID]
-  );
+    setLoading(false);
+  }, []);
 
   const closeScreen = async () => {
     if (!document.exitFullscreen) {
@@ -74,66 +72,73 @@ function TakeQuiz() {
     }
   };
 
-  useEffect(() => {
-    //disable mouse drag select start
+  // useEffect(() => {
+  //   //disable mouse drag select start
 
-    document.addEventListener("contextmenu", (event) => event.preventDefault());
+  //   document.addEventListener("contextmenu", (event) => event.preventDefault());
 
-    document.onselectstart = new Function("return false");
+  //   document.onselectstart = new Function("return false");
 
-    function dMDown(e) {
-      return false;
-    }
+  //   function dMDown(e) {
+  //     return false;
+  //   }
 
-    function dOClick() {
-      return true;
-    }
+  //   function dOClick() {
+  //     return true;
+  //   }
 
-    document.onmousedown = dMDown;
+  //   document.onmousedown = dMDown;
 
-    document.onclick = dOClick;
+  //   document.onclick = dOClick;
 
-    // $("#document").attr("unselectable", "on");
+  //   // $("#document").attr("unselectable", "on");
 
-    //disable mouse drag select end
+  //   //disable mouse drag select end
 
-    //disable right click - context menu
+  //   //disable right click - context menu
 
-    document.oncontextmenu = new Function("return false");
+  //   document.oncontextmenu = new Function("return false");
 
-    //disable CTRL+A/CTRL+C through key board start
+  //   //disable CTRL+A/CTRL+C through key board start
 
-    //use this function
+  //   //use this function
 
-    function disableSelectCopy(e) {
-      // current pressed key
+  //   function disableSelectCopy(e) {
+  //     // current pressed key
 
-      var pressedKey = String.fromCharCode(e.keyCode).toLowerCase();
+  //     var pressedKey = String.fromCharCode(e.keyCode).toLowerCase();
 
-      if (
-        e.ctrlKey &&
-        (pressedKey == "c" ||
-          pressedKey == "x" ||
-          pressedKey == "v" ||
-          pressedKey == "a")
-      ) {
-        return false;
-      }
-      // else if (
-      //   e.ctrlKey &&
-      //   e.shiftKey &&
-      //   (pressedKey == "i" || pressedKey == "c")
-      // ) {
-      //   return false;
-      // }
-    }
+  //     if (
+  //       e.ctrlKey &&
+  //       (pressedKey == "c" ||
+  //         pressedKey == "x" ||
+  //         pressedKey == "v" ||
+  //         pressedKey == "a")
+  //     ) {
+  //       return false;
+  //     }
+  //     // else if (
+  //     //   e.ctrlKey &&
+  //     //   e.shiftKey &&
+  //     //   (pressedKey == "i" || pressedKey == "c")
+  //     // ) {
+  //     //   return false;
+  //     // }
+  //   }
 
-    document.onkeydown = disableSelectCopy;
-  });
+  //   document.onkeydown = disableSelectCopy;
+  // }, []);
 
   useEffect(() => {
     // goFullScreen();
-    getData();
+
+    const type = localStorage.getItem("type");
+    if (type !== "Student") {
+      alert("Access Denied");
+      history.push("/login");
+    } else {
+      getData();
+    }
   }, [getData]);
 
   // useEffect(() => {
@@ -192,27 +197,46 @@ function TakeQuiz() {
   function prevQue() {
     if (current - 1 >= 0) setCurrent(current - 1);
   }
+
+  function calcScore() {
+    let score = 0;
+    questionList.forEach((item) => {
+      if (item.questionIsAttempted) {
+        item.questionOptions.forEach((option) => {
+          if (option.optionIsSelected) {
+            score += parseFloat(option.optionWeightage);
+          }
+        });
+      }
+    });
+    return score;
+  }
+
   function EndTest() {
     let n = 0;
     let m = 0;
-    questionList.forEach((item) => {
-      if (item.questionIsAttempted) n += 1;
-      if (item.questionIsMarked) m += 1;
-    });
-    setAttempt({ atm: n, mrk: m });
+    let score = calcScore();
+    setAttempt({ atm: n, mrk: m, sc: score });
 
     setShow(!show);
   }
-  function onTimerExpire() {
+  async function onTimerExpire() {
     let n = 0;
     let m = 0;
-    questionList.forEach((item) => {
-      if (item.questionIsAttempted) n += 1;
-      if (item.questionIsMarked) m += 1;
-    });
+    let score = calcScore();
     alert(
       `Time has ended. Total Attempted : ${n}.  Total Mark For Review : ${m}.`
     );
+
+    await db
+      .collection("Student")
+      .doc(currentUser.email)
+      .collection("Attempt")
+      .doc(quizInfo.quizUUID)
+      .set({
+        questions: questionList,
+        Score: attempt.sc,
+      });
     closeScreen();
     history.push("/");
   }
@@ -229,14 +253,15 @@ function TakeQuiz() {
           questionList={questionList}
           db={db}
           currentUser={currentUser}
-          quizInfo={item1}
+          quizInfo={quizInfo}
           history={history}
+          closeScreen={closeScreen}
         />
         <div className="row lft-border mx-3">
           <div className="col-3 rgt-border">
-            Name : {item1.quizName}
+            Name : {quizInfo.quizName}
             <br />
-            <Link to="/studentDash">Exit to Dashboard</Link>
+            {/* <Link to="/studentDash">Exit to Dashboard</Link> */}
           </div>
           <div className=" py-1 col-3 text-left rgt-border">
             <strong>Email:</strong> {currentUser.email}

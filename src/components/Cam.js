@@ -13,8 +13,8 @@ import { db } from "../firebase";
 import { useAuth } from "../contexts/AuthContext";
 
 function Cam({ history, setDisp }) {
-  let item1 = localStorage.getItem("quizInfo");
-  item1 = JSON.parse(item1);
+  let quizInfo = localStorage.getItem("quizInfo");
+  quizInfo = JSON.parse(quizInfo);
   const webcamRef = useRef(null);
   const [imgSrc, setImgSrc] = useState(null);
 
@@ -38,7 +38,7 @@ function Cam({ history, setDisp }) {
     async function saveSS() {
       await db
         .collection("quizInfo")
-        .doc(item1.quizUUID)
+        .doc(quizInfo.quizUUID)
         .collection("Defaulters")
         .doc(currentUser.email)
         .set({
@@ -47,7 +47,7 @@ function Cam({ history, setDisp }) {
         });
       await db
         .collection("quizInfo")
-        .doc(item1.quizUUID)
+        .doc(quizInfo.quizUUID)
         .collection("Defaulters")
         .doc(currentUser.email)
         .collection("Images")
@@ -58,7 +58,7 @@ function Cam({ history, setDisp }) {
     if (imgSrc) {
       saveSS();
     }
-  }, [imgSrc, currentUser, item1]);
+  }, [imgSrc, currentUser, quizInfo]);
 
   async function loadModel() {
     try {
@@ -96,13 +96,13 @@ function Cam({ history, setDisp }) {
 
               if (predictions[n].score > 0.5) {
                 dict[predictions[n].class] += 1;
-                if (
-                  predictions[n].class !== "person" &&
-                  predictions[n].class !== "cell phone"
-                ) {
-                  continue;
-                }
-                // console.log(count, predictions[n].class);
+                // if (
+                //   predictions[n].class !== "person" &&
+                //   predictions[n].class !== "cell phone"
+                // ) {
+                //   continue;
+                // }
+                console.log(count, predictions[n].class);
 
                 if (dict["person"] > 1 || dict["cell phone"] > 0) {
                   count += 1;
@@ -121,13 +121,13 @@ function Cam({ history, setDisp }) {
           if (dict["person"] === 0) setPerson(false);
           else setPerson(true);
 
-          if (violations <= 5) setTimeout(predictionFunction, 1000);
+          if (violations <= 5) setTimeout(predictionFunction, 500);
           else {
             alert("you have been caught");
             history.push("/");
           }
         } catch {
-          console.log("error");
+          // console.log("error");
         }
       }
     },

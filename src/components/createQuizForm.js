@@ -2,12 +2,16 @@ import React, { useState, useCallback, useEffect } from "react";
 import XLSX from "xlsx";
 import "bootstrap/dist/css/bootstrap.css";
 import { Form, Button, Alert } from "react-bootstrap";
-import { useHistory, useLocation } from "react-router-dom";
+
+import { useHistory, Link ,  useLocation } from "react-router-dom";
+
 import { db } from "../firebase";
 import { useAuth } from "../contexts/AuthContext";
 import * as emailjs from "emailjs-com";
 import Loader from "./Loader";
-import {v4 as uuid} from "uuid"; 
+
+import { v4 as uuid } from "uuid";
+
 
 function CreateQuizForm() {
   let item = JSON.parse(localStorage.getItem("quizInfo"));
@@ -50,7 +54,14 @@ function CreateQuizForm() {
       }
       setLoading(false);
     }
-    getData();
+
+    const type = localStorage.getItem("type");
+    if (type !== "Teacher") {
+      alert("Access Denied");
+      history.push("/login");
+    } else {
+      getData();
+    }
   }, []);
 
   function handleChange(e) {
@@ -65,87 +76,92 @@ function CreateQuizForm() {
     });
   }
   const handleFileChange = useCallback((e) => {
-    // Reading data from excel file
-    const file = e.target.files[0];
+    try {
+      // Reading data from excel file
+      const file = e.target.files[0];
 
-    var reader = new FileReader();
-    reader.onload = function (e) {
-      var data = new Uint8Array(e.target.result);
-      var workbook = XLSX.read(data, { type: "array" });
-      var firstSheet = workbook.SheetNames[0];
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        var data = new Uint8Array(e.target.result);
+        var workbook = XLSX.read(data, { type: "array" });
+        var firstSheet = workbook.SheetNames[0];
 
-      const elements = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet]);
+        const elements = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet]);
 
-      // Converting json to array
-      var jsArray = JSON.parse(JSON.stringify(elements));
+        // Converting json to array
+        var jsArray = JSON.parse(JSON.stringify(elements));
 
-      if (file.name === "ta-list.xlsx" || file.name === "ta-list.xls") {
-        let taEmailList = [];
-        for (let i = 0; i < jsArray.length; i++) {
-          taEmailList.push(jsArray[i].Email);
-        }
-
-        setInfo((prev) => {
-          return {
-            ...prev,
-            quizTaEmailList: taEmailList,
-          };
-        });
-      } else if (
-        file.name === "student-list.xlsx" ||
-        file.name === "student-list.xls"
-      ) {
-        let studentEmailList = [];
-        for (let i = 0; i < jsArray.length; i++) {
-          studentEmailList.push(jsArray[i].Email);
-        }
-
-        setInfo((prev) => {
-          return {
-            ...prev,
-            quizStudentEmailList: studentEmailList,
-          };
-        });
-      } else {
-        let arr = [];
-        for (let i = 0; i < jsArray.length; i++) {
-          let questionTemp = {};
-          let questionNo = jsArray[i].questionNo.toString();
-          let questionContent = jsArray[i].questionContent;
-          let questionOption = jsArray[i].questionOption;
-          let optionContent = jsArray[i].optionContent;
-          let optionIsCorrect = jsArray[i].optionIsCorrect;
-          let optionWeightage = jsArray[i].optionWeightage.toString();
-
-          let questionOptionArr = questionOption.split(",");
-          let optionContentArr = optionContent.split(",,");
-          let optionWeightageArr = optionWeightage.split(",");
-          let optionIsCorrectArr = optionIsCorrect.split(",");
-
-          let allOptions = [];
-          for (var x = 0; x < questionOptionArr.length; x++) {
-            allOptions.push({
-              optionContent: optionContentArr[x],
-              optionIsCorrect: optionIsCorrectArr[x] === "True" ? true : false,
-              optionWeightage: optionWeightageArr[x],
-              optionIsSelected: false,
-            });
+        if (file.name === "ta-list.xlsx" || file.name === "ta-list.xls") {
+          let taEmailList = [];
+          for (let i = 0; i < jsArray.length; i++) {
+            taEmailList.push(jsArray[i].Email);
           }
-          questionTemp = {
-            questionNo: questionNo,
-            questionContent: questionContent,
-            questionOptions: allOptions,
-            questionIsAttempted: false,
-            questionIsMarked: false,
-          };
-          arr.push(questionTemp);
+
+          setInfo((prev) => {
+            return {
+              ...prev,
+              quizTaEmailList: taEmailList,
+            };
+          });
+        } else if (
+          file.name === "student-list.xlsx" ||
+          file.name === "student-list.xls"
+        ) {
+          let studentEmailList = [];
+          for (let i = 0; i < jsArray.length; i++) {
+            studentEmailList.push(jsArray[i].Email);
+          }
+
+          setInfo((prev) => {
+            return {
+              ...prev,
+              quizStudentEmailList: studentEmailList,
+            };
+          });
+        } else {
+          let arr = [];
+          for (let i = 0; i < jsArray.length; i++) {
+            let questionTemp = {};
+            let questionNo = jsArray[i].questionNo.toString();
+            let questionContent = jsArray[i].questionContent;
+            let questionOption = jsArray[i].questionOption;
+            let optionContent = jsArray[i].optionContent;
+            let optionIsCorrect = jsArray[i].optionIsCorrect;
+            let optionWeightage = jsArray[i].optionWeightage.toString();
+
+            let questionOptionArr = questionOption.split(",");
+            let optionContentArr = optionContent.split(",,");
+            let optionWeightageArr = optionWeightage.split(",");
+            let optionIsCorrectArr = optionIsCorrect.split(",");
+
+            let allOptions = [];
+            for (var x = 0; x < questionOptionArr.length; x++) {
+              allOptions.push({
+                optionContent: optionContentArr[x],
+                optionIsCorrect:
+                  optionIsCorrectArr[x] === "True" ? true : false,
+                optionWeightage: optionWeightageArr[x],
+                optionIsSelected: false,
+              });
+            }
+            questionTemp = {
+              questionNo: questionNo,
+              questionContent: questionContent,
+              questionOptions: allOptions,
+              questionIsAttempted: false,
+              questionIsMarked: false,
+            };
+            arr.push(questionTemp);
+          }
+
+          setQuestionList(arr);
         }
+      };
 
-        setQuestionList(arr);
-      }
-    };
-
-    if (file) reader.readAsArrayBuffer(file);
+      if (file) reader.readAsArrayBuffer(file);
+    } catch (e) {
+      console.log(e);
+    }
   }, []);
 
   // Making random string for uuid
@@ -177,8 +193,15 @@ function CreateQuizForm() {
     info.quizUUID = info.quizUUID ? info.quizUUID : finalID;
     // console.log("tempUUID: " + tempUUID);
 
-    if (questionList.length === 0) {
-      setError("No questions provided!");
+    // if(info.quizName === "" || info.quizTimeStart === "" || info.quizTimeEnd === "" ||){
+    //   setError("Fill All detais");
+    //   setLoading(false);
+    //   return;
+    // }
+
+    if (info.quizStudentEmailList.length === 0) {
+      setError("No Student Email Listprovided!");
+      setLoading(false);
       return;
     }
 
@@ -190,7 +213,7 @@ function CreateQuizForm() {
       .set(Object.assign({}, info))
       .then(() => {
         localStorage.setItem("quizInfo", JSON.stringify(info));
-        console.log("Created quiz");
+        // console.log("Created quiz");
       });
 
     for (var y = 0; y < questionList.length; y++) {
@@ -207,8 +230,10 @@ function CreateQuizForm() {
       alert("No Emails Provided!");
     } else {
       for (var i = 0; i < n; i++) {
-        // store token in db 
-        var token=uuid();
+
+        // store token in db
+        var token = uuid();
+
         var tokenInfo = {
           token: token,
           quizUUID: info.quizUUID,
@@ -251,23 +276,6 @@ function CreateQuizForm() {
     history.push("/create-quiz");
   }
 
-  async function deleteQuiz() {
-    await db.collection("quizInfo").doc(info.quizUUID).delete();
-
-    await db
-      .collection("Student")
-      .get()
-      .then((snapshot) => {
-        snapshot.docs.forEach(async (doc) => {
-          await db
-            .doc("Student/" + doc.id + "/Attempt/" + info.quizUUID)
-            .delete();
-        });
-      });
-    localStorage.setItem("quizUUID", "");
-    history.push("/teacherDash");
-  }
-
   if (loading || !currentUser) {
     return <Loader />;
   }
@@ -285,6 +293,9 @@ function CreateQuizForm() {
               value={info.quizName}
               onChange={handleChange}
               required
+
+              required
+
             />
           </Form.Group>
 
@@ -308,28 +319,26 @@ function CreateQuizForm() {
               required
             />
           </Form.Group>
-          <Form.Group controlId="exampleForm.ControlInput1">
-            <Form.Label>
-              Let students review test after it ends :
-              <Form.Control
-                type="checkbox"
-                className="d-inline"
-                name="quizLetReview"
-                checked={info.quizLetReview}
-                onChange={() => {}}
-                onClick={() =>
-                  setInfo((prev) => {
-                    return {
-                      ...prev,
-                      quizLetReview: !prev.quizLetReview,
-                    };
-                  })
-                }
-              />
-            </Form.Label>
+          <Form.Group controlId="exampleForm.ControlInput1" className="page">
+            <Form.Label>Let students review test after it ends :</Form.Label>
+            <input
+              type="checkbox"
+              className=" mx-4"
+              name="quizLetReview"
+              checked={info.quizLetReview}
+              onChange={() => {}}
+              onClick={() =>
+                setInfo((prev) => {
+                  return {
+                    ...prev,
+                    quizLetReview: !prev.quizLetReview,
+                  };
+                })
+              }
+            />
           </Form.Group>
           <Form.Group controlId="exampleForm.ControlInput1">
-            <Form.Label>Quiz Weightage:</Form.Label>
+            <Form.Label>Quiz Total Points :</Form.Label>
             <Form.Control
               type="text"
               name="quizWeightage"
@@ -367,8 +376,19 @@ function CreateQuizForm() {
               type="file"
               name="taList"
               onChange={handleFileChange}
-            />
+           required
+              />
           </Form.Group> */}
+
+          <a
+            className="badge badge-info badge-pill p-2 m-2"
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://docs.google.com/document/d/1HLln3DDiDUr0q4Bs0brsxgEJVRPVr9QlYTzrUefeYTI/edit?usp=sharing"
+          >
+            Quizzy Documentation
+          </a>
+
           <Form.Group controlId="formFile">
             <Form.Label>
               Student List (.xls and .xlsx):
@@ -384,7 +404,11 @@ function CreateQuizForm() {
             </Form.Label>
             <Form.Control
               type="file"
-              name="taList"
+              name="studentList"
+              accept=".xls,.xlsx"
+              data-bs-toggle="tooltip"
+              data-bs-placement="right"
+              title="Format :  student-list.(xls/xlsx)"
               onChange={handleFileChange}
               required
             />
@@ -406,6 +430,10 @@ function CreateQuizForm() {
             <Form.Control
               type="file"
               name="questionList"
+              accept=".xls,.xlsx"
+              data-bs-toggle="tooltip"
+              data-bs-placement="right"
+              title="Format :  quiz_questions.(xls/xlsx)"
               onChange={handleFileChange}
               required
             />
@@ -416,22 +444,10 @@ function CreateQuizForm() {
           <Button variant="primary" type="submit">
             Save Quiz Information
           </Button>
+          <Link to="/create-quiz" className="mx-3">
+            Go To Editing{" "}
+          </Link>
         </Form>
-      </div>
-      <div className="text-center">
-        {info.quizUUID !== "" && (
-          <div>
-            <button className="btn btn-danger mx-3" onClick={deleteQuiz}>
-              Delete Quiz
-            </button>
-            <button
-              className="btn btn-warning mx-3"
-              onClick={() => history.push("/show-defaulters")}
-            >
-              Show Defaulters
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );

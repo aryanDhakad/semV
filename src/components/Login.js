@@ -32,6 +32,7 @@ export default function Login() {
     await login(emailRef.current.value, passwordRef.current.value)
       .then((cred) => {
         setLoading(false);
+        localStorage.setItem("type", type);
         if (type === "Student") {
           history.push("/studentDash");
           // db.collection("Student")
@@ -63,6 +64,7 @@ export default function Login() {
       .catch((err) => {
         console.log(err);
         setError(`${err.message}`);
+        setLoading(false);
       });
   }
 
@@ -142,7 +144,11 @@ export default function Login() {
                       </Button>
                     </div>
                     <div className="col-6 p-1">
-                      <PopupSignIn setError={setError} loading={loading} />
+                      <PopupSignIn
+                        setError={setError}
+                        loading={loading}
+                        type={type}
+                      />
                     </div>
                   </div>
                 </Card.Footer>
