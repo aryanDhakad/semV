@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import Timer from "./Timer";
 import { useHistory } from "react-router-dom";
@@ -10,7 +10,7 @@ import QuizCurrentQuestion from "./QuizCurrentQuestion";
 import QuestionPanel from "./QuestionPanel";
 import Loader from "./Loader";
 
-var elem = document.documentElement;
+// var elem = document.documentElement;
 
 function TakeQuiz() {
   let quizInfo = localStorage.getItem("quizInfo");
@@ -46,7 +46,7 @@ function TakeQuiz() {
       });
 
     setLoading(false);
-  }, []);
+  }, [quizInfo.quizUUID]);
 
   const closeScreen = async () => {
     if (!document.exitFullscreen) {
@@ -60,17 +60,17 @@ function TakeQuiz() {
     }
   };
 
-  const goFullScreen = () => {
-    if (elem.requestFullscreen) {
-      elem.requestFullscreen();
-    } else if (elem.webkitRequestFullscreen) {
-      /* Safari */
-      elem.webkitRequestFullscreen();
-    } else if (elem.msRequestFullscreen) {
-      /* IE11 */
-      elem.msRequestFullscreen();
-    }
-  };
+  // const goFullScreen = () => {
+  //   if (elem.requestFullscreen) {
+  //     elem.requestFullscreen();
+  //   } else if (elem.webkitRequestFullscreen) {
+  //     /* Safari */
+  //     elem.webkitRequestFullscreen();
+  //   } else if (elem.msRequestFullscreen) {
+  //     /* IE11 */
+  //     elem.msRequestFullscreen();
+  //   }
+  // };
 
   // useEffect(() => {
   //   //disable mouse drag select start
@@ -139,7 +139,7 @@ function TakeQuiz() {
     } else {
       getData();
     }
-  }, [getData]);
+  }, [getData, history]);
 
   // useEffect(() => {
   //   // console.log("setCurrent", current, questionList.length);
@@ -223,7 +223,7 @@ function TakeQuiz() {
   async function onTimerExpire() {
     let n = 0;
     let m = 0;
-    let score = calcScore();
+    // let score = calcScore();
     alert(
       `Time has ended. Total Attempted : ${n}.  Total Mark For Review : ${m}.`
     );

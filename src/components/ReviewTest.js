@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { Link, useHistory } from "react-router-dom";
 import { db } from "../firebase";
@@ -58,7 +58,7 @@ function ReviewTest() {
     } else {
       getData();
     }
-  }, []);
+  }, [currentUser.email, history, quizInfo.quizUUID]);
 
   useEffect(() => {
     const type = localStorage.getItem("type");
@@ -136,7 +136,7 @@ function ReviewTest() {
                                 {opt.optionIsSelected &&
                                   (opt.optionIsCorrect ? (
                                     <span className="badge mx-1 badge-pill badge-success">
-                                      Correect
+                                      Correct
                                     </span>
                                   ) : (
                                     <span className="badge mx-1 badge-pill badge-danger">

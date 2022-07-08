@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useHistory, useLocation, Route, useParams } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { Card } from "react-bootstrap";
 import { db } from "../firebase";
 import "bootstrap/dist/css/bootstrap.css";
@@ -100,10 +100,11 @@ export default function StartQuiz() {
     }
 
     if (currentUser) getData();
-  }, []);
+  }, [currentUser, history]);
 
   return (
     <div className=" p-3  text-center">
+      <div hidden style={{ display: 'none' }}>{loading}</div>
       <div className="row mb-2">
         <div className="col-8">
           <Card className="my-3 lft-border">

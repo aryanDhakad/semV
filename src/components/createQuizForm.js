@@ -3,7 +3,7 @@ import XLSX from "xlsx";
 import "bootstrap/dist/css/bootstrap.css";
 import { Form, Button, Alert } from "react-bootstrap";
 
-import { useHistory, Link ,  useLocation } from "react-router-dom";
+import { useHistory, Link } from "react-router-dom";
 
 import { db } from "../firebase";
 import { useAuth } from "../contexts/AuthContext";
@@ -62,7 +62,7 @@ function CreateQuizForm() {
     } else {
       getData();
     }
-  }, []);
+  }, [currentUser.displayName, currentUser.email, history, info.quizUUID]);
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -183,9 +183,9 @@ function CreateQuizForm() {
 
     // generating uuid
     var tempUUID = info.quizName.split(" ");
-        
+
     var finalID = "";
-    for(var i=0; i<tempUUID.length; i++){
+    for (var i = 0; i < tempUUID.length; i++) {
       finalID += tempUUID[i];
       finalID += "_";
     }
@@ -229,7 +229,7 @@ function CreateQuizForm() {
     if (n === 0) {
       alert("No Emails Provided!");
     } else {
-      for (var i = 0; i < n; i++) {
+      for (var j = 0; j < n; j++) {
 
         // store token in db
         var token = uuid();
@@ -237,7 +237,7 @@ function CreateQuizForm() {
         var tokenInfo = {
           token: token,
           quizUUID: info.quizUUID,
-          studentEmail: studentEmailList[i],
+          studentEmail: studentEmailList[j],
         };
 
         console.log(tokenInfo);
@@ -250,7 +250,7 @@ function CreateQuizForm() {
           });
 
         var contactParam = {
-          to_email: studentEmailList[i],
+          to_email: studentEmailList[j],
           quizUUID: info.quizUUID,
           quiz_start: info.quizTimeStart,
           quiz_end: info.quizTimeEnd,
@@ -267,7 +267,7 @@ function CreateQuizForm() {
             contactParam,
             "user_a1Gz7NxOzg08tk9jMMEmL"
           )
-          .then(function (res) {});
+          .then(function (res) { });
       }
     }
 
@@ -294,7 +294,7 @@ function CreateQuizForm() {
               onChange={handleChange}
               required
 
-              required
+
 
             />
           </Form.Group>
@@ -326,7 +326,7 @@ function CreateQuizForm() {
               className=" mx-4"
               name="quizLetReview"
               checked={info.quizLetReview}
-              onChange={() => {}}
+              onChange={() => { }}
               onClick={() =>
                 setInfo((prev) => {
                   return {

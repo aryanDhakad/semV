@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { db } from "../firebase";
 import { Link, useHistory } from "react-router-dom";
 
@@ -45,7 +45,7 @@ function CreateQuiz() {
 
   const [optionId, setOptionId] = useState(-1);
 
-  async function getData() {
+  const getData = useCallback(async () => {
     await db
       .collection("quizInfo/" + quizInfo.quizUUID + "/questions")
       .get()
@@ -54,7 +54,7 @@ function CreateQuiz() {
 
         setQuestionList([...(document || [])]);
       });
-  }
+  }, [quizInfo.quizUUID])
 
   useEffect(() => {
     setLoading(true);
@@ -66,7 +66,7 @@ function CreateQuiz() {
       getData();
     }
     setLoading(false);
-  }, []);
+  }, [getData, history]);
 
   useEffect(() => {
     const type = localStorage.getItem("type");
@@ -293,6 +293,7 @@ function CreateQuiz() {
   }
   return (
     <div className="p-2 ">
+      <div hidden style={{ display: 'none' }}>{error}</div>
       <div className="row px-3 mx-3 my-5 fss d-flex justify-content-around align-items-center lft-border">
         <div className="  col-md-8 d-flex justify-content-around ">
           <ul className="list-group ml-4">
@@ -414,7 +415,7 @@ function CreateQuiz() {
                 name="edit"
                 value="question"
                 checked={edit === "question"}
-                onChange={() => {}}
+                onChange={() => { }}
                 onClick={radioChange}
               />
             </div>
@@ -427,7 +428,7 @@ function CreateQuiz() {
                 name="edit"
                 value="option"
                 checked={edit === "option"}
-                onChange={() => {}}
+                onChange={() => { }}
                 onClick={radioChange}
               />{" "}
             </div>

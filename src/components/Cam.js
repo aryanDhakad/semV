@@ -142,7 +142,7 @@ function Cam({ history, setDisp }) {
 
   useEffect(() => {
     if (start) setTimeout(play, 5000);
-  }, [start]);
+  }, [play, start]);
 
   useEffect(() => {
     if (!person) {
@@ -150,7 +150,7 @@ function Cam({ history, setDisp }) {
     } else {
       setDisp("block");
     }
-  }, [person]);
+  }, [person, setDisp]);
 
   // useEffect(() => {
   //   //prevent initial triggering

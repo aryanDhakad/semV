@@ -57,7 +57,7 @@ export default function TeacherDash() {
     } else {
       if (currentUser) getData();
     }
-  }, [currentUser]);
+  }, [currentUser, history]);
 
   function handleSubmit(type, item) {
     if (type === "Edit") {

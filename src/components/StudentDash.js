@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Alert } from "react-bootstrap";
 import { useAuth } from "../contexts/AuthContext";
 import { useHistory } from "react-router-dom";
 import { db } from "../firebase";
 import Notif from "./Notif";
 import QuizListItem from "./QuizListItem";
-import Cam from "./Cam";
+// import Cam from "./Cam";
 import Loader from "./Loader";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -76,7 +76,7 @@ function StudentDash() {
     } else {
       if (currentUser) getData();
     }
-  }, [currentUser]);
+  }, [currentUser, history, type]);
 
   async function handleLogout() {
     setError("");

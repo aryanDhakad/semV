@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Alert } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import { useHistory } from "react-router-dom";
+// import { useHistory } from "react-router-dom";
 import { db } from "../firebase";
-import { useAuth } from "../contexts/AuthContext";
+// import { useAuth } from "../contexts/AuthContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Loader from "./Loader";
 
@@ -13,7 +13,7 @@ function Defaulters() {
 
   const [defaulters, setDefaulters] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  // const [error, setError] = useState(null);
   const [defaulter, setDefaulter] = useState("def");
   const [images, setImages] = useState([]);
 
@@ -36,7 +36,7 @@ function Defaulters() {
     }
 
     getData();
-  }, []);
+  }, [item.quizUUID]);
 
   useEffect(() => {
     async function getImage() {

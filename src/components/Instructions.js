@@ -34,7 +34,7 @@ function Instructions() {
     } else {
       goFullScreen();
     }
-  }, []);
+  }, [history, type]);
 
   const videoConstraints = {
     height: 170,
