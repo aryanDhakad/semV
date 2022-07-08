@@ -1,12 +1,14 @@
 import React, { useRef, useState } from "react";
 import { Form, Button, Card, Alert } from "react-bootstrap";
 import { useAuth } from "../contexts/AuthContext";
+
 import { useHistory } from "react-router-dom";
 // import { db } from "../firebase";
 import PopupSignIn from "./PopupSignIn";
 import loginPage from "../images/loginPage.jpeg";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { db } from "../firebase";
 
 export default function Login() {
   const emailRef = useRef();
@@ -15,13 +17,13 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const [type, setType] = useState("");
+  // const [type, setType] = useState("");
   const history = useHistory();
 
-  function radioChange(e) {
-    const { value } = e.target;
-    setType(value);
-  }
+  // function radioChange(e) {
+  //   const { value } = e.target;
+  //   setType(value);
+  // }
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -30,10 +32,12 @@ export default function Login() {
     setLoading(true);
 
     await login(emailRef.current.value, passwordRef.current.value)
-      .then((cred) => {
+      .then(async (cred) => {
         setLoading(false);
-        localStorage.setItem("type", type);
-        if (type === "Student") {
+        let userType = await db.collection("users").doc(cred.user.uid).get();
+        userType = userType.data().userType;
+        localStorage.setItem("type", userType);
+        if (userType === "Student") {
           history.push("/studentDash");
           // db.collection("Student")
           //   .doc(cred.user.email)
@@ -45,7 +49,7 @@ export default function Login() {
           //       setError("User Not Found");
           //     }
           //   });
-        } else if (type === "Teacher") {
+        } else if (userType === "Teacher") {
           history.push("/teacherDash");
           // db.collection("Student")
           //   .doc(cred.user.email)
@@ -67,6 +71,8 @@ export default function Login() {
         setLoading(false);
       });
   }
+
+
 
   return (
     <div style={{ color: "#F1732B" }}>
@@ -107,7 +113,7 @@ export default function Login() {
                     <Form.Label>Password</Form.Label>
                     <Form.Control type="password" ref={passwordRef} required />
                   </Form.Group>
-                  <Form.Group className="d-flex justify-content-center">
+                  {/* <Form.Group className="d-flex justify-content-center">
                     <Form.Label className="mx-4">
                       Student
                       <Form.Control
@@ -128,12 +134,12 @@ export default function Login() {
                         onChange={radioChange}
                       />
                     </Form.Label>
-                  </Form.Group>
+                  </Form.Group> */}
                   {/* <Link to="/signup">Create Account</Link> */}
                 </Card.Body>
                 <Card.Footer className="d-flex justify-content-between">
                   <div className="row w-100">
-                    <div className="col-6 p-1">
+                    <div className="col-4 p-1">
                       <Button
                         disabled={loading}
                         className=" rounded btn-block "
@@ -143,12 +149,22 @@ export default function Login() {
                         <FontAwesomeIcon icon={["fas", "sign-in-alt"]} />
                       </Button>
                     </div>
-                    <div className="col-6 p-1">
+                    <div className="col-4 p-1">
                       <PopupSignIn
                         setError={setError}
                         loading={loading}
-                        type={type}
+
                       />
+                    </div>
+                    <div className="col-4 p-1">
+                      <Button
+                        disabled={loading}
+                        className=" rounded btn-block "
+                        onClick={() => history.push("/signup")}
+                        style={{ backgroundColor: "#F1732B" }}
+                      >
+                        <FontAwesomeIcon icon={["fa", "user-plus"]} />
+                      </Button>
                     </div>
                   </div>
                 </Card.Footer>

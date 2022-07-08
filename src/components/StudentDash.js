@@ -18,8 +18,8 @@ function StudentDash() {
   const [quizzesDone, setQuizzesDone] = useState([]);
   const [notifs, setNotifs] = useState([]);
   const history = useHistory();
-
   useEffect(() => {
+    console.log(currentUser)
     async function getData() {
       setLoading(true);
 
@@ -121,6 +121,14 @@ function StudentDash() {
           <Button variant="outline-danger" onClick={handleLogout}>
             <FontAwesomeIcon icon={["fas", "sign-out-alt"]} size="lg" />
           </Button>
+          <Button
+            className="   rounded  btn-block "
+            disabled={loading}
+            style={{ backgroundColor: "#F1732B" }}
+            onClick={() => history.push("/signup")}
+          >
+            <FontAwesomeIcon icon={["fa", "user"]} />
+          </Button>
         </div>
         <div className="  col-6 fss rgt-border " style={{ color: "#F1732B" }}>
           <strong>STUDENT DASHBOARD</strong>
@@ -129,7 +137,9 @@ function StudentDash() {
           <strong>Email:</strong> {currentUser.email}
           <br />
           <strong>Name:</strong> {currentUser.displayName}
+
         </div>
+
       </div>
 
       <div className="row mb-2 overflowCustom" style={{ maxHeight: "100vh" }}>

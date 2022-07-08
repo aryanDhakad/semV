@@ -5,7 +5,7 @@ import { useHistory } from "react-router-dom";
 import { Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-export default function PopupSignIn({ setError, loading, type }) {
+export default function PopupSignIn({ setError, loading }) {
   const history = useHistory();
 
   const handleGoogleLogin = (event) => {
@@ -22,24 +22,20 @@ export default function PopupSignIn({ setError, loading, type }) {
             last_Visited: new Date().toLocaleString(),
           };
 
-          localStorage.setItem("type", type);
-          if (type === "Student") {
-            await db
-              .collection("Student")
-              .doc(result.additionalUserInfo.profile.email)
-              .get()
-              .then((doc) => {
-                if (doc.exists) {
-                  doc.ref.update(details);
-                } else {
-                  doc.ref.set(details);
-                }
-              });
+          localStorage.setItem("type", "Student");
+          await db
+            .collection("Student")
+            .doc(result.additionalUserInfo.profile.email)
+            .get()
+            .then((doc) => {
+              if (doc.exists) {
+                doc.ref.update(details);
+              } else {
+                doc.ref.set(details);
+              }
+            });
 
-            history.push("/studentDash");
-          } else if (type === "Teacher") {
-            history.push("/teacherDash");
-          }
+          history.push("/studentDash");
         } else {
           setError("Use Institute ID");
         }
