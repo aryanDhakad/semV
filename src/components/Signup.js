@@ -63,28 +63,61 @@ export default function Signup() {
     }
     setError("");
     setLoading(true);
-    await signup(emailRef.current.value, passwordRef.current.value)
-      .then((cred) => {
-        updateProfile({ displayName: nameRef.current.value });
-        localStorage.setItem("type", type);
+    try{
 
-        return cred
-
-      }).then((cred) => {
-        db.collection("users").doc(cred.user.uid).set({
+      const cred = await signup(emailRef.current.value, passwordRef.current.value);
+      setLoading(false);
+      if (cred) {
+        const profile = {
           displayName: nameRef.current.value,
           email: emailRef.current.value,
-          userType: type
+          photoURL: "https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50"
+        };
+        await db.collection("users").doc(cred.user.uid).set({
+          userType: type,
+          ...profile
+        });
+        try{
+          await updateProfile(profile);
+          setLoading(false);
+          history.push("/");
+        }catch(e){
+          setError(e.message);
 
-        })
-      })
-      .then(() => {
-        history.push("/");
-      })
-      .catch((err) => {
-        setError(`${err.message}`);
-      });
-    setLoading(false);
+        }
+        setLoading(false);
+        
+      }
+    }catch(e){
+      setLoading(false);
+      setError(e.message);
+    }
+ 
+    // await signup(emailRef.current.value, passwordRef.current.value)
+    //   .then((cred) => {
+       
+    //     updateProfile({ displayName: nameRef.current.value });
+    //     localStorage.setItem("type", type);
+    //     return cred;
+
+    //   }).then((cred) => {
+    //     console.log(cred,type);
+    //     db.collection("users").doc(cred.user.uid).set({
+    //       displayName: nameRef.current.value,
+    //       email: emailRef.current.value,
+    //       userType: type
+
+    //     })
+    //   })
+    //   .then(() => {
+    //     setLoading(false);
+    //     history.push("/");
+    //   })
+    //   .catch((err) => {
+    //     setError(`${err.message}`);
+    //   });
+      // setLoading(false);
+    
   }
 
   return (

@@ -15,6 +15,12 @@ export default function PopupSignIn({ setError, loading }) {
     auth
       .signInWithPopup(provider)
       .then(async function (result) {
+        // console.log(result);
+        if(result.user.email === "aryandhakad1@gmail.com"){
+          localStorage.setItem("type", "Teacher");
+          history.push("/teacherDash");
+          return ;
+        }
         if (result.additionalUserInfo.profile.hd === "iiita.ac.in") {
           let details = {
             name: result.additionalUserInfo.profile.name,
